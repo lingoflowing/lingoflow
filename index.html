@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
+<meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
+
+<meta property="og:title" content="LingoFlow">
+<meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://lingoflowing.com/ogp.png">
+<meta property="og:url" content="https://lingoflowing.com">
+
+<link rel="icon" href="/favicon.png">
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Microsoft JhengHei",sans-serif;
+  background:linear-gradient(120deg,#e9f4ff,#f7fbff);
+  color:#111827;
+}
+.app{
+  width:calc(100vw - 16px);
+  max-width:760px;
+  margin:8px auto;
+  padding:10px;
+  min-height:calc(100vh - 16px);
+  background:rgba(255,255,255,.75);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:22px;
+  box-shadow:0 16px 50px rgba(15,23,42,.12);
+}
+.controls{
+  position:sticky;top:0;z-index:10;display:flex;gap:8px;align-items:center;
+  padding:8px 0 12px;background:rgba(255,255,255,.82);backdrop-filter:blur(16px);
+}
+button,select{
+  height:42px;border:0;border-radius:999px;background:#007aff;color:#fff;
+  font-size:20px;font-weight:800;padding:0 16px;box-shadow:0 3px 10px rgba(0,122,255,.24);cursor:pointer;
+}
+#viewBtn{min-width:128px}
+#modeBtn,#levelBtn{min-width:86px}
+#categorySelect{min-width:116px;max-width:150px}
+.box,.list{
+  background:rgba(255,255,255,.68);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:18px;
+  min-height:360px;
+  padding:20px 18px;
+}
+.line{margin:0 0 22px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+.zh,.pinyin,.jp{font-size:24px;font-weight:800;line-height:1.55;letter-spacing:.3px}
+.zh{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:.5px}
+.pinyin{color:#111827}
+.jp{color:#1f2937}
+.hidden-line{visibility:hidden}
+.hidden-panel{display:none}
+.list-item{padding:16px 8px;border-bottom:1px solid rgba(0,0,0,.08);border-radius:12px;cursor:pointer;user-select:none}
+.list-item:active{background:rgba(0,122,255,.08)}
+.list-item.playing{background:rgba(0,122,255,.06);outline:2px solid rgba(0,122,255,.20)}
+.category-title{color:#007aff;font-size:18px;font-weight:900;margin:18px 0 8px}
+.level-title{color:#64748b;font-size:16px;font-weight:900;margin:12px 0 6px}
+.status{margin-top:12px;padding:10px 12px;border-radius:14px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:15px}
+.list-status{margin:0 0 10px;padding:8px 10px;border-radius:12px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:14px}
+.char{display:inline;color:#111827!important;transition:color .06s linear,text-shadow .06s linear}
+.char.done{color:#007aff!important;text-shadow:0 0 8px rgba(0,122,255,.24)!important}
+.error{background:#fff1f2;color:#9f1239;padding:14px;border-radius:14px;font-weight:800;line-height:1.6}
+@media(max-width:520px){
+  .app{width:100vw;margin:0;border-radius:0;min-height:100vh}
+  .controls{gap:5px;overflow-x:auto}
+  button,select{height:38px;font-size:16px;padding:0 10px;flex:0 0 auto}
+  #viewBtn{min-width:104px}
+  #modeBtn,#levelBtn{min-width:68px}
+  #categorySelect{min-width:92px}
+  .zh,.pinyin,.jp{font-size:21px}
+  .box,.list{min-height:calc(100vh - 90px);padding:18px 14px}
+}
+
+/* ===== FIXED MENU FORCE OVERRIDE ===== */
+.controls{
+  position:fixed !important;
+  top:0 !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  z-index:99999 !important;
+
+  width:calc(100vw - 16px) !important;
+  max-width:760px !important;
+
+  display:flex !important;
+  gap:8px !important;
+  align-items:center !important;
+
+  padding:10px !important;
+  margin:0 !important;
+
+  background:rgba(255,255,255,.94) !important;
+  backdrop-filter:blur(16px) !important;
+  border-radius:0 0 18px 18px !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.12) !important;
+}
+
+.box,
+.list{
+  margin-top:82px !important;
+}
+
+@media(max-width:520px){
+  .controls{
+    width:100vw !important;
+    left:0 !important;
+    right:0 !important;
+    transform:none !important;
+    overflow-x:auto !important;
+    border-radius:0 0 14px 14px !important;
+  }
+
+  .box,
+  .list{
+    margin-top:76px !important;
+  }
+}
+
+
+/* ===== LingoFlow Start Overlay ===== */
+#startOverlay{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:linear-gradient(135deg,#eaf4ff,#ffffff);
+}
+
+#startOverlay.hidden{
+  display:none !important;
+}
+
+.start-card{
+  width:min(420px, 92vw);
+  padding:28px 22px;
+  border-radius:28px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:0 20px 60px rgba(15,23,42,.16);
+  text-align:center;
+  backdrop-filter:blur(16px);
+}
+
+.logo-mark{
+  width:76px;
+  height:76px;
+  margin:0 auto 14px;
+  border-radius:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#007aff;
+  color:#fff;
+  font-size:34px;
+  font-weight:900;
+  box-shadow:0 12px 30px rgba(0,122,255,.28);
+}
+
+.logo-title{
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:.2px;
+  margin:0 0 8px;
+  color:#0f172a;
+}
+
+.logo-subtitle{
+  font-size:16px;
+  font-weight:700;
+  line-height:1.55;
+  color:#475569;
+  margin:0 0 22px;
+}
+
+.start-button{
+  width:100%;
+  height:52px;
+  border:0;
+  border-radius:999px;
+  background:#007aff;
+  color:white;
+  font-size:20px;
+  font-weight:900;
+  box-shadow:0 10px 24px rgba(0,122,255,.26);
+  cursor:pointer;
+}
+
+.start-note{
+  margin-top:14px;
+  font-size:13px;
+  font-weight:700;
+  color:#64748b;
+  line-height:1.5;
+}
+
+</style>
+</head>
+<body>
+
+<div id="startOverlay">
+  <div class="start-card">
+    <div class="logo-mark">流</div>
+    <h1 class="logo-title">LingoFlow</h1>
+    <p class="logo-subtitle">台湾華語を、聞き流しで自然に学ぶ。</p>
+    <button id="startButton" class="start-button" type="button">タップして開始</button>
+    <div class="start-note">音声は開始後だけ再生されます。<br>電車・会社・カフェでも安心して開けます。</div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="controls">
+    <button id="viewBtn" type="button">問題</button>
+    <button id="modeBtn" type="button">話す</button>
+    <button id="levelBtn" type="button">初級</button>
+    <select id="categorySelect">
+      <option value="all">全部</option>
+      <option value="greeting">挨拶</option>
+      <option value="cafe">カフェ</option>
+      <option value="restaurant">食事</option>
+      <option value="shopping">買物</option>
+      <option value="transport">交通</option>
+      <option value="hotel">ホテル</option>
+      <option value="tourism">観光</option>
+      <option value="daily">日常</option>
+      <option value="work">仕事</option>
+      <option value="emergency">緊急</option>
+    </select>
+  </div>
+  <div id="box" class="box"></div>
+  <div id="listPanel" class="list hidden-panel"></div>
+</div>
+
+<script id="embeddedData" type="application/json">
+{"beginner": [{"zh": "你好。", "pinyin": "Nǐ hǎo.", "jp": "こんにちは。", "category": "greeting"}, {"zh": "早安。", "pinyin": "Zǎo ān.", "jp": "おはよう。", "category": "greeting"}, {"zh": "晚安。", "pinyin": "Wǎn ān.", "jp": "おやすみ。", "category": "greeting"}, {"zh": "謝謝。", "pinyin": "Xièxiè.", "jp": "ありがとう。", "category": "greeting"}, {"zh": "不好意思。", "pinyin": "Bù hǎo yìsi.", "jp": "すみません。", "category": "greeting"}, {"zh": "再見。", "pinyin": "Zài jiàn.", "jp": "さようなら。", "category": "greeting"}, {"zh": "請問。", "pinyin": "Qǐng wèn.", "jp": "お聞きしてもいいですか？", "category": "greeting"}, {"zh": "沒關係。", "pinyin": "Méi guānxi.", "jp": "大丈夫です。", "category": "greeting"}, {"zh": "可以。", "pinyin": "Kěyǐ.", "jp": "できます。／いいです。", "category": "greeting"}, {"zh": "不行。", "pinyin": "Bù xíng.", "jp": "だめです。／できません。", "category": "greeting"}, {"zh": "我要咖啡。", "pinyin": "Wǒ yào kāfēi.", "jp": "コーヒーが欲しいです。／コーヒーをください。", "category": "cafe"}, {"zh": "一杯拿鐵。", "pinyin": "Yì bēi nátiě.", "jp": "ラテを一杯。", "category": "cafe"}, {"zh": "冰的。", "pinyin": "Bīng de.", "jp": "冷たいものです。", "category": "cafe"}, {"zh": "熱的。", "pinyin": "Rè de.", "jp": "熱いものです。", "category": "cafe"}, {"zh": "這個多少？", "pinyin": "Zhège duōshǎo?", "jp": "これはいくらですか？", "category": "cafe"}, {"zh": "可以外帶嗎？", "pinyin": "Kěyǐ wài dài ma?", "jp": "持ち帰りできますか？", "category": "cafe"}, {"zh": "我要內用。", "pinyin": "Wǒ yào nèiyòng.", "jp": "店内利用にします。", "category": "cafe"}, {"zh": "不要糖。", "pinyin": "Bú yào táng.", "jp": "砂糖はいりません。", "category": "cafe"}, {"zh": "少冰。", "pinyin": "Shǎo bīng.", "jp": "氷少なめで。", "category": "cafe"}, {"zh": "謝謝你。", "pinyin": "Xièxiè nǐ.", "jp": "ありがとうございます。", "category": "cafe"}, {"zh": "我要這個。", "pinyin": "Wǒ yào zhège.", "jp": "これが欲しいです。／これをください。", "category": "restaurant"}, {"zh": "好吃。", "pinyin": "Hǎo chī.", "jp": "おいしいです。", "category": "restaurant"}, {"zh": "不要辣。", "pinyin": "Bú yào là.", "jp": "辛くしないでください。", "category": "restaurant"}, {"zh": "有水嗎？", "pinyin": "Yǒu shuǐ ma?", "jp": "水はありますか？", "category": "restaurant"}, {"zh": "請給我菜單。", "pinyin": "Qǐng gěi wǒ càidān.", "jp": "メニューをください。", "category": "restaurant"}, {"zh": "可以點餐嗎？", "pinyin": "Kěyǐ diǎn cān ma?", "jp": "注文できますか？", "category": "restaurant"}, {"zh": "再一份。", "pinyin": "Zài yí fèn.", "jp": "もう一つ。", "category": "restaurant"}, {"zh": "太多了。", "pinyin": "Tài duō le.", "jp": "多すぎます。", "category": "restaurant"}, {"zh": "很好吃。", "pinyin": "Hěn hǎo chī.", "jp": "とてもおいしいです。", "category": "restaurant"}, {"zh": "吃飽了。", "pinyin": "Chī bǎo le.", "jp": "お腹いっぱいです。", "category": "restaurant"}, {"zh": "這個多少錢？", "pinyin": "Zhège duōshǎo qián?", "jp": "これはいくらですか？", "category": "shopping"}, {"zh": "太貴了。", "pinyin": "Tài guì le.", "jp": "高すぎます。", "category": "shopping"}, {"zh": "便宜一點。", "pinyin": "Piányí yìdiǎn.", "jp": "少し安くしてください。", "category": "shopping"}, {"zh": "我要試穿。", "pinyin": "Wǒ yào shì chuān.", "jp": "試着したいです。", "category": "shopping"}, {"zh": "有別的嗎？", "pinyin": "Yǒu bié de ma?", "jp": "他のものはありますか？", "category": "shopping"}, {"zh": "我要買。", "pinyin": "Wǒ yào mǎi.", "jp": "買います。", "category": "shopping"}, {"zh": "不要了。", "pinyin": "Bú yào le.", "jp": "いりません。／やめます。", "category": "shopping"}, {"zh": "刷卡可以嗎？", "pinyin": "Shuākǎ kěyǐ ma?", "jp": "カード払いできますか？", "category": "shopping"}, {"zh": "給你。", "pinyin": "Gěi nǐ.", "jp": "どうぞ。／あなたに渡します。", "category": "shopping"}, {"zh": "找錢。", "pinyin": "Zhǎo qián.", "jp": "おつりです。／おつりをください。", "category": "shopping"}, {"zh": "在哪裡？", "pinyin": "Zài nǎlǐ?", "jp": "どこにありますか？", "category": "transport"}, {"zh": "捷運站在哪？", "pinyin": "Jiéyùn zhàn zài nǎ?", "jp": "MRTの駅はどこですか？", "category": "transport"}, {"zh": "我要去這裡。", "pinyin": "Wǒ yào qù zhèlǐ.", "jp": "ここへ行きたいです。", "category": "transport"}, {"zh": "多少錢？", "pinyin": "Duōshǎo qián?", "jp": "いくらですか？", "category": "transport"}, {"zh": "可以刷卡嗎？", "pinyin": "Kěyǐ shuākǎ ma?", "jp": "カード払いできますか？", "category": "transport"}, {"zh": "太遠了。", "pinyin": "Tài yuǎn le.", "jp": "遠すぎます。", "category": "transport"}, {"zh": "很近。", "pinyin": "Hěn jìn.", "jp": "近いです。", "category": "transport"}, {"zh": "左邊。", "pinyin": "Zuǒ biān.", "jp": "左側です。", "category": "transport"}, {"zh": "右邊。", "pinyin": "Yòu biān.", "jp": "右側です。", "category": "transport"}, {"zh": "直走。", "pinyin": "Zhí zǒu.", "jp": "まっすぐ行きます。", "category": "transport"}, {"zh": "我要入住。", "pinyin": "Wǒ yào rù zhù.", "jp": "チェックインしたいです。", "category": "hotel"}, {"zh": "退房。", "pinyin": "Tuì fáng.", "jp": "チェックアウトです。", "category": "hotel"}, {"zh": "有空房嗎？", "pinyin": "Yǒu kōng fáng ma?", "jp": "空いている部屋はありますか？", "category": "hotel"}, {"zh": "房卡。", "pinyin": "Fáng kǎ.", "jp": "ルームカードです。", "category": "hotel"}, {"zh": "WiFi。", "pinyin": "WiFi.", "jp": "Wi‑Fiです。", "category": "hotel"}, {"zh": "冷氣。", "pinyin": "Lěngqì.", "jp": "エアコンです。", "category": "hotel"}, {"zh": "毛巾。", "pinyin": "Máojīn.", "jp": "タオルです。", "category": "hotel"}, {"zh": "水。", "pinyin": "Shuǐ.", "jp": "水です。", "category": "hotel"}, {"zh": "早餐。", "pinyin": "Zǎocān.", "jp": "朝食です。", "category": "hotel"}, {"zh": "可以。", "pinyin": "Kěyǐ.", "jp": "できます。／大丈夫です。", "category": "hotel"}, {"zh": "很漂亮。", "pinyin": "Hěn piàoliang.", "jp": "きれいです。", "category": "tourism"}, {"zh": "我要拍照。", "pinyin": "Wǒ yào pāizhào.", "jp": "写真を撮りたいです。", "category": "tourism"}, {"zh": "人很多。", "pinyin": "Rén hěn duō.", "jp": "人が多いです。", "category": "tourism"}, {"zh": "很好玩。", "pinyin": "Hěn hǎo wán.", "jp": "とても楽しいです。", "category": "tourism"}, {"zh": "在哪裡？", "pinyin": "Zài nǎlǐ?", "jp": "どこにありますか？", "category": "tourism"}, {"zh": "我要去。", "pinyin": "Wǒ yào qù.", "jp": "行きたいです。", "category": "tourism"}, {"zh": "太遠了。", "pinyin": "Tài yuǎn le.", "jp": "遠すぎます。", "category": "tourism"}, {"zh": "很近。", "pinyin": "Hěn jìn.", "jp": "近いです。", "category": "tourism"}, {"zh": "可以嗎？", "pinyin": "Kěyǐ ma?", "jp": "いいですか？／できますか？", "category": "tourism"}, {"zh": "走吧。", "pinyin": "Zǒu ba.", "jp": "行きましょう。", "category": "tourism"}, {"category": "daily", "zh": "我回來了。", "pinyin": "Wǒ huílái le.", "jp": "ただいま。"}, {"category": "daily", "zh": "你回來了。", "pinyin": "Nǐ huílái le.", "jp": "おかえり。"}, {"category": "daily", "zh": "我知道了。", "pinyin": "Wǒ zhīdào le.", "jp": "分かりました。"}, {"category": "daily", "zh": "真的嗎？", "pinyin": "Zhēn de ma?", "jp": "本当ですか？"}, {"category": "daily", "zh": "沒問題。", "pinyin": "Méi wèntí.", "jp": "問題ありません。"}, {"category": "daily", "zh": "等一下。", "pinyin": "Děng yíxià.", "jp": "ちょっと待ってください。"}, {"category": "daily", "zh": "我先走了。", "pinyin": "Wǒ xiān zǒu le.", "jp": "お先に失礼します。"}, {"category": "daily", "zh": "慢慢來。", "pinyin": "Mànmàn lái.", "jp": "ゆっくりで大丈夫です。"}, {"category": "daily", "zh": "今天辛苦了。", "pinyin": "Jīntiān xīnkǔ le.", "jp": "今日はお疲れさまでした。"}, {"category": "daily", "zh": "我懂了。", "pinyin": "Wǒ dǒng le.", "jp": "理解しました。"}, {"category": "daily", "zh": "沒事。", "pinyin": "Méi shì.", "jp": "大丈夫です。"}, {"category": "daily", "zh": "好久不見。", "pinyin": "Hǎojiǔ bújiàn.", "jp": "お久しぶりです。"}, {"category": "daily", "zh": "我很忙。", "pinyin": "Wǒ hěn máng.", "jp": "とても忙しいです。"}, {"category": "daily", "zh": "我很累。", "pinyin": "Wǒ hěn lèi.", "jp": "とても疲れています。"}, {"category": "daily", "zh": "今天天氣很好。", "pinyin": "Jīntiān tiānqì hěn hǎo.", "jp": "今日は天気がとてもいいです。"}, {"category": "daily", "zh": "我想休息。", "pinyin": "Wǒ xiǎng xiūxí.", "jp": "休みたいです。"}, {"category": "daily", "zh": "你吃了嗎？", "pinyin": "Nǐ chī le ma?", "jp": "ご飯食べましたか？"}, {"category": "daily", "zh": "我還沒吃。", "pinyin": "Wǒ hái méi chī.", "jp": "まだ食べていません。"}, {"category": "daily", "zh": "一起去吧。", "pinyin": "Yìqǐ qù ba.", "jp": "一緒に行きましょう。"}, {"category": "daily", "zh": "沒時間。", "pinyin": "Méi shíjiān.", "jp": "時間がありません。"}, {"category": "daily", "zh": "我先看看。", "pinyin": "Wǒ xiān kànkan.", "jp": "先にちょっと見てみます。"}, {"category": "daily", "zh": "真的很好吃。", "pinyin": "Zhēn de hěn hǎochī.", "jp": "本当においしいです。"}, {"category": "daily", "zh": "我不太懂。", "pinyin": "Wǒ bú tài dǒng.", "jp": "あまり分かりません。"}, {"category": "daily", "zh": "請再說一次。", "pinyin": "Qǐng zài shuō yí cì.", "jp": "もう一度言ってください。"}, {"category": "daily", "zh": "可以慢一點嗎？", "pinyin": "Kěyǐ màn yìdiǎn ma?", "jp": "もう少しゆっくりでもいいですか？"}, {"category": "daily", "zh": "我在這裡。", "pinyin": "Wǒ zài zhèlǐ.", "jp": "私はここにいます。"}, {"category": "daily", "zh": "我馬上到。", "pinyin": "Wǒ mǎshàng dào.", "jp": "すぐ着きます。"}, {"category": "daily", "zh": "今天很開心。", "pinyin": "Jīntiān hěn kāixīn.", "jp": "今日はとても楽しかったです。"}, {"category": "daily", "zh": "明天見。", "pinyin": "Míngtiān jiàn.", "jp": "また明日。"}, {"category": "daily", "zh": "路上小心。", "pinyin": "Lùshàng xiǎoxīn.", "jp": "気をつけて帰ってください。"}], "intermediate": [{"zh": "最近過得怎麼樣啊？看起來有點忙。", "pinyin": "Zuìjìn guò de zěnme yàng a? Kàn qǐlái yǒudiǎn máng.", "jp": "最近どう過ごしてる？ちょっと忙しそうに見えるね。", "category": "greeting"}, {"zh": "你今天看起來精神不錯喔，是不是睡很好？", "pinyin": "Nǐ jīntiān kàn qǐlái jīngshén búcuò o, shì bú shì shuì hěn hǎo?", "jp": "今日は元気そうに見えるね。よく眠れたの？", "category": "greeting"}, {"zh": "好久不見啊，你最近在忙什麼？", "pinyin": "Hǎo jiǔ bú jiàn a, nǐ zuìjìn zài máng shénme?", "jp": "久しぶりだね。最近は何で忙しくしてるの？", "category": "greeting"}, {"zh": "今天過得還好吧？看你有點累。", "pinyin": "Jīntiān guò de hái hǎo ba? Kàn nǐ yǒudiǎn lèi.", "jp": "今日はどうだった？ちょっと疲れてるように見えるよ。", "category": "greeting"}, {"zh": "最近天氣變化很大喔，要多注意身體。", "pinyin": "Zuìjìn tiānqì biànhuà hěn dà o, yào duō zhùyì shēntǐ.", "jp": "最近は天気の変化が大きいね。体にもっと気をつけてね。", "category": "greeting"}, {"zh": "今天有空嗎？要不要一起吃個飯啊？", "pinyin": "Jīntiān yǒu kòng ma? Yào bú yào yìqǐ chī gè fàn a?", "jp": "今日は時間ある？一緒にご飯でも食べに行かない？", "category": "greeting"}, {"zh": "最近工作還順利嗎？有沒有比較輕鬆一點？", "pinyin": "Zuìjìn gōngzuò hái shùnlì ma? Yǒu méiyǒu bǐjiào qīngsōng yìdiǎn?", "jp": "最近、仕事は順調？少しは楽になった？", "category": "greeting"}, {"zh": "你今天怎麼這麼早來啊？有什麼事情嗎？", "pinyin": "Nǐ jīntiān zěnme zhème zǎo lái a?", "jp": "今日はどうしてこんなに早く来たの？何か用事があるの？", "category": "greeting"}, {"zh": "你最近看起來不錯喔，是不是有在運動？", "pinyin": "Nǐ zuìjìn kàn qǐlái búcuò o, shì bú shì yǒu zài yùndòng?", "jp": "最近いい感じに見えるね。運動してるの？", "category": "greeting"}, {"zh": "今天下班後有安排嗎？還是直接回家？", "pinyin": "Jīntiān xiàbān hòu yǒu ānpái ma?", "jp": "今日、仕事の後に予定ある？それともそのまま家に帰る？", "category": "greeting"}, {"zh": "我想點一杯拿鐵，可以做熱的嗎？", "pinyin": "Wǒ xiǎng diǎn yì bēi nátiě, kěyǐ zuò rè de ma?", "jp": "ラテを一杯注文したいんですが、ホットにできますか？", "category": "cafe"}, {"zh": "這杯可以少糖嗎？我不太喜歡太甜。", "pinyin": "Zhè bēi kěyǐ shǎo táng ma?", "jp": "この一杯、砂糖少なめにできますか？あまり甘すぎるのは好きじゃないんです。", "category": "cafe"}, {"zh": "這裡可以用電腦嗎？會不會不方便啊？", "pinyin": "Zhèlǐ kěyǐ yòng diànnǎo ma?", "jp": "ここでパソコンを使っても大丈夫ですか？迷惑になりませんか？", "category": "cafe"}, {"zh": "這家咖啡店氣氛不錯吧？蠻適合聊天的。", "pinyin": "Zhè jiā kāfēidiàn qìfēn búcuò ba?", "jp": "このカフェ、雰囲気いいね。おしゃべりするのにかなり向いてる。", "category": "cafe"}, {"zh": "你覺得這杯咖啡怎麼樣？味道還可以吧？", "pinyin": "Nǐ juéde zhè bēi kāfēi zěnme yàng?", "jp": "このコーヒーどう？味はまあまあいいよね？", "category": "cafe"}, {"zh": "可以幫我換成冰的嗎？我想喝冰的。", "pinyin": "Kěyǐ bāng wǒ huàn chéng bīng de ma?", "jp": "これ、アイスに変えてもらえますか？冷たいのが飲みたいです。", "category": "cafe"}, {"zh": "這附近還有別的咖啡店嗎？想比較看看。", "pinyin": "Zhè fùjìn hái yǒu bié de kāfēidiàn ma?", "jp": "この近くに他のカフェもありますか？ちょっと比べてみたいです。", "category": "cafe"}, {"zh": "這裡可以坐久一點嗎？我想待一下。", "pinyin": "Zhèlǐ kěyǐ zuò jiǔ yìdiǎn ma?", "jp": "ここ、少し長く座ってても大丈夫ですか？ちょっとゆっくりしたいです。", "category": "cafe"}, {"zh": "現在人不多喔，我們可以慢慢坐。", "pinyin": "Xiànzài rén bú duō o.", "jp": "今はあまり人が多くないね。ゆっくり座っていられる。", "category": "cafe"}, {"zh": "這個看起來不錯耶，要不要試試看？", "pinyin": "Zhège kàn qǐlái búcuò ye.", "jp": "これ、見た感じかなり良さそうだね。試してみない？", "category": "cafe"}, {"zh": "這道菜會不會很辣啊？我有點不太能吃辣。", "pinyin": "Zhè dào cài huì bú huì hěn là a?", "jp": "この料理、かなり辛いですか？私は少し辛いものが苦手なんです。", "category": "restaurant"}, {"zh": "這家店好像很有名吧？很多人在排隊。", "pinyin": "Zhè jiā diàn hǎoxiàng hěn yǒumíng ba?", "jp": "この店、かなり有名みたいだね。たくさん人が並んでる。", "category": "restaurant"}, {"zh": "可以幫我少放一點油嗎？", "pinyin": "Kěyǐ bāng wǒ shǎo fàng yìdiǎn yóu ma?", "jp": "油を少なめにしてもらえますか？", "category": "restaurant"}, {"zh": "這個份量夠嗎？還是要再點一點？", "pinyin": "Zhège fènliàng gòu ma?", "jp": "この量で足りますか？それとももう少し注文した方がいい？", "category": "restaurant"}, {"zh": "這個可以打包嗎？我可能吃不完。", "pinyin": "Zhège kěyǐ dǎbāo ma?", "jp": "これ、持ち帰りできますか？食べきれないかもしれません。", "category": "restaurant"}, {"zh": "我們要不要一起點幾道菜分著吃？", "pinyin": "Wǒmen yào bú yào yìqǐ diǎn jǐ dào cài?", "jp": "何品か一緒に注文して、みんなで分けて食べない？", "category": "restaurant"}, {"zh": "這家店氣氛不錯喔，很適合聊天。", "pinyin": "Zhè jiā diàn qìfēn búcuò o.", "jp": "この店、雰囲気かなりいいね。おしゃべりするのに向いてる。", "category": "restaurant"}, {"zh": "這個味道有點重，你覺得還可以嗎？", "pinyin": "Zhège wèidào yǒudiǎn zhòng.", "jp": "これ、ちょっと味が濃いね。あなたは大丈夫？", "category": "restaurant"}, {"zh": "你平常都吃這種嗎？", "pinyin": "Nǐ píngcháng dōu chī zhè zhǒng ma?", "jp": "普段もこういうの食べるの？", "category": "restaurant"}, {"zh": "我們要不要再點一個甜點？", "pinyin": "Wǒmen yào bú yào zài diǎn yí gè tiándiǎn?", "jp": "もう一つデザート注文しない？", "category": "restaurant"}, {"zh": "這個可以便宜一點嗎？", "pinyin": "Zhège kěyǐ piányí yìdiǎn ma?", "jp": "これ、もう少し安くできますか？", "category": "shopping"}, {"zh": "你覺得這個好看嗎？", "pinyin": "Nǐ juéde zhège hǎokàn ma?", "jp": "これ、どう思う？いい感じだと思う？", "category": "shopping"}, {"zh": "有沒有別的顏色啊？", "pinyin": "Yǒu méiyǒu bié de yánsè a?", "jp": "他の色もありますか？", "category": "shopping"}, {"zh": "這個尺寸好像有點小。", "pinyin": "Zhège chǐcùn hǎoxiàng yǒudiǎn xiǎo.", "jp": "このサイズ、ちょっと小さい気がする。", "category": "shopping"}, {"zh": "可以試穿看看嗎？", "pinyin": "Kěyǐ shìchuān kànkan ma?", "jp": "試着してみてもいいですか？", "category": "shopping"}, {"zh": "這個品質還可以吧？", "pinyin": "Zhège pǐnzhí hái kěyǐ ba?", "jp": "この品質なら、まあ悪くないよね？", "category": "shopping"}, {"zh": "如果買兩個會比較便宜嗎？", "pinyin": "Rúguǒ mǎi liǎng gè huì bǐjiào piányí ma?", "jp": "二つ買ったら、もう少し安くなりますか？", "category": "shopping"}, {"zh": "我再看看好了。", "pinyin": "Wǒ zài kànkan hǎo le.", "jp": "もう少し見てみます。", "category": "shopping"}, {"zh": "這個可以退嗎？", "pinyin": "Zhège kěyǐ tuì ma?", "jp": "これ、返品できますか？", "category": "shopping"}, {"zh": "這個有點貴欸。", "pinyin": "Zhège yǒudiǎn guì ei.", "jp": "ちょっと高い気がするね。", "category": "shopping"}, {"zh": "我要去這裡，可以怎麼走啊？", "pinyin": "Wǒ yào qù zhèlǐ, kěyǐ zěnme zǒu a?", "jp": "ここへ行きたいんですが、どう行けばいいですか？", "category": "transport"}, {"zh": "現在這個時間會不會很塞啊？", "pinyin": "Xiànzài zhège shíjiān huì bú huì hěn sāi a?", "jp": "今のこの時間だと、かなり渋滞しそうかな？", "category": "transport"}, {"zh": "大概要多久才會到？", "pinyin": "Dàgài yào duōjiǔ cái huì dào?", "jp": "だいたいどれくらいで着きますか？", "category": "transport"}, {"zh": "你覺得坐捷運還是計程車比較快？", "pinyin": "Nǐ juéde zuò jiéyùn háishì jìchéngchē bǐjiào kuài?", "jp": "MRTとタクシーなら、どっちの方が早いと思う？", "category": "transport"}, {"zh": "我好像走錯路了欸。", "pinyin": "Wǒ hǎoxiàng zǒu cuò lù le ei.", "jp": "なんだか道を間違えた気がする。", "category": "transport"}, {"zh": "這附近有公車站嗎？", "pinyin": "Zhè fùjìn yǒu gōngchē zhàn ma?", "jp": "この近くにバス停ありますか？", "category": "transport"}, {"zh": "這班車會到市區嗎？", "pinyin": "Zhè bān chē huì dào shìqū ma?", "jp": "このバス、市内まで行きますか？", "category": "transport"}, {"zh": "可以幫我看一下路嗎？", "pinyin": "Kěyǐ bāng wǒ kàn yíxià lù ma?", "jp": "ちょっと道を見てもらえますか？", "category": "transport"}, {"zh": "我要在下一站下車。", "pinyin": "Wǒ yào zài xià yí zhàn xià chē.", "jp": "次の駅で降ります。", "category": "transport"}, {"zh": "這條路好像比較快。", "pinyin": "Zhè tiáo lù hǎoxiàng bǐjiào kuài.", "jp": "この道の方がたぶん早そうだね。", "category": "transport"}, {"zh": "可以提早入住嗎？", "pinyin": "Kěyǐ tízǎo rùzhù ma?", "jp": "チェックインを少し早めることはできますか？", "category": "hotel"}, {"zh": "房間準備好了嗎？", "pinyin": "Fángjiān zhǔnbèi hǎo le ma?", "jp": "部屋の準備はもうできていますか？", "category": "hotel"}, {"zh": "可以幫我寄放行李嗎？", "pinyin": "Kěyǐ bāng wǒ jìfàng xínglǐ ma?", "jp": "荷物を預かってもらえますか？", "category": "hotel"}, {"zh": "房間可以換嗎？", "pinyin": "Fángjiān kěyǐ huàn ma?", "jp": "部屋を変えてもらうことはできますか？", "category": "hotel"}, {"zh": "這間房間還可以吧？", "pinyin": "Zhè jiān fángjiān hái kěyǐ ba?", "jp": "この部屋なら、まあ悪くないですね。", "category": "hotel"}, {"zh": "這裡有Wi-Fi嗎？", "pinyin": "Zhèlǐ yǒu Wi-Fi ma?", "jp": "ここってWi‑Fiありますか？", "category": "hotel"}, {"zh": "早餐幾點開始？", "pinyin": "Zǎocān jǐ diǎn kāishǐ?", "jp": "朝食は何時から始まりますか？", "category": "hotel"}, {"zh": "可以幫我叫車嗎？", "pinyin": "Kěyǐ bāng wǒ jiào chē ma?", "jp": "車を呼んでもらえますか？", "category": "hotel"}, {"zh": "我要晚一點退房。", "pinyin": "Wǒ yào wǎn yìdiǎn tuì fáng.", "jp": "チェックアウトを少し遅くしたいです。", "category": "hotel"}, {"zh": "這裡服務還不錯喔。", "pinyin": "Zhèlǐ fúwù hái búcuò o.", "jp": "ここのサービス、なかなかいいですね。", "category": "hotel"}, {"zh": "這附近有推薦的景點嗎？", "pinyin": "Zhè fùjìn yǒu tuījiàn de jǐngdiǎn ma?", "jp": "この近くにおすすめの観光スポットありますか？", "category": "tourism"}, {"zh": "這裡真的蠻漂亮的欸。", "pinyin": "Zhèlǐ zhēn de mán piàoliang de ei.", "jp": "ここ、本当にかなりきれいだね。", "category": "tourism"}, {"zh": "可以幫我拍照嗎？", "pinyin": "Kěyǐ bāng wǒ pāizhào ma?", "jp": "写真を撮ってもらってもいいですか？", "category": "tourism"}, {"zh": "這個地方怎麼走啊？", "pinyin": "Zhège dìfāng zěnme zǒu a?", "jp": "ここへはどうやって行けばいいですか？", "category": "tourism"}, {"zh": "人有點多喔。", "pinyin": "Rén yǒudiǎn duō o.", "jp": "人、ちょっと多いね。", "category": "tourism"}, {"zh": "這裡很適合拍照。", "pinyin": "Zhèlǐ hěn shìhé pāizhào.", "jp": "ここ、写真撮るのにかなり向いてるね。", "category": "tourism"}, {"zh": "我們要不要去別的地方看看？", "pinyin": "Wǒmen yào bú yào qù bié de dìfāng kànkan?", "jp": "他の場所も見に行ってみない？", "category": "tourism"}, {"zh": "這裡真的很有特色。", "pinyin": "Zhèlǐ zhēn de hěn yǒu tèsè.", "jp": "ここ、本当にかなり特徴があるね。", "category": "tourism"}, {"zh": "這個景點很有名吧？", "pinyin": "Zhège jǐngdiǎn hěn yǒumíng ba?", "jp": "この観光スポット、かなり有名なんだよね？", "category": "tourism"}, {"zh": "我們可以慢慢逛一下。", "pinyin": "Wǒmen kěyǐ mànmàn guàng yíxià.", "jp": "少しゆっくり見て回ろうか。", "category": "tourism"}, {"zh": "我今天有點累，想早點休息。", "pinyin": "Wǒ jīntiān yǒudiǎn lèi.", "jp": "今日は少し疲れてるから、早めに休みたいです。", "category": "daily"}, {"zh": "我現在有點餓了，要不要吃東西？", "pinyin": "Wǒ xiànzài yǒudiǎn è le.", "jp": "今ちょっとお腹が空いてきた。何か食べに行かない？", "category": "daily"}, {"zh": "你現在在做什麼啊？", "pinyin": "Nǐ xiànzài zài zuò shénme a?", "jp": "今、何してるの？", "category": "daily"}, {"zh": "今天好像有點忙欸。", "pinyin": "Jīntiān hǎoxiàng yǒudiǎn máng ei.", "jp": "今日はちょっと忙しい感じだね。", "category": "daily"}, {"zh": "等一下，我馬上過去。", "pinyin": "Děng yíxià, wǒ mǎshàng guòqù.", "jp": "ちょっと待って。すぐそっちに行くね。", "category": "daily"}, {"zh": "這樣可以嗎？", "pinyin": "Zhèyàng kěyǐ ma?", "jp": "これで大丈夫ですか？", "category": "daily"}, {"zh": "我覺得還不錯啊。", "pinyin": "Wǒ juéde hái búcuò a.", "jp": "私はこれ、まあ悪くないと思うよ。", "category": "daily"}, {"zh": "你要不要休息一下？", "pinyin": "Nǐ yào bú yào xiūxí yíxià?", "jp": "少し休んだ方がいいんじゃない？", "category": "daily"}, {"zh": "今天過得很快。", "pinyin": "Jīntiān guò de hěn kuài.", "jp": "今日は時間が過ぎるのが早かったね。", "category": "daily"}, {"zh": "差不多可以了吧。", "pinyin": "Chàbùduō kěyǐ le ba.", "jp": "そろそろ大丈夫そうだね。", "category": "daily"}, {"zh": "這個地方我再確認一下喔。", "pinyin": "Zhège dìfāng wǒ zài quèrèn yíxià o.", "jp": "この部分、もう一度確認しておくね。", "category": "work"}, {"zh": "你覺得這樣可以嗎？", "pinyin": "Nǐ juéde zhèyàng kěyǐ ma?", "jp": "これで大丈夫だと思う？", "category": "work"}, {"zh": "這個有點問題喔。", "pinyin": "Zhège yǒudiǎn wèntí o.", "jp": "これはちょっと問題があるね。", "category": "work"}, {"zh": "我等一下再處理。", "pinyin": "Wǒ děng yíxià zài chǔlǐ.", "jp": "これはあとで処理します。", "category": "work"}, {"zh": "這個先不用做吧。", "pinyin": "Zhège xiān bú yòng zuò ba.", "jp": "これは今は先にやらなくてもいいよね。", "category": "work"}, {"zh": "我先確認一下資料。", "pinyin": "Wǒ xiān quèrèn yíxià zīliào.", "jp": "先に資料を確認しておきます。", "category": "work"}, {"zh": "這樣安排可以嗎？", "pinyin": "Zhèyàng ānpái kěyǐ ma?", "jp": "この予定の組み方で大丈夫ですか？", "category": "work"}, {"zh": "今天事情有點多。", "pinyin": "Jīntiān shìqíng yǒudiǎn duō.", "jp": "今日はやることがちょっと多いです。", "category": "work"}, {"zh": "這個要趕一下。", "pinyin": "Zhège yào gǎn yíxià.", "jp": "これは少し急いで進める必要があります。", "category": "work"}, {"zh": "你可以幫我看一下嗎？", "pinyin": "Nǐ kěyǐ bāng wǒ kàn yíxià ma?", "jp": "ちょっと見てもらえますか？", "category": "work"}, {"zh": "我有點不舒服，可以幫我一下嗎？", "pinyin": "Wǒ yǒudiǎn bù shūfú.", "jp": "ちょっと体調がよくないので、手伝ってもらえますか？", "category": "emergency"}, {"zh": "現在有點危險喔。", "pinyin": "Xiànzài yǒudiǎn wēixiǎn o.", "jp": "今ちょっと危ない状況だね。", "category": "emergency"}, {"zh": "可以幫我打電話嗎？", "pinyin": "Kěyǐ bāng wǒ dǎ diànhuà ma?", "jp": "電話をかけてもらえますか？", "category": "emergency"}, {"zh": "我需要幫忙。", "pinyin": "Wǒ xūyào bāngmáng.", "jp": "助けが必要です。", "category": "emergency"}, {"zh": "我找不到路了。", "pinyin": "Wǒ zhǎo bú dào lù le.", "jp": "道が見つからなくなりました。", "category": "emergency"}, {"zh": "這裡好像不太安全。", "pinyin": "Zhèlǐ hǎoxiàng bú tài ānquán.", "jp": "ここはあまり安全ではなさそうです。", "category": "emergency"}, {"zh": "可以帶我去醫院嗎？", "pinyin": "Kěyǐ dài wǒ qù yīyuàn ma?", "jp": "病院まで連れて行ってもらえますか？", "category": "emergency"}, {"zh": "我東西不見了。", "pinyin": "Wǒ dōngxī bú jiàn le.", "jp": "私の物がなくなりました。", "category": "emergency"}, {"zh": "可以幫我報警嗎？", "pinyin": "Kěyǐ bāng wǒ bàojǐng ma?", "jp": "警察に通報してもらえますか？", "category": "emergency"}, {"zh": "我真的需要幫忙。", "pinyin": "Wǒ zhēn de xūyào bāngmáng.", "jp": "本当に助けが必要です。", "category": "emergency"}], "advanced": [{"zh": "最近過得還可以嗎？感覺你好像有點忙欸。\n對啊，最近事情真的有點多，不過慢慢習慣了啦。", "pinyin": "Zuìjìn guò de hái kěyǐ ma? Gǎnjué nǐ yǒudiǎn máng ei.\nDuì a, zuìjìn shìqíng zhēn de yǒudiǎn duō, búguò mànmàn xíguàn le la.", "jp": "最近はまあまあ過ごせてる？なんだか少し忙しそうに見えるね。\nうん、最近は本当にやることが少し多いけど、だんだん慣れてきたよ。", "category": "greeting"}, {"zh": "好久不見欸，你最近都在忙什麼啊？\n其實也沒什麼特別，就是工作比較多一點而已。", "pinyin": "Hǎo jiǔ bú jiàn ei, nǐ zuìjìn dōu zài máng shénme a?\nQíshí yě méi shénme tèbié, jiùshì gōngzuò bǐjiào duō yìdiǎn éryǐ.", "jp": "久しぶりだね。最近は何で忙しくしてるの？\n実は特別なことはないんだけど、ただ仕事が少し多いだけだよ。", "category": "greeting"}, {"zh": "你今天看起來精神不錯欸，是不是睡很好？\n對啊，昨天難得沒有熬夜，所以差很多。", "pinyin": "Nǐ jīntiān kàn qǐlái jīngshén búcuò ei, shì bú shì shuì hěn hǎo?\nDuì a, zuótiān nándé méiyǒu áo yè, suǒyǐ chà hěn duō.", "jp": "今日は元気そうに見えるね。よく眠れたの？\nうん、昨日は珍しく夜更かししなかったから、かなり違うよ。", "category": "greeting"}, {"zh": "最近工作還順利嗎？有沒有比較上手一點？\n還可以啦，現在慢慢比較習慣了。", "pinyin": "Zuìjìn gōngzuò hái shùnlì ma? Yǒu méiyǒu bǐjiào shàngshǒu yìdiǎn?\nHái kěyǐ la, xiànzài mànmàn bǐjiào xíguàn le.", "jp": "最近、仕事は順調？少し慣れてきた？\nまあまあかな。今はだんだん少し慣れてきたよ。", "category": "greeting"}, {"zh": "你今天怎麼這麼早來啊？平常不是比較晚？\n因為今天事情比較多，所以想早點處理。", "pinyin": "Nǐ jīntiān zěnme zhème zǎo lái a? Píngcháng bú shì bǐjiào wǎn?\nYīnwèi jīntiān shìqíng bǐjiào duō, suǒyǐ xiǎng zǎo diǎn chǔlǐ.", "jp": "今日はどうしてこんなに早く来たの？いつもはもう少し遅いんじゃない？\n今日はやることが多いから、早めに処理したかったんだ。", "category": "greeting"}, {"zh": "今天看你一直在忙，是不是事情很多啊？\n對啊，一直有新的事情進來，幾乎沒停過。", "pinyin": "Jīntiān kàn nǐ yìzhí zài máng, shì bú shì shìqíng hěn duō a?\nDuì a, yìzhí yǒu xīn de shìqíng jìnlái, jīhū méi tíng guò.", "jp": "今日はずっと忙しそうにしてるね。やることが多いの？\nうん、新しい用事がずっと入ってきて、ほとんど止まる時間がなかったよ。", "category": "greeting"}, {"zh": "最近天氣變冷滿多的，你有沒有多穿一點？\n有啊，不然真的會受不了，溫差太大。", "pinyin": "Zuìjìn tiānqì biàn lěng mǎn duō de, nǐ yǒu méiyǒu duō chuān yìdiǎn?\nYǒu a, bùrán zhēn de huì shòu bù liǎo, wēnchā tài dà.", "jp": "最近かなり寒くなってきたね。ちゃんと多めに着てる？\n着てるよ。そうじゃないと本当に耐えられない。気温差が大きすぎるよ。", "category": "greeting"}, {"zh": "今天過得怎麼樣？感覺你好像還不錯。\n嗯，今天事情都有順利完成，還算輕鬆。", "pinyin": "Jīntiān guò de zěnme yàng? Gǎnjué nǐ hǎoxiàng hái búcuò.\nEn, jīntiān shìqíng dōu yǒu shùnlì wánchéng, hái suàn qīngsōng.", "jp": "今日はどうだった？なんだかまあまあ良さそうに見えるね。\nうん、今日はやることが全部順調に終わったから、わりと楽だったよ。", "category": "greeting"}, {"zh": "你今天看起來有點累，是不是昨天又很晚？\n對啊，昨天忙到很晚，回去就睡了。", "pinyin": "Nǐ jīntiān kàn qǐlái yǒudiǎn lèi, shì bú shì zuótiān yòu hěn wǎn?\nDuì a, zuótiān máng dào hěn wǎn, huíqù jiù shuì le.", "jp": "今日は少し疲れて見えるね。昨日また遅かったの？\nうん、昨日はかなり遅くまで忙しくて、帰ったらそのまま寝たよ。", "category": "greeting"}, {"zh": "最近在忙什麼啊？感覺你好像都沒休息。\n最近在準備新的東西，所以時間都排滿了。", "pinyin": "Zuìjìn zài máng shénme a? Gǎnjué nǐ hǎoxiàng dōu méi xiūxí.\nZuìjìn zài zhǔnbèi xīn de dōngxī, suǒyǐ shíjiān dōu pái mǎn le.", "jp": "最近は何で忙しくしてるの？なんだか全然休めてないみたい。\n最近は新しいことを準備してるから、時間が全部埋まってるんだ。", "category": "greeting"}, {"zh": "這間咖啡店感覺不錯欸，你怎麼找到的？\n朋友推薦的啊，咖啡跟環境都還不錯。", "pinyin": "Zhè jiān kāfēidiàn gǎnjué búcuò ei, nǐ zěnme zhǎodào de?\nPéngyǒu tuījiàn de a, kāfēi gēn huánjìng dōu hái búcuò.", "jp": "このカフェ、いい感じだね。どうやって見つけたの？\n友達にすすめられたんだ。コーヒーも環境もなかなかいいよ。", "category": "cafe"}, {"zh": "你平常會來咖啡店工作嗎？還是在家比較多？\n我比較常來這種地方，比較容易專心。", "pinyin": "Nǐ píngcháng huì lái kāfēidiàn gōngzuò ma? Háishì zài jiā bǐjiào duō?\nWǒ bǐjiào cháng lái zhè zhǒng dìfāng, bǐjiào róngyì zhuānxīn.", "jp": "普段はカフェで仕事するの？それとも家にいることが多い？\n私はこういう場所に来ることが多いよ。その方が集中しやすいから。", "category": "cafe"}, {"zh": "這杯咖啡有點偏酸欸，你覺得呢？\n對，我也覺得，不過還算順口。", "pinyin": "Zhè bēi kāfēi yǒudiǎn piān suān ei, nǐ juéde ne?\nDuì, wǒ yě juéde, búguò hái suàn shùnkǒu.", "jp": "このコーヒー、少し酸味が強いね。どう思う？\nうん、私もそう思う。でもまあ飲みやすい方だね。", "category": "cafe"}, {"zh": "這裡坐滿了欸，要不要換一家？\n也可以，不然等也不一定有位子。", "pinyin": "Zhèlǐ zuò mǎn le ei, yào bú yào huàn yì jiā?\nYě kěyǐ, bùrán děng yě bù yídìng yǒu wèizi.", "jp": "ここ満席だね。他の店に変えない？\nそれでもいいよ。待っても席が空くとは限らないし。", "category": "cafe"}, {"zh": "你覺得這裡可以待久一點嗎？我想慢慢用電腦。\n應該可以啦，只要不是尖峰時間。", "pinyin": "Nǐ juéde zhèlǐ kěyǐ dài jiǔ yìdiǎn ma? Wǒ xiǎng mànmàn yòng diànnǎo.\nYīnggāi kěyǐ la, zhǐyào bú shì jiānfēng shíjiān.", "jp": "ここで少し長くいても大丈夫そう？ゆっくりパソコンを使いたいんだけど。\nたぶん大丈夫だよ。混む時間帯じゃなければね。", "category": "cafe"}, {"zh": "這家店氣氛真的很舒服，會讓人想一直待著。\n對啊，而且音樂也不會太吵。", "pinyin": "Zhè jiā diàn qìfēn zhēn de hěn shūfú, huì ràng rén xiǎng yìzhí dài zhe.\nDuì a, érqiě yīnyuè yě bú huì tài chǎo.", "jp": "この店の雰囲気、本当に居心地がいいね。ずっといたくなる感じ。\nうん、それに音楽もうるさすぎないしね。", "category": "cafe"}, {"zh": "你點咖啡會固定嗎？還是看心情？\n大部分看心情，有時候會亂試。", "pinyin": "Nǐ diǎn kāfēi huì gùdìng ma? Háishì kàn xīnqíng?\nDà bùfèn kàn xīnqíng, yǒu shíhòu huì luàn shì.", "jp": "コーヒーを注文するとき、いつも同じものにする？それとも気分で選ぶ？\nだいたい気分で選ぶよ。たまには適当に試してみることもある。", "category": "cafe"}, {"zh": "第一次來這裡，你會推薦點什麼？\n可以先試招牌，通常不會踩雷。", "pinyin": "Dì yī cì lái zhèlǐ, nǐ huì tuījiàn diǎn shénme?\nKěyǐ xiān shì zhāopái, tōngcháng bú huì cǎi léi.", "jp": "初めてここに来たら、何を頼むのがおすすめ？\nまずは看板メニューを試すといいよ。普通は外れにくいから。", "category": "cafe"}, {"zh": "你今天會待多久？還是等一下就走？\n我應該還會再待一下，慢慢來。", "pinyin": "Nǐ jīntiān huì dài duōjiǔ? Háishì děng yíxià jiù zǒu?\nWǒ yīnggāi hái huì zài dài yíxià, mànmàn lái.", "jp": "今日はどれくらいここにいる予定？それとも少ししたらもう行く？\nたぶんもう少しここにいるよ。ゆっくりでいいから。", "category": "cafe"}, {"zh": "這個甜點看起來不錯欸，要不要點來試試？\n好啊，反正現在也不趕時間。", "pinyin": "Zhège tiándiǎn kàn qǐlái búcuò ei, yào bú yào diǎn lái shìshì?\nHǎo a, fǎnzhèng xiànzài yě bù gǎn shíjiān.", "jp": "このデザート、見た感じよさそうだね。頼んで試してみない？\nいいよ。どうせ今は急いでないし。", "category": "cafe"}, {"zh": "這家店看起來很多人在排隊欸，應該蠻好吃的。\n對啊，不然不會排這麼久，我們等一下好了。", "pinyin": "Zhè jiā diàn kàn qǐlái hěn duō rén zài páiduì ei, yīnggāi mán hǎo chī de.\nDuì a, bùrán bú huì pái zhème jiǔ, wǒmen děng yíxià hǎo le.", "jp": "この店、かなり人が並んでるね。たぶんけっこうおいしいんだろうね。\nうん、そうじゃなかったらこんなに長く並ばないよ。少し待とう。", "category": "restaurant"}, {"zh": "這道菜味道蠻重的欸，你吃得習慣嗎？\n還可以啦，就是有點鹹，下次可以點清淡一點。", "pinyin": "Zhè dào cài wèidào mán zhòng de ei, nǐ chī de xíguàn ma?\nHái kěyǐ la, jiùshì yǒudiǎn xián, xià cì kěyǐ diǎn qīngdàn yìdiǎn.", "jp": "この料理、味がかなり濃いね。食べ慣れてる？\nまあ大丈夫だよ。ただ少ししょっぱいから、次はもう少しあっさりしたものを頼んでもいいね。", "category": "restaurant"}, {"zh": "你覺得這份量夠嗎？還是我們再多點一個？\n我覺得可以再點一道菜，不然有點不夠。", "pinyin": "Nǐ juéde zhè fènliàng gòu ma? Háishì wǒmen zài duō diǎn yí gè?\nWǒ juéde kěyǐ zài diǎn yí dào cài, bùrán yǒudiǎn bú gòu.", "jp": "この量で足りると思う？それとももう一品頼む？\nもう一品頼んでもいいと思う。そうしないと少し足りなさそう。", "category": "restaurant"}, {"zh": "這個湯喝起來很清爽欸，剛好解膩。\n對啊，配這種重口味的剛剛好。", "pinyin": "Zhège tāng hē qǐlái hěn qīngshuǎng ei, gānghǎo jiě nì.\nDuì a, pèi zhè zhǒng zhòng kǒuwèi de gānggāng hǎo.", "jp": "このスープ、飲むとすごくさっぱりしてるね。ちょうど油っこさを消してくれる。\nうん、こういう味の濃い料理と合わせるのにちょうどいいね。", "category": "restaurant"}, {"zh": "你平常會吃這種嗎？還是比較少？\n其實不常，不過偶爾吃還不錯。", "pinyin": "Nǐ píngcháng huì chī zhè zhǒng ma? Háishì bǐjiào shǎo?\nQíshí bù cháng, búguò ǒu'ěr chī hái búcuò.", "jp": "普段こういうの食べる？それともあまり食べない？\n実はあまり食べないけど、たまに食べるとなかなかいいね。", "category": "restaurant"}, {"zh": "這家店氣氛還不錯欸，很適合聊天。\n對啊，而且不會太吵，剛剛好。", "pinyin": "Zhè jiā diàn qìfēn hái búcuò ei, hěn shìhé liáotiān.\nDuì a, érqiě bú huì tài chǎo, gānggāng hǎo.", "jp": "この店、雰囲気がなかなかいいね。おしゃべりするのに向いてる。\nうん、それにうるさすぎなくて、ちょうどいいね。", "category": "restaurant"}, {"zh": "這個可以打包嗎？我真的吃不完。\n可以啊，很多人都會這樣。", "pinyin": "Zhège kěyǐ dǎbāo ma? Wǒ zhēn de chī bù wán.\nKěyǐ a, hěn duō rén dōu huì zhèyàng.", "jp": "これ、持ち帰りできますか？本当に食べきれません。\nできますよ。そうする人は多いです。", "category": "restaurant"}, {"zh": "我們要不要再點一個甜點來吃？\n好啊，剛好想吃點甜的。", "pinyin": "Wǒmen yào bú yào zài diǎn yí gè tiándiǎn lái chī?\nHǎo a, gānghǎo xiǎng chī diǎn tián de.", "jp": "もう一つデザートを頼んで食べない？\nいいね。ちょうど甘いものが少し食べたかったんだ。", "category": "restaurant"}, {"zh": "這個醬料味道很特別欸，你要不要試試看？\n好，我先沾一點點看看味道。", "pinyin": "Zhège jiàngliào wèidào hěn tèbié ei, nǐ yào bú yào shìshì kàn?\nHǎo, wǒ xiān zhān yìdiǎndiǎn kànkan wèidào.", "jp": "このソース、味がかなり独特だね。試してみる？\nうん、まず少しだけつけて味を見てみる。", "category": "restaurant"}, {"zh": "吃完之後我們要不要去走走消化一下？\n好啊，不然真的有點太撐了。", "pinyin": "Chī wán zhīhòu wǒmen yào bú yào qù zǒuzǒu xiāohuà yíxià?\nHǎo a, bùrán zhēn de yǒudiǎn tài chēng le.", "jp": "食べ終わった後、少し歩いて消化しない？\nいいね。そうしないと本当に少し食べすぎた感じがする。", "category": "restaurant"}, {"zh": "這件穿起來感覺不錯欸，不過顏色有點太亮。\n那你可以試旁邊那件，顏色比較低調。", "pinyin": "Zhè jiàn chuān qǐlái gǎnjué búcuò ei, búguò yánsè yǒudiǎn tài liàng.\nNà nǐ kěyǐ shì pángbiān nà jiàn, yánsè bǐjiào dīdiào.", "jp": "これを着るといい感じだけど、色が少し明るすぎるね。\nそれなら横のを試してみたら？色がもう少し落ち着いてるよ。", "category": "shopping"}, {"zh": "這個價格你覺得合理嗎？我有點猶豫。\n以品質來說還可以，不過可以再看看。", "pinyin": "Zhège jiàgé nǐ juéde hélǐ ma? Wǒ yǒudiǎn yóuyù.\nYǐ pǐnzhí lái shuō hái kěyǐ, búguò kěyǐ zài kànkan.", "jp": "この値段、妥当だと思う？ちょっと迷ってるんだ。\n品質から見るとまあ悪くないけど、もう少し見てもいいと思う。", "category": "shopping"}, {"zh": "如果只是平常用，其實不用買太貴的吧。\n對啊，實用比較重要，不用太講究。", "pinyin": "Rúguǒ zhǐshì píngcháng yòng, qíshí bú yòng mǎi tài guì de ba.\nDuì a, shíyòng bǐjiào zhòngyào, bú yòng tài jiǎngjiù.", "jp": "普段使うだけなら、実はあまり高いものを買わなくてもいいよね。\nうん、実用性の方が大事だし、こだわりすぎなくていいよ。", "category": "shopping"}, {"zh": "這裡東西很多欸，反而有點不知道怎麼選。\n那就先看你需要什麼，再慢慢挑。", "pinyin": "Zhèlǐ dōngxī hěn duō ei, fǎn'ér yǒudiǎn bù zhīdào zěnme xuǎn.\nNà jiù xiān kàn nǐ xūyào shénme, zài mànmàn tiāo.", "jp": "ここは物が多いね。逆にどう選べばいいか少し分からなくなる。\nそれならまず必要なものを見て、それからゆっくり選ぼう。", "category": "shopping"}, {"zh": "這雙鞋穿起來很舒服，可是風格不太一樣。\n偶爾換一下也不錯啊，可以試試。", "pinyin": "Zhè shuāng xié chuān qǐlái hěn shūfú, kěshì fēnggé bú tài yíyàng.\nǑu'ěr huàn yíxià yě búcuò a, kěyǐ shìshì.", "jp": "この靴、履くとすごく楽だけど、雰囲気がちょっといつもと違うね。\nたまには変えてみるのも悪くないよ。試してみてもいいと思う。", "category": "shopping"}, {"zh": "如果可以退貨我會比較放心買。\n那你先問清楚規則比較好。", "pinyin": "Rúguǒ kěyǐ tuìhuò wǒ huì bǐjiào fàngxīn mǎi.\nNà nǐ xiān wèn qīngchǔ guīzé bǐjiào hǎo.", "jp": "返品できるなら、もっと安心して買えるんだけど。\nそれなら先にルールをしっかり確認した方がいいよ。", "category": "shopping"}, {"zh": "這個設計很簡單，但看起來很有質感。\n對啊，這種反而比較耐看。", "pinyin": "Zhège shèjì hěn jiǎndān, dàn kàn qǐlái hěn yǒu zhígǎn.\nDuì a, zhè zhǒng fǎn'ér bǐjiào nài kàn.", "jp": "このデザインはとてもシンプルだけど、見た感じかなり質感があるね。\nうん、こういうのの方が逆に長く見ても飽きにくいよ。", "category": "shopping"}, {"zh": "買完這個之後要不要去別的店看看？\n好啊，反正時間還早。", "pinyin": "Mǎi wán zhège zhīhòu yào bú yào qù bié de diàn kànkan?\nHǎo a, fǎnzhèng shíjiān hái zǎo.", "jp": "これを買った後、他の店も見に行かない？\nいいよ。どうせまだ時間も早いし。", "category": "shopping"}, {"zh": "這個尺寸有點小，你要不要拿大一點的？\n好，我試試看大一號。", "pinyin": "Zhège chǐcùn yǒudiǎn xiǎo, nǐ yào bú yào ná dà yìdiǎn de?\nHǎo, wǒ shìshì kàn dà yí hào.", "jp": "このサイズは少し小さいね。もう少し大きいのを持ってきたら？\nうん、ワンサイズ大きいのを試してみる。", "category": "shopping"}, {"zh": "這個真的有點貴欸，我再想一下好了。\n可以啊，不用急著決定。", "pinyin": "Zhège zhēn de yǒudiǎn guì ei, wǒ zài xiǎng yíxià hǎo le.\nKěyǐ a, bú yòng jí zhe juédìng.", "jp": "これは本当に少し高いね。もう少し考えてみることにする。\nいいよ。急いで決めなくて大丈夫だよ。", "category": "shopping"}, {"zh": "現在這時間去市區會很塞欸，你確定要現在出發？\n應該會，不過如果現在不走會更晚到。", "pinyin": "Xiànzài zhè shíjiān qù shìqū huì hěn sāi ei, nǐ quèdìng yào xiànzài chūfā?\nYīnggāi huì, búguò rúguǒ xiànzài bù zǒu huì gèng wǎn dào.", "jp": "今この時間に市内へ行くとかなり渋滞するよ。本当に今出発する？\nたぶん渋滞するけど、今行かなかったらもっと遅く着くよ。", "category": "transport"}, {"zh": "我好像坐錯方向了欸，現在怎麼辦？\n沒關係，下一站下車換回來就好。", "pinyin": "Wǒ hǎoxiàng zuò cuò fāngxiàng le ei, xiànzài zěnme bàn?\nMéi guānxi, xià yí zhàn xià chē huàn huílái jiù hǎo.", "jp": "どうやら反対方向に乗ってしまったみたい。今どうしよう？\n大丈夫。次の駅で降りて戻ればいいよ。", "category": "transport"}, {"zh": "這附近不好叫車欸，我們要不要走到大路？\n好啊，那邊比較好攔車。", "pinyin": "Zhè fùjìn bù hǎo jiào chē ei, wǒmen yào bú yào zǒu dào dà lù?\nHǎo a, nà biān bǐjiào hǎo lán chē.", "jp": "この辺りはタクシーを呼びにくいね。大通りまで歩かない？\nいいよ。あそこならタクシーを捕まえやすいから。", "category": "transport"}, {"zh": "你覺得捷運還是計程車比較快？\n如果不趕時間，我覺得捷運比較穩。", "pinyin": "Nǐ juéde jiéyùn háishì jìchéngchē bǐjiào kuài?\nRúguǒ bù gǎn shíjiān, wǒ juéde jiéyùn bǐjiào wěn.", "jp": "MRTとタクシーなら、どっちの方が早いと思う？\n急いでいないなら、MRTの方が安定してると思う。", "category": "transport"}, {"zh": "這條路看起來比較近，我們要不要走這邊？\n可以試試看，不行再回頭。", "pinyin": "Zhè tiáo lù kàn qǐlái bǐjiào jìn, wǒmen yào bú yào zǒu zhè biān?\nKěyǐ shìshì kàn, bù xíng zài huítóu.", "jp": "この道、見た感じ近そうだね。こっちを歩いてみない？\n試してみてもいいよ。だめならまた戻ればいいし。", "category": "transport"}, {"zh": "我不太確定在哪一站下車，你可以提醒我嗎？\n可以，到前一站我會跟你說。", "pinyin": "Wǒ bù tài quèdìng zài nǎ yí zhàn xià chē, nǐ kěyǐ tíxǐng wǒ ma?\nKěyǐ, dào qián yí zhàn wǒ huì gēn nǐ shuō.", "jp": "どの駅で降りるかあまり確信がないんだけど、教えてくれる？\nいいよ。一つ前の駅になったら言うね。", "category": "transport"}, {"zh": "這班車人有點多欸，要不要等下一班？\n好啊，反正很快就來了。", "pinyin": "Zhè bān chē rén yǒudiǎn duō ei, yào bú yào děng xià yì bān?\nHǎo a, fǎnzhèng hěn kuài jiù lái le.", "jp": "この電車、人が少し多いね。次のを待つ？\nいいよ。どうせすぐ来るから。", "category": "transport"}, {"zh": "從這裡走過去會不會太遠？\n有一點，不過天氣好可以走。", "pinyin": "Cóng zhèlǐ zǒu guòqù huì bú huì tài yuǎn?\nYǒu yìdiǎn, búguò tiānqì hǎo kěyǐ zǒu.", "jp": "ここから歩いて行くと遠すぎるかな？\n少し遠いけど、天気がいいから歩けるよ。", "category": "transport"}, {"zh": "我們現在出發應該還來得及吧？\n應該可以，只要不要拖太久。", "pinyin": "Wǒmen xiànzài chūfā yīnggāi hái lái de jí ba?\nYīnggāi kěyǐ, zhǐyào bú yào tuō tài jiǔ.", "jp": "今出発すれば、まだ間に合うよね？\nたぶん大丈夫。あまり長くぐずぐずしなければね。", "category": "transport"}, {"zh": "這張卡可以直接刷嗎？還是要先加值？\n通常可以直接用，不過餘額要注意。", "pinyin": "Zhè zhāng kǎ kěyǐ zhíjiē shuā ma? Háishì yào xiān jiāzhí?\nTōngcháng kěyǐ zhíjiē yòng, búguò yú'é yào zhùyì.", "jp": "このカードはそのままタッチできますか？それとも先にチャージが必要？\n普通はそのまま使えるけど、残高には注意した方がいいよ。", "category": "transport"}, {"zh": "這間房間還可以，不過隔音有點普通欸。\n對啊，晚上可能會有點吵。", "pinyin": "Zhè jiān fángjiān hái kěyǐ, búguò géyīn yǒudiǎn pǔtōng ei.\nDuì a, wǎnshàng kěnéng huì yǒudiǎn chǎo.", "jp": "この部屋はまあ悪くないけど、防音がちょっと普通だね。\nうん、夜は少しうるさいかもしれないね。", "category": "hotel"}, {"zh": "這裡住起來還算方便，附近什麼都有。\n對，走路就有捷運跟便利商店。", "pinyin": "Zhèlǐ zhù qǐlái hái suàn fāngbiàn, fùjìn shénme dōu yǒu.\nDuì, zǒulù jiù yǒu jiéyùn gēn biànlì shāngdiàn.", "jp": "ここは泊まるにはわりと便利だね。近くに何でもある。\nうん、歩いて行けるところにMRTもコンビニもあるよ。", "category": "hotel"}, {"zh": "可以提早入住就好了，行李有點麻煩。\n先問看看，至少可以寄放。", "pinyin": "Kěyǐ tízǎo rùzhù jiù hǎo le, xínglǐ yǒudiǎn máfan.\nXiān wèn kànkan, zhìshǎo kěyǐ jìfàng.", "jp": "早めにチェックインできたらいいのにね。荷物が少し面倒だし。\n先に聞いてみよう。少なくとも荷物は預けられると思う。", "category": "hotel"}, {"zh": "早餐選擇好像不多欸，你覺得呢？\n還可以啦，不夠的話外面也有。", "pinyin": "Zǎocān xuǎnzé hǎoxiàng bù duō ei, nǐ juéde ne?\nHái kěyǐ la, bú gòu de huà wàimiàn yě yǒu.", "jp": "朝食の選択肢、あまり多くなさそうだね。どう思う？\nまあ大丈夫かな。足りなければ外にもあるし。", "category": "hotel"}, {"zh": "房間有點冷，你知道怎麼調空調嗎？\n我看一下，應該可以調高溫度。", "pinyin": "Fángjiān yǒudiǎn lěng, nǐ zhīdào zěnme tiáo kōngtiáo ma?\nWǒ kàn yíxià, yīnggāi kěyǐ tiáo gāo wēndù.", "jp": "部屋が少し寒いね。エアコンの調整方法分かる？\n見てみるよ。たぶん温度を上げられると思う。", "category": "hotel"}, {"zh": "如果明天要早起，要不要先叫車？\n好啊，比較安心。", "pinyin": "Rúguǒ míngtiān yào zǎoqǐ, yào bú yào xiān jiào chē?\nHǎo a, bǐjiào ānxīn.", "jp": "明日早起きするなら、先に車を呼んでおく？\nうん、その方が安心だね。", "category": "hotel"}, {"zh": "這裡服務還不錯，處理事情也很快。\n對啊，回應都蠻清楚的。", "pinyin": "Zhèlǐ fúwù hái búcuò, chǔlǐ shìqíng yě hěn kuài.\nDuì a, huíyìng dōu mán qīngchǔ de.", "jp": "ここのサービスはなかなかいいね。対応も早い。\nうん、返事もかなり分かりやすいね。", "category": "hotel"}, {"zh": "離車站有點遠，拖行李有點累。\n對，不過搭車就還好。", "pinyin": "Lí chēzhàn yǒudiǎn yuǎn, tuō xínglǐ yǒudiǎn lèi.\nDuì, búguò dā chē jiù hái hǎo.", "jp": "駅から少し遠いね。荷物を引いて歩くと少し疲れる。\nうん。でも車に乗ればまあ大丈夫だよ。", "category": "hotel"}, {"zh": "退房時間是十一點對吧？\n應該是，不過可以再確認。", "pinyin": "Tuìfáng shíjiān shì shíyī diǎn duì ba?\nYīnggāi shì, búguò kěyǐ zài quèrèn.", "jp": "チェックアウト時間は11時で合ってるよね？\nたぶんそうだけど、もう一度確認してもいいね。", "category": "hotel"}, {"zh": "下次來可能還會住這裡，還不錯。\n我也是，整體蠻平衡的。", "pinyin": "Xià cì lái kěnéng hái huì zhù zhèlǐ, hái búcuò.\nWǒ yě shì, zhěngtǐ mán pínghéng de.", "jp": "次に来たら、またここに泊まるかもしれない。なかなかいいね。\n私も。全体的にかなりバランスがいいと思う。", "category": "hotel"}, {"zh": "這個地方真的很漂亮欸，你來過嗎？\n沒有欸，第一次來就覺得很值得。", "pinyin": "Zhège dìfāng zhēn de hěn piàoliang ei, nǐ lái guò ma?\nMéiyǒu ei, dì yī cì lái jiù juéde hěn zhídé.", "jp": "この場所、本当にきれいだね。来たことある？\nないよ。初めて来たけど、すごく来る価値があると思った。", "category": "tourism"}, {"zh": "人有點多，要不要先去別的地方？\n好，等一下再回來拍照。", "pinyin": "Rén yǒudiǎn duō, yào bú yào xiān qù bié de dìfāng?\nHǎo, děng yíxià zài huílái pāizhào.", "jp": "人が少し多いね。先に別の場所へ行かない？\nいいよ。後でもう一度戻って写真を撮ろう。", "category": "tourism"}, {"zh": "這裡大概需要多久逛完？\n慢慢看可能要一個多小時。", "pinyin": "Zhèlǐ dàgài xūyào duōjiǔ guàng wán?\nMànmàn kàn kěnéng yào yí gè duō xiǎoshí.", "jp": "ここは見終わるのにだいたいどれくらい必要？\nゆっくり見るなら1時間以上はかかるかも。", "category": "tourism"}, {"zh": "光線有點強，現在拍照不好看。\n等一下太陽低一點會比較好。", "pinyin": "Guāngxiàn yǒudiǎn qiáng, xiànzài pāizhào bù hǎokàn.\nDěng yíxià tàiyáng dī yìdiǎn huì bǐjiào hǎo.", "jp": "光が少し強いね。今写真を撮ってもあまりきれいに見えない。\nもう少し太陽が低くなったら、もっとよくなるよ。", "category": "tourism"}, {"zh": "我想買紀念品，但不想太觀光客。\n可以找在地設計的東西。", "pinyin": "Wǒ xiǎng mǎi jìniànpǐn, dàn bù xiǎng tài guānguāngkè.\nKěyǐ zhǎo zàidì shèjì de dōngxī.", "jp": "お土産を買いたいけど、あまり観光客っぽすぎるものは嫌だな。\n地元デザインのものを探すといいよ。", "category": "tourism"}, {"zh": "這裡路不好走，鞋子不舒服會很累。\n對，下次要穿好走一點的。", "pinyin": "Zhèlǐ lù bù hǎo zǒu, xiézi bù shūfú huì hěn lèi.\nDuì, xià cì yào chuān hǎo zǒu yìdiǎn de.", "jp": "ここは道が歩きにくいね。靴が合わないとすごく疲れる。\nうん、次はもう少し歩きやすい靴を履かないとね。", "category": "tourism"}, {"zh": "時間夠的話要不要去老街？\n好啊，聽說很多小吃。", "pinyin": "Shíjiān gòu de huà yào bú yào qù lǎojiē?\nHǎo a, tīngshuō hěn duō xiǎochī.", "jp": "時間が足りるなら、老街へ行かない？\nいいね。小吃がたくさんあるって聞いたよ。", "category": "tourism"}, {"zh": "這個介紹寫得很清楚，你看得懂嗎？\n差不多，不懂再查。", "pinyin": "Zhège jièshào xiě de hěn qīngchǔ, nǐ kàn de dǒng ma?\nChàbùduō, bù dǒng zài chá.", "jp": "この説明、かなり分かりやすく書いてあるね。読める？\nだいたい分かるよ。分からないところはあとで調べればいい。", "category": "tourism"}, {"zh": "晚上來應該也很漂亮吧？\n應該是，氣氛會更好。", "pinyin": "Wǎnshàng lái yīnggāi yě hěn piàoliang ba?\nYīnggāi shì, qìfēn huì gèng hǎo.", "jp": "夜に来てもきっときれいだよね？\nたぶんね。雰囲気がもっとよくなると思う。", "category": "tourism"}, {"zh": "今天行程有點滿，要不要刪一個？\n可以，不然太趕了。", "pinyin": "Jīntiān xíngchéng yǒudiǎn mǎn, yào bú yào shān yí gè?\nKěyǐ, bùrán tài gǎn le.", "jp": "今日の予定、少し詰まってるね。一つ削らない？\nいいよ。そうしないと急ぎすぎるから。", "category": "tourism"}, {"zh": "你今天看起來很累，是不是沒睡好？\n對啊，昨天太晚睡了。", "pinyin": "Nǐ jīntiān kàn qǐlái hěn lèi, shì bú shì méi shuì hǎo?\nDuì a, zuótiān tài wǎn shuì le.", "jp": "今日はすごく疲れて見えるね。ちゃんと眠れなかったの？\nうん、昨日寝るのが遅すぎたんだ。", "category": "daily"}, {"zh": "我現在有點餓，要不要一起吃？\n好啊，我也剛好想吃。", "pinyin": "Wǒ xiànzài yǒudiǎn è, yào bú yào yìqǐ chī?\nHǎo a, wǒ yě gānghǎo xiǎng chī.", "jp": "今ちょっとお腹が空いたんだけど、一緒に食べに行かない？\nいいよ。私もちょうど何か食べたいと思ってた。", "category": "daily"}, {"zh": "今天過得好快，一下就晚上了。\n真的，忙起來完全沒感覺。", "pinyin": "Jīntiān guò de hǎo kuài, yíxià jiù wǎnshàng le.\nZhēn de, máng qǐlái wánquán méi gǎnjué.", "jp": "今日は時間が過ぎるのが早かったね。あっという間に夜になった。\n本当だね。忙しくなると全然気づかないよ。", "category": "daily"}, {"zh": "你等一下有空嗎？可以幫我看一下？\n可以，你先傳給我。", "pinyin": "Nǐ děng yíxià yǒu kòng ma? Kěyǐ bāng wǒ kàn yíxià?\nKěyǐ, nǐ xiān chuán gěi wǒ.", "jp": "あとで時間ある？ちょっと見てもらえる？\nいいよ。先に送ってくれれば見るよ。", "category": "daily"}, {"zh": "我今天不想出門，想在家休息。\n也好，偶爾放鬆一下。", "pinyin": "Wǒ jīntiān bù xiǎng chūmén, xiǎng zài jiā xiūxí.\nYě hǎo, ǒu'ěr fàngsōng yíxià.", "jp": "今日は外に出たくない。家で休みたい。\nそれもいいね。たまにはリラックスした方がいいよ。", "category": "daily"}, {"zh": "這件事我還沒決定，再想一下。\n沒關係，不用急。", "pinyin": "Zhè jiàn shì wǒ hái méi juédìng, zài xiǎng yíxià.\nMéi guānxi, bú yòng jí.", "jp": "この件はまだ決めてないから、もう少し考える。\n大丈夫。急がなくていいよ。", "category": "daily"}, {"zh": "這樣安排會不會太趕？\n有點，不過可以試試看。", "pinyin": "Zhèyàng ānpái huì bú huì tài gǎn?\nYǒudiǎn, búguò kěyǐ shìshì kàn.", "jp": "この予定の組み方、ちょっと急ぎすぎかな？\n少しね。でも試してみることはできるよ。", "category": "daily"}, {"zh": "我剛剛忘記帶東西，要回去拿。\n好，我等你。", "pinyin": "Wǒ gānggāng wàngjì dài dōngxī, yào huíqù ná.\nHǎo, wǒ děng nǐ.", "jp": "さっき持ってくる物を忘れたから、戻って取りに行かないと。\nいいよ。待ってるね。", "category": "daily"}, {"zh": "今天真的很熱，我想買飲料。\n我也是，太熱了。", "pinyin": "Jīntiān zhēn de hěn rè, wǒ xiǎng mǎi yǐnliào.\nWǒ yě shì, tài rè le.", "jp": "今日は本当に暑いね。飲み物を買いたい。\n私も。暑すぎるよ。", "category": "daily"}, {"zh": "如果不方便就算了，我可以改天再問。\n沒事，現在可以。", "pinyin": "Rúguǒ bù fāngbiàn jiù suàn le, wǒ kěyǐ gǎitiān zài wèn.\nMéi shì, xiànzài kěyǐ.", "jp": "もし都合が悪ければ大丈夫。また別の日に聞いてもいいから。\n大丈夫。今でもいいよ。", "category": "daily"}, {"zh": "這個我再確認一下，怕會出問題。\n好，確認清楚比較安全。", "pinyin": "Zhège wǒ zài quèrèn yíxià, pà huì chū wèntí.\nHǎo, quèrèn qīngchǔ bǐjiào ānquán.", "jp": "これ、もう一度確認するね。問題が出るのが心配だから。\nうん、はっきり確認した方が安全だね。", "category": "work"}, {"zh": "今天事情很多，我可能晚點回。\n沒關係，你先忙。", "pinyin": "Jīntiān shìqíng hěn duō, wǒ kěnéng wǎn diǎn huí.\nMéi guānxi, nǐ xiān máng.", "jp": "今日はやることが多いから、少し遅く帰るかもしれない。\n大丈夫。先に仕事してて。", "category": "work"}, {"zh": "這資料有點怪，我想再看一次。\n好，小心一點比較好。", "pinyin": "Zhè zīliào yǒudiǎn guài, wǒ xiǎng zài kàn yí cì.\nHǎo, xiǎoxīn yìdiǎn bǐjiào hǎo.", "jp": "この資料、少し変なところがある。もう一回見たい。\nうん、慎重にした方がいいね。", "category": "work"}, {"zh": "這樣排程有點趕。\n那我們先抓重點。", "pinyin": "Zhèyàng páichéng yǒudiǎn gǎn.\nNà wǒmen xiān zhuā zhòngdiǎn.", "jp": "このスケジュール、少し急ぎすぎだね。\nそれなら先に重点を押さえよう。", "category": "work"}, {"zh": "這件我先處理，其他晚點。\n好，我整理資料給你。", "pinyin": "Zhè jiàn wǒ xiān chǔlǐ, qítā wǎn diǎn.\nHǎo, wǒ zhěnglǐ zīliào gěi nǐ.", "jp": "これは先に私が処理して、他のものはあとにする。\n分かった。資料を整理して渡すね。", "category": "work"}, {"zh": "剛剛會議有些沒聽清楚。\n我等一下整理給你。", "pinyin": "Gānggāng huìyì yǒu xiē méi tīng qīngchǔ.\nWǒ děng yíxià zhěnglǐ gěi nǐ.", "jp": "さっきの会議で、聞き取れなかったところが少しある。\nあとで整理して渡すね。", "category": "work"}, {"zh": "這問題今天解不了。\n先找原因比較重要。", "pinyin": "Zhè wèntí jīntiān jiě bù liǎo.\nXiān zhǎo yuányīn bǐjiào zhòngyào.", "jp": "この問題は今日中には解決できない。\n先に原因を見つける方が大事だね。", "category": "work"}, {"zh": "有回覆我再跟你說。\n好，方便安排。", "pinyin": "Yǒu huífù wǒ zài gēn nǐ shuō.\nHǎo, fāngbiàn ānpái.", "jp": "返事が来たらまた言うね。\nうん、その方が予定を組みやすい。", "category": "work"}, {"zh": "這版本先不要發。\n好，再確認。", "pinyin": "Zhè bǎnběn xiān bú yào fā.\nHǎo, zài quèrèn.", "jp": "このバージョンはまだ出さないで。\n分かった。もう一度確認する。", "category": "work"}, {"zh": "今天先做到這裡。\n好，明天再繼續。", "pinyin": "Jīntiān xiān zuò dào zhèlǐ.\nHǎo, míngtiān zài jìxù.", "jp": "今日はまずここまでにしよう。\nうん、明日また続きをやろう。", "category": "work"}, {"zh": "我現在不舒服，可以幫我叫救護車嗎？\n好，我馬上打電話。", "pinyin": "Wǒ xiànzài bù shūfú, kěyǐ bāng wǒ jiào jiùhùchē ma?\nHǎo, wǒ mǎshàng dǎ diànhuà.", "jp": "今体調が悪いです。救急車を呼んでもらえますか？\n分かりました。すぐ電話します。", "category": "emergency"}, {"zh": "我的錢包不見了，剛剛可能掉了。\n先不要急，我們回去找。", "pinyin": "Wǒ de qiánbāo bú jiàn le, gānggāng kěnéng diào le.\nXiān bú yào jí, wǒmen huíqù zhǎo.", "jp": "財布がなくなりました。さっき落としたのかもしれません。\nまず焦らないで。戻って探してみよう。", "category": "emergency"}, {"zh": "我迷路了，手機也快沒電。\n先找店家幫忙。", "pinyin": "Wǒ mílù le, shǒujī yě kuài méi diàn.\nXiān zhǎo diànjiā bāngmáng.", "jp": "道に迷いました。携帯の電池ももうすぐ切れそうです。\nまずお店の人に助けを求めよう。", "category": "emergency"}, {"zh": "這裡不太安全，我們先走。\n好，去人多的地方。", "pinyin": "Zhèlǐ bù tài ānquán, wǒmen xiān zǒu.\nHǎo, qù rén duō de dìfāng.", "jp": "ここはあまり安全ではなさそうです。先に離れましょう。\nうん、人の多い場所へ行こう。", "category": "emergency"}, {"zh": "我受傷了，有點痛。\n先去藥局。", "pinyin": "Wǒ shòushāng le, yǒudiǎn tòng.\nXiān qù yàojú.", "jp": "けがをしました。少し痛いです。\nまず薬局へ行こう。", "category": "emergency"}, {"zh": "我找不到朋友了。\n你先待著，我幫你打電話。", "pinyin": "Wǒ zhǎo bú dào péngyǒu le.\nNǐ xiān dài zhe, wǒ bāng nǐ dǎ diànhuà.", "jp": "友達が見つかりません。\nあなたは先にここにいて。私が電話してあげる。", "category": "emergency"}, {"zh": "護照不見了，我很緊張。\n先報警，再聯絡。", "pinyin": "Hùzhào bú jiàn le, wǒ hěn jǐnzhāng.\nXiān bàojǐng, zài liánluò.", "jp": "パスポートがなくなりました。すごく不安です。\nまず警察に届けて、それから連絡しよう。", "category": "emergency"}, {"zh": "有人一直跟著我。\n先進店裡比較安全。", "pinyin": "Yǒurén yìzhí gēn zhe wǒ.\nXiān jìn diàn lǐ bǐjiào ānquán.", "jp": "誰かがずっと私について来ています。\nまずお店に入った方が安全です。", "category": "emergency"}, {"zh": "我頭很暈，需要坐一下。\n先休息，我去買水。", "pinyin": "Wǒ tóu hěn yūn, xūyào zuò yíxià.\nXiān xiūxí, wǒ qù mǎi shuǐ.", "jp": "頭がすごくふらふらします。少し座る必要があります。\n先に休んでいて。水を買ってくる。", "category": "emergency"}, {"zh": "如果變嚴重就直接去醫院。\n對，安全最重要。", "pinyin": "Rúguǒ biàn yánzhòng jiù zhíjiē qù yīyuàn.\nDuì, ānquán zuì zhòngyào.", "jp": "もしもっとひどくなったら、すぐ病院へ行きましょう。\nうん、安全が一番大事だね。", "category": "emergency"}]}
+</script>
+
+<script>
+const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
+
+const categoryNames = {
+  all:"全部", greeting:"挨拶", cafe:"カフェ", restaurant:"食事", shopping:"買物",
+  transport:"交通", hotel:"ホテル", tourism:"観光", daily:"日常", work:"仕事", emergency:"緊急"
+};
+const levelNames = { beginner:"初級", intermediate:"中級", advanced:"上級" };
+const levels = ["beginner","intermediate","advanced"];
+const views = ["question","list","continuous","random"];
+
+let mode = "speaking";
+let level = "beginner";
+let view = "question";
+let category = "all";
+let step = 0;
+let history = [];
+let index = -1;
+let autoId = 0;
+let audioEnabled = false;
+let sx = 0, sy = 0;
+let currentListItems = [];
+
+const box = document.getElementById("box");
+const listPanel = document.getElementById("listPanel");
+const viewBtn = document.getElementById("viewBtn");
+const modeBtn = document.getElementById("modeBtn");
+const levelBtn = document.getElementById("levelBtn");
+const categorySelect = document.getElementById("categorySelect");
+
+function esc(s){
+  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+}
+function stopAudio(){
+  autoId++;
+  speechSynthesis.cancel();
+}
+function getList(){
+  let list = (DATA[level] || []).filter(p => category === "all" || p.category === category);
+  return list.length ? list : (DATA[level] || []);
+}
+function pick(){
+  const list = getList();
+  return list[Math.floor(Math.random() * list.length)];
+}
+function updateButtons(){
+  modeBtn.textContent = mode === "speaking" ? "話す" : "読む";
+  levelBtn.textContent = levelNames[level];
+  viewBtn.textContent = view === "question" ? "問題" :
+                        view === "list" ? "一覧" :
+                        view === "continuous" ? "連続再生" : "ランダム再生";
+}
+function setView(v){
+  stopAudio();
+  view = v;
+  updateButtons();
+  if(view === "list"){
+    box.classList.add("hidden-panel");
+    listPanel.classList.remove("hidden-panel");
+    renderList();
+    return;
+  }
+  listPanel.classList.add("hidden-panel");
+  box.classList.remove("hidden-panel");
+  if(view === "continuous" || view === "random"){
+    nextQuestion(true);
+    startAuto();
+  }else{
+    if(!history[index]) nextQuestion(true);
+    else renderQuestion();
+  }
+}
+function cycleView(){ setView(views[(views.indexOf(view)+1) % views.length]); }
+function cycleMode(){
+  stopAudio();
+  mode = mode === "speaking" ? "reading" : "speaking";
+  step = 0;
+  updateButtons();
+  renderQuestion();
+  if(view === "continuous" || view === "random") startAuto();
+}
+function cycleLevel(){
+  stopAudio();
+  level = levels[(levels.indexOf(level)+1) % levels.length];
+  step = 0; history = []; index = -1;
+  updateButtons();
+  if(view === "list") renderList(); else nextQuestion(true);
+  if(view === "continuous" || view === "random") startAuto();
+}
+function setCategory(c){
+  stopAudio();
+  category = c;
+  step = 0; history = []; index = -1;
+  if(view === "list") renderList(); else nextQuestion(true);
+  if(view === "continuous" || view === "random") startAuto();
+}
+function nextQuestion(forceNew){
+  stopAudio();
+  step = 0;
+  const p = pick();
+  if(!p) {
+    box.innerHTML = '<div class="error">表示できるデータがありません。</div>';
+    return;
+  }
+  if(view === "random" || forceNew || index >= history.length - 1){
+    history.push(p); index = history.length - 1;
+  }else{ index++; }
+  renderQuestion();
+}
+function prevQuestion(){
+  stopAudio();
+  if(index > 0){ index--; step = 0; renderQuestion(); }
+}
+function nextStep(){
+  if(view === "continuous" || view === "random") return;
+  if(!history[index]) return;
+  if(step < 2){ step++; renderQuestion(); }
+  else{ speak(history[index].zh); }
+}
+function renderQuestion(){
+  const p = history[index];
+  if(!p) return;
+  const order = mode === "speaking" ? ["jp","zh","pinyin"] : ["zh","pinyin","jp"];
+  const visible = step + 1;
+  box.innerHTML = order.map((key,i) => `
+    <div class="line ${i < visible ? "" : "hidden-line"}">
+      <div class="${key}">${esc(p[key])}</div>
+    </div>
+  `).join("");
+  if(mode === "reading" && step === 1) speak(p.zh);
+  if(mode === "speaking" && step === 2) speak(p.zh);
+}
+function renderChars(text){
+  return Array.from(String(text ?? "")).map((ch,i) => {
+    if(ch === "\n") return "<br>";
+    if(ch === " ") return " ";
+    return `<span class="char" data-i="${i}">${esc(ch)}</span>`;
+  }).join("");
+}
+function renderAuto(p){
+  box.innerHTML = `
+    <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
+    <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
+    <div class="line"><div class="jp">${esc(p.jp)}</div></div>
+    <div class="status">連続再生中：中国語 → ピンイン → 日本語</div>
+  `;
+}
+function speak(text){
+  if(!audioEnabled) return Promise.resolve();
+  speechSynthesis.cancel();
+  return new Promise(resolve => {
+    const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+    u.lang = "zh-TW";
+    u.rate = 1.0;
+    u.pitch = 1.02;
+    const voices = speechSynthesis.getVoices();
+    const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
+    if(v) u.voice = v;
+    u.onend = resolve;
+    u.onerror = resolve;
+    speechSynthesis.speak(u);
+  });
+}
+function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+function estimate(text){
+  const clean = String(text).replace(/\s/g,"");
+  let weight = 0;
+  for (const ch of clean){
+    weight += 1;
+    if("，。！？,.!?".includes(ch)) weight += 1.6;
+    if("啊吧嗎呢啦喔".includes(ch)) weight += 0.8;
+  }
+  return Math.max(2200, weight * 200);
+}
+async function highlightElement(text, rootEl){
+  if(!audioEnabled) return;
+  speechSynthesis.cancel();
+
+  rootEl.innerHTML = renderChars(text);
+  const total = Array.from(String(text ?? "")).length;
+  const duration = estimate(text);
+  const chars = rootEl.querySelectorAll(".char");
+  const charsArray = Array.from(chars);
+
+  let ended = false;
+  let last = -1;
+
+  const markUntil = (i) => {
+    chars.forEach(span => {
+      if(Number(span.dataset.i) <= i){
+        span.classList.add("done");
+        span.style.setProperty("color", "#007aff", "important");
+        span.style.setProperty("text-shadow", "0 0 8px rgba(0,122,255,.24)", "important");
+      }
+    });
+  };
+  const markAll = () => chars.forEach(span => {
+    span.classList.add("done");
+    span.style.setProperty("color", "#007aff", "important");
+    span.style.setProperty("text-shadow", "0 0 8px rgba(0,122,255,.24)", "important");
+  });
+
+  // 同期開始の可視確認。クリック直後に先頭文字を必ず青くする。
+  markUntil(0);
+
+  const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+  u.lang = "zh-TW";
+  u.rate = 1.0;
+  u.pitch = 1.02;
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
+  if(v) u.voice = v;
+
+  u.onend = () => { ended = true; markAll(); };
+  u.onerror = () => { ended = true; markAll(); };
+
+  speechSynthesis.speak(u);
+
+  const start = performance.now();
+  const delay = 220;
+
+  while(!ended){
+    await wait(100);
+    const elapsed = Math.max(0, performance.now() - start - delay);
+    const progress = Math.min(0.96, elapsed / duration);
+    let weightedTotal = 0;
+    const weights = charsArray.map(ch => {
+      const t = ch.textContent || "";
+      let w = 1;
+      if("，。！？,.!?".includes(t)) w += 1.6;
+      if("啊吧嗎呢啦喔".includes(t)) w += 0.8;
+      weightedTotal += w;
+      return w;
+    });
+
+    const targetWeight = progress * weightedTotal;
+    let acc = 0;
+    let i = 0;
+    for(let k=0; k<weights.length; k++){
+      acc += weights[k];
+      if(acc >= targetWeight){
+        i = k;
+        break;
+      }
+    }
+    if(i > last){
+      last = i;
+      markUntil(i);
+    }
+  }
+}
+async function speakHighlight(text){
+  if(!audioEnabled) return;
+  const zhEl = document.querySelector("#box .zh");
+  if(zhEl) await highlightElement(text, zhEl);
+}
+async function startAuto(){
+  const id = ++autoId;
+  while(id === autoId && (view === "continuous" || view === "random")){
+    const p = history[index] || pick();
+    if(!p) break;
+    step = 2;
+    renderAuto(p);
+    await speakHighlight(p.zh);
+    if(id !== autoId || !(view === "continuous" || view === "random")) break;
+    await wait(1200);
+    if(id !== autoId || !(view === "continuous" || view === "random")) break;
+    history.push(pick());
+    index = history.length - 1;
+  }
+}
+async function playListById(id){
+  stopAudio();
+
+  const item = currentListItems[Number(id)];
+  const el = listPanel.querySelector(`.list-item[data-id="${id}"]`);
+  const zhEl = el ? el.querySelector(".zh") : null;
+
+  if(!item || !zhEl){
+    alert("一覧再生エラー: item not found");
+    return;
+  }
+
+  document.querySelectorAll(".list-item").forEach(x => x.classList.remove("playing"));
+  el.classList.add("playing");
+
+  await highlightElement(item.zh, zhEl);
+}
+function renderList(){
+  currentListItems = [];
+  let out = '<div class="list-status">一覧クリック: 音声に合わせて中国語が青色に進みます</div>';
+
+  Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
+    let html = `<div class="category-title">${categoryNames[cat]}</div>`;
+    let has = false;
+
+    levels.forEach(lv => {
+      const list = (DATA[lv] || []).filter(p => p.category === cat);
+      if(!list.length) return;
+
+      has = true;
+      html += `<div class="level-title">${levelNames[lv]}</div>`;
+
+      list.forEach(p => {
+        const id = currentListItems.length;
+        currentListItems.push(p);
+
+        html += `
+          <div class="list-item" data-id="${id}">
+            <div class="zh">${esc(p.zh)}</div>
+            <div class="pinyin">${esc(p.pinyin)}</div>
+            <div class="jp">${esc(p.jp)}</div>
+          </div>`;
+      });
+    });
+
+    if(has) out += html;
+  });
+
+  listPanel.innerHTML = out;
+}
+
+// 恒久対策: listPanelに1回だけイベント委任。
+// 動的に生成された全.list-itemに必ず効く。
+listPanel.addEventListener("click", function(e){
+  const item = e.target.closest(".list-item");
+  if(!item || !listPanel.contains(item)) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const id = item.getAttribute("data-id");
+  playListById(id);
+}, true);
+
+viewBtn.addEventListener("click", cycleView);
+modeBtn.addEventListener("click", cycleMode);
+levelBtn.addEventListener("click", cycleLevel);
+categorySelect.addEventListener("change", e => setCategory(e.target.value));
+box.addEventListener("click", nextStep);
+box.addEventListener("touchstart", e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
+box.addEventListener("touchend", e => {
+  const dx = e.changedTouches[0].clientX - sx;
+  const dy = e.changedTouches[0].clientY - sy;
+  if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){
+    if(dx < 0) nextQuestion(true); else prevQuestion();
+  }
+}, {passive:true});
+speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+updateButtons();
+nextQuestion(true);
+
+// ===== Start overlay / audio permission =====
+(function(){
+  const overlay = document.getElementById("startOverlay");
+  const btn = document.getElementById("startButton");
+  if(!overlay || !btn) return;
+
+  // ページを開いた直後は必ず開始画面を表示し、音声は無効にする。
+  audioEnabled = false;
+  overlay.classList.remove("hidden");
+
+  btn.addEventListener("click", () => {
+    audioEnabled = true;
+
+    try{
+      speechSynthesis.cancel();
+      speechSynthesis.getVoices();
+    }catch(e){}
+
+    overlay.classList.add("hidden");
+  });
+})();
+
+</script>
+</body>
+</html>
