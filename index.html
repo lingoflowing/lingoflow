@@ -604,27 +604,30 @@ box.addEventListener("touchend", e => {
   }
 }, {passive:true});
 speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+
+// ===== Start overlay / audio permission =====
+const overlay = document.getElementById("startOverlay");
+const btn = document.getElementById("startButton");
+
+audioEnabled = false;
+
+if(overlay){
+  overlay.classList.remove("hidden");
+}
+
+if(btn){
+  btn.onclick = function(){
+    audioEnabled = true;
+    overlay.classList.add("hidden");
+  };
+}
+  
 updateButtons();
 nextQuestion(true);
 
 let audioEnabled = false;
 
-// ===== Start overlay / audio permission =====
-(function(){
-  const overlay = document.getElementById("startOverlay");
-  const btn = document.getElementById("startButton");
-
-  if(!overlay || !btn) return;
-
-  btn.onclick = () => {
-
-    audioEnabled = true;
-
-    overlay.classList.add("hidden");
-
-  };
-
-})();
+)();
 
   
 
