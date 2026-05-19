@@ -410,7 +410,7 @@ function speak(text){
     u.onend = resolve;
     u.onerror = resolve;
 
-    if (!audioUnlocked) return;
+    if(!audioEnabled) return;
     
     speechSynthesis.speak(u);
   });
