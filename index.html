@@ -390,6 +390,30 @@ function setView(v){
     else renderQuestion();
   }
 }
+
+function stopAllPlayback(){
+  audioEnabled = false;
+  autoId++;
+
+  try{
+    speechSynthesis.cancel();
+  }catch(e){}
+}
+
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){
+    stopAllPlayback();
+  }
+});
+
+window.addEventListener("pagehide", () => {
+  stopAllPlayback();
+});
+
+window.addEventListener("blur", () => {
+  stopAllPlayback();
+});
+  
 function cycleView(){ setView(views[(views.indexOf(view)+1) % views.length]); }
 function cycleMode(){
   stopAudio();
@@ -582,6 +606,9 @@ async function startAuto(){
     step = 2;
     renderAuto(p);
     await speakHighlight(p.zh);
+
+    if(!audioEnabled) break;
+    
     if(id !== autoId || !(view === "continuous" || view === "random")) break;
     await wait(1200);
     if(id !== autoId || !(view === "continuous" || view === "random")) break;
