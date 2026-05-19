@@ -247,6 +247,9 @@ button,select{
 </script>
 
 <script>
+
+let audioUnlocked = false;
+  
 const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 
 const categoryNames = {
@@ -406,6 +409,9 @@ function speak(text){
     if(v) u.voice = v;
     u.onend = resolve;
     u.onerror = resolve;
+
+    if (!audioUnlocked) return;
+    
     speechSynthesis.speak(u);
   });
 }
@@ -601,8 +607,20 @@ nextQuestion(true);
 // ===== Start overlay / audio permission =====
 (function(){
   const overlay = document.getElementById("startOverlay");
-  const btn = document.getElementById("startButton");
+  const btn = document.getElementById("startButton");  
   if(!overlay || !btn) return;
+
+  btn.onclick = () => {
+
+    audioUnlocked = true;
+
+    overlay.classList.add("hidden");
+
+  };
+
+})();
+
+  
 
   // ページを開いた直後は必ず開始画面を表示し、音声は無効にする。
   // Test
