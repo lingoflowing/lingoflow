@@ -279,6 +279,32 @@ const categorySelect = document.getElementById("categorySelect");
 
 
 // ===== Start overlay / audio permission: fixed version =====
+
+  document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    audioEnabled = false;
+
+    try {
+      speechSynthesis.cancel();
+    } catch (e) {}
+
+    const overlay = document.getElementById("startOverlay");
+    if (overlay) {
+      overlay.classList.remove("hidden");
+      overlay.style.display = "flex";
+    }
+  }
+});
+
+window.addEventListener("pagehide", () => {
+  audioEnabled = false;
+
+  try {
+    speechSynthesis.cancel();
+  } catch (e) {}
+});
+
+  
 // ページを開いた直後は必ず無音。ユーザーが「タップして開始」を押した後だけ音声を許可する。
 const startOverlay = document.getElementById("startOverlay");
 const startButton = document.getElementById("startButton");
