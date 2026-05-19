@@ -607,10 +607,13 @@ speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 updateButtons();
 nextQuestion(true);
 
+let audioEnabled = false;
+
 // ===== Start overlay / audio permission =====
 (function(){
   const overlay = document.getElementById("startOverlay");
-  const btn = document.getElementById("startButton");  
+  const btn = document.getElementById("startButton");
+
   if(!overlay || !btn) return;
 
   btn.onclick = () => {
