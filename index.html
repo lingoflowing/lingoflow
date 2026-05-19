@@ -131,6 +131,7 @@ button,select{
   position:fixed;
   inset:0;
   z-index:100000;
+  pointer-events:auto;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -247,9 +248,6 @@ button,select{
 </script>
 
 <script>
-
-let audioUnlocked = false;
-  
 const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 
 const categoryNames = {
@@ -278,6 +276,47 @@ const viewBtn = document.getElementById("viewBtn");
 const modeBtn = document.getElementById("modeBtn");
 const levelBtn = document.getElementById("levelBtn");
 const categorySelect = document.getElementById("categorySelect");
+
+
+// ===== Start overlay / audio permission: fixed version =====
+// ページを開いた直後は必ず無音。ユーザーが「タップして開始」を押した後だけ音声を許可する。
+const startOverlay = document.getElementById("startOverlay");
+const startButton = document.getElementById("startButton");
+
+audioEnabled = false;
+
+function closeStartOverlay(){
+  audioEnabled = true;
+
+  try{
+    speechSynthesis.cancel();
+    speechSynthesis.getVoices();
+  }catch(err){}
+
+  if(startOverlay){
+    startOverlay.classList.add("hidden");
+    startOverlay.style.display = "none";
+  }
+}
+
+if(startOverlay){
+  startOverlay.classList.remove("hidden");
+  startOverlay.style.display = "flex";
+}
+
+if(startButton){
+  startButton.addEventListener("click", function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    closeStartOverlay();
+  }, true);
+
+  startButton.addEventListener("touchend", function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    closeStartOverlay();
+  }, true);
+}
 
 function esc(s){
   return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
@@ -409,12 +448,6 @@ function speak(text){
     if(v) u.voice = v;
     u.onend = resolve;
     u.onerror = resolve;
-
-    if(!audioEnabled){
-  ended = true;
-  return;
-}
-    
     speechSynthesis.speak(u);
   });
 }
@@ -604,49 +637,9 @@ box.addEventListener("touchend", e => {
   }
 }, {passive:true});
 speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-
-// ===== Start overlay / audio permission =====
-const overlay = document.getElementById("startOverlay");
-const btn = document.getElementById("startButton");
-
-audioEnabled = false;
-
-if(overlay){
-  overlay.classList.remove("hidden");
-}
-
-if(btn){
-  btn.onclick = function(){
-    audioEnabled = true;
-    overlay.classList.add("hidden");
-  };
-}
-  
 updateButtons();
 nextQuestion(true);
 
-let audioEnabled = false;
-
-)();
-
-  
-
-  // ページを開いた直後は必ず開始画面を表示し、音声は無効にする。
-  // Test
-  audioEnabled = false;
-  overlay.classList.remove("hidden");
-
-  btn.addEventListener("click", () => {
-    audioEnabled = true;
-
-    try{
-      speechSynthesis.cancel();
-      speechSynthesis.getVoices();
-    }catch(e){}
-
-    overlay.classList.add("hidden");
-  });
-})();
 
 </script>
 </body>
