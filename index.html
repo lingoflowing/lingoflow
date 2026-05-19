@@ -337,13 +337,13 @@ function showStartOverlay(){
 }
 
 function stopAllPlayback(){
-  audioEnabled = false;
+  // スリープ・別タブ移動では「音声と連続再生ループ」だけ止める。
+  // audioEnabled は false にしない。false にすると復帰後に連続再生を再開できなくなる。
   autoId++;
   try{
     speechSynthesis.pause();
     speechSynthesis.cancel();
   }catch(e){}
-  showStartOverlay();
 }
 
 document.addEventListener("visibilitychange", function(){
@@ -355,13 +355,7 @@ document.addEventListener("visibilitychange", function(){
 window.addEventListener("pagehide", stopAllPlayback);
 window.addEventListener("blur", stopAllPlayback);
 
-window.addEventListener("pageshow", function(){
-  if(!audioEnabled) showStartOverlay();
-});
-
-window.addEventListener("focus", function(){
-  if(!audioEnabled) showStartOverlay();
-});
+// 復帰時に自動再生はしない。再開はユーザーのタップ操作だけで行う。
 function getList(){
   let list = (DATA[level] || []).filter(p => category === "all" || p.category === category);
   return list.length ? list : (DATA[level] || []);
@@ -439,7 +433,12 @@ function prevQuestion(){
   if(index > 0){ index--; step = 0; renderQuestion(); }
 }
 function nextStep(){
-  if(view === "continuous" || view === "random") return;
+  // 連続再生・ランダム再生がスリープ等で止まった後は、
+  // ユーザーが画面をタップした時だけ再開する。
+  if(view === "continuous" || view === "random"){
+    startAuto();
+    return;
+  }
   if(!history[index]) return;
   if(step < 2){ step++; renderQuestion(); }
   else{ speak(history[index].zh); }
