@@ -15,12 +15,6 @@
 
 <link rel="icon" href="/favicon.png">
 
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#007aff">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="LingoFlow">
-<link rel="apple-touch-icon" href="/favicon.png">
-
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
@@ -285,30 +279,6 @@ const categorySelect = document.getElementById("categorySelect");
 
 
 // ===== Start overlay / audio permission: fixed version =====
-
-function stopAudioWhenLeave(){
-  audioEnabled = false;
-
-  try {
-    speechSynthesis.cancel();
-  } catch(e) {}
-}
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    stopAudioWhenLeave();
-  }
-});
-
-window.addEventListener("blur", () => {
-  stopAudioWhenLeave();
-});
-
-window.addEventListener("pagehide", () => {
-  stopAudioWhenLeave();
-});
-
-  
 // ページを開いた直後は必ず無音。ユーザーが「タップして開始」を押した後だけ音声を許可する。
 const startOverlay = document.getElementById("startOverlay");
 const startButton = document.getElementById("startButton");
@@ -353,8 +323,45 @@ function esc(s){
 }
 function stopAudio(){
   autoId++;
-  speechSynthesis.cancel();
+  try{
+    speechSynthesis.pause();
+    speechSynthesis.cancel();
+  }catch(e){}
 }
+
+function showStartOverlay(){
+  if(startOverlay){
+    startOverlay.classList.remove("hidden");
+    startOverlay.style.display = "flex";
+  }
+}
+
+function stopAllPlayback(){
+  audioEnabled = false;
+  autoId++;
+  try{
+    speechSynthesis.pause();
+    speechSynthesis.cancel();
+  }catch(e){}
+  showStartOverlay();
+}
+
+document.addEventListener("visibilitychange", function(){
+  if(document.hidden){
+    stopAllPlayback();
+  }
+});
+
+window.addEventListener("pagehide", stopAllPlayback);
+window.addEventListener("blur", stopAllPlayback);
+
+window.addEventListener("pageshow", function(){
+  if(!audioEnabled) showStartOverlay();
+});
+
+window.addEventListener("focus", function(){
+  if(!audioEnabled) showStartOverlay();
+});
 function getList(){
   let list = (DATA[level] || []).filter(p => category === "all" || p.category === category);
   return list.length ? list : (DATA[level] || []);
@@ -390,30 +397,6 @@ function setView(v){
     else renderQuestion();
   }
 }
-
-function stopAllPlayback(){
-  audioEnabled = false;
-  autoId++;
-
-  try{
-    speechSynthesis.cancel();
-  }catch(e){}
-}
-
-document.addEventListener("visibilitychange", () => {
-  if(document.hidden){
-    stopAllPlayback();
-  }
-});
-
-window.addEventListener("pagehide", () => {
-  stopAllPlayback();
-});
-
-window.addEventListener("blur", () => {
-  stopAllPlayback();
-});
-  
 function cycleView(){ setView(views[(views.indexOf(view)+1) % views.length]); }
 function cycleMode(){
   stopAudio();
@@ -558,13 +541,19 @@ async function highlightElement(text, rootEl){
   u.onend = () => { ended = true; markAll(); };
   u.onerror = () => { ended = true; markAll(); };
 
+  if(!audioEnabled){
+    ended = true;
+    return;
+  }
+
   speechSynthesis.speak(u);
 
   const start = performance.now();
   const delay = 220;
 
-  while(!ended){
+  while(!ended && audioEnabled){
     await wait(100);
+    if(!audioEnabled) break;
     const elapsed = Math.max(0, performance.now() - start - delay);
     const progress = Math.min(0.96, elapsed / duration);
     let weightedTotal = 0;
@@ -599,20 +588,29 @@ async function speakHighlight(text){
   if(zhEl) await highlightElement(text, zhEl);
 }
 async function startAuto(){
+  if(!audioEnabled) return;
+
   const id = ++autoId;
-  while(id === autoId && (view === "continuous" || view === "random")){
+
+  while(id === autoId && audioEnabled && (view === "continuous" || view === "random")){
     const p = history[index] || pick();
     if(!p) break;
+
     step = 2;
     renderAuto(p);
+
     await speakHighlight(p.zh);
 
-    if(!audioEnabled) break;
-    
-    if(id !== autoId || !(view === "continuous" || view === "random")) break;
+    if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
+
     await wait(1200);
-    if(id !== autoId || !(view === "continuous" || view === "random")) break;
-    history.push(pick());
+
+    if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
+
+    const next = pick();
+    if(!next) break;
+
+    history.push(next);
     index = history.length - 1;
   }
 }
