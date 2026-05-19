@@ -1,0 +1,17 @@
+{
+  "name": "LingoFlow",
+  "short_name": "LingoFlow",
+  "description": "台湾華語を、聞き流しで自然に学ぶ。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007aff",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
