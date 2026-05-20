@@ -241,6 +241,35 @@ button,select{
   min-width:96px;
 }
 
+
+/* ===== Compact controls for Listen Mode button ===== */
+.controls{
+  gap:6px !important;
+}
+
+#listenModeBtn{
+  min-width:88px !important;
+}
+
+@media(max-width:520px){
+  .controls{
+    gap:4px !important;
+    padding:8px 6px !important;
+  }
+
+  button,select{
+    height:36px !important;
+    font-size:14px !important;
+    padding:0 8px !important;
+  }
+
+  #viewBtn{min-width:76px !important;}
+  #modeBtn{min-width:58px !important;}
+  #listenModeBtn{min-width:76px !important;}
+  #levelBtn{min-width:58px !important;}
+  #categorySelect{min-width:80px !important;max-width:96px !important;}
+}
+
 </style>
 </head>
 <body>
@@ -413,15 +442,11 @@ if(startOverlay){
 }
 
 // スマホ対策:
-// 一部ブラウザでは click が遅延/無効化されるため、複数イベントで開始を受ける。
+// イベント多重発火を避けるため、開始処理は pointerup のみに統一する。
 // startUnlocked により二重実行は防止する。
 [startButton, startCard, startOverlay].forEach(target => {
   if(!target) return;
-
   target.addEventListener("pointerup", handleStartTap, {capture:true});
-  target.addEventListener("touchstart", handleStartTap, {capture:true, passive:false});
-  target.addEventListener("touchend", handleStartTap, {capture:true, passive:false});
-  target.addEventListener("click", handleStartTap, {capture:true});
 });
 
 function esc(s){
