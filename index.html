@@ -230,35 +230,6 @@ button,select{
   color:#005bbb;
 }
 
-
-/* ===== Listen Mode ===== */
-.listen-only .pinyin,
-.listen-only .jp{
-  display:none !important;
-}
-
-#listenModeBtn{
-  min-width:88px;
-}
-
-@media(max-width:520px){
-  .controls{
-    gap:4px !important;
-    padding-left:6px !important;
-    padding-right:6px !important;
-  }
-  button,select{
-    height:36px !important;
-    font-size:14px !important;
-    padding:0 8px !important;
-  }
-  #viewBtn{min-width:76px !important;}
-  #modeBtn{min-width:58px !important;}
-  #listenModeBtn{min-width:76px !important;}
-  #levelBtn{min-width:58px !important;}
-  #categorySelect{min-width:80px !important;max-width:96px !important;}
-}
-
 </style>
 </head>
 <body>
@@ -277,7 +248,6 @@ button,select{
   <div class="controls">
     <button id="viewBtn" type="button">問題</button>
     <button id="modeBtn" type="button">話す</button>
-    <button id="listenModeBtn" type="button">通常</button>
     <button id="levelBtn" type="button">初級</button>
     <select id="categorySelect">
       <option value="all">全部</option>
@@ -790,32 +760,6 @@ speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 updateButtons();
 nextQuestion(true);
 
-
-
-/* ===== Listen Mode JS ===== */
-let listenOnlyMode = false;
-const listenModeBtn = document.getElementById("listenModeBtn");
-
-function applyListenMode(){
-  if(listenOnlyMode){
-    document.body.classList.add("listen-only");
-    if(listenModeBtn) listenModeBtn.textContent = "聞き流し";
-  }else{
-    document.body.classList.remove("listen-only");
-    if(listenModeBtn) listenModeBtn.textContent = "通常";
-  }
-}
-
-if(listenModeBtn){
-  listenModeBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    listenOnlyMode = !listenOnlyMode;
-    applyListenMode();
-  });
-}
-
-applyListenMode();
 
 </script>
 </body>
