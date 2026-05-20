@@ -267,7 +267,6 @@ let history = [];
 let index = -1;
 let autoId = 0;
 let audioEnabled = false;
-let isPlaying = false;
 let sx = 0, sy = 0;
 let currentListItems = [];
 
@@ -320,9 +319,9 @@ if(startButton){
 }
 
 
-// ===== Chrome PC voice fallback =====
-// Chrome PCでは speechSynthesis.getVoices() が初回だけ空になることがあるため、
-// 音声一覧をキャッシュし、台湾華語を優先しつつ確実に何かの音声へフォールバックする。
+// ===== Firefox / Chrome stable voice selection =====
+// 重要: Firefoxではユーザー操作直後の speechSynthesis.speak() が必要。
+// cancel後にsetTimeout等で待つと、ユーザー操作扱いが切れて発話が飲み込まれる場合がある。
 let cachedVoices = [];
 
 function refreshVoices(){
@@ -342,7 +341,6 @@ function getBestChineseVoice(){
   const norm = s => String(s || '').toLowerCase();
 
   return (
-    voices.find(v => v.lang === 'zh-TW') ||
     voices.find(v => norm(v.lang) === 'zh-tw') ||
     voices.find(v => norm(v.name).includes('taiwan')) ||
     voices.find(v => String(v.name || '').includes('臺灣')) ||
@@ -350,19 +348,16 @@ function getBestChineseVoice(){
     voices.find(v => norm(v.lang) === 'zh-hk') ||
     voices.find(v => norm(v.lang).startsWith('zh-')) ||
     voices.find(v => norm(v.lang).startsWith('zh')) ||
-    voices.find(v => norm(v.lang) === 'ja-jp') ||
-    voices.find(v => norm(v.lang).startsWith('en')) ||
-    voices[0]
+    null
   );
 }
 
-function applyVoiceFallback(utterance){
+function applyChineseVoice(utterance){
   const voice = getBestChineseVoice();
+  utterance.lang = 'zh-TW';
   if(voice){
     utterance.voice = voice;
     utterance.lang = voice.lang || 'zh-TW';
-  }else{
-    utterance.lang = 'zh-TW';
   }
   return utterance;
 }
@@ -371,19 +366,10 @@ function esc(s){
   return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
 }
 function stopAudio(){
-  // すべての再生系処理を無効化する唯一の停止口。
-  // autoIdを進めることで、進行中の連続再生ループ・ハイライト・待機処理を安全に破棄する。
   autoId++;
-  isPlaying = false;
-
   try{
     speechSynthesis.pause();
     speechSynthesis.cancel();
-  }catch(e){}
-
-  try{
-    document.querySelectorAll(".char.done").forEach(el => el.classList.remove("done"));
-    document.querySelectorAll(".list-item.playing").forEach(el => el.classList.remove("playing"));
   }catch(e){}
 }
 
@@ -394,38 +380,26 @@ function showStartOverlay(){
   }
 }
 
-function stopAllPlayback(reason){
-  // スリープ・別タブ移動・ページ離脱では必ず完全停止。
-  // audioEnabled は維持する。復帰後に勝手に再生せず、次のユーザー操作だけで再開可能にするため。
-  stopAudio();
-
-  if(reason === "background"){
-    try{
-      document.body.dataset.playbackStopped = "background";
-    }catch(e){}
-  }
+function stopAllPlayback(){
+  // スリープ・別タブ移動では「音声と連続再生ループ」だけ止める。
+  // audioEnabled は false にしない。false にすると復帰後に連続再生を再開できなくなる。
+  autoId++;
+  try{
+    speechSynthesis.pause();
+    speechSynthesis.cancel();
+  }catch(e){}
 }
 
 document.addEventListener("visibilitychange", function(){
   if(document.hidden){
-    stopAllPlayback("background");
+    stopAllPlayback();
   }
 });
 
-// iPhone Safari / Chrome on iOS 対策。
-// pagehide: タブ移動・ホーム画面・スリープに強い。
-// blur: スリープボタン・アプリ切替など、visibilitychangeが遅れるケースの保険。
-window.addEventListener("pagehide", function(){ stopAllPlayback("background"); });
-// Firefox desktopではTTS開始時のfocus変化で音声が止まる場合があるため、blur停止は使わない。
+window.addEventListener("pagehide", stopAllPlayback);
+// Firefox desktop対策: blurで停止するとTTS開始時のfocus変化で音声が止まる場合があるため使わない。
 
 // 復帰時に自動再生はしない。再開はユーザーのタップ操作だけで行う。
-window.addEventListener("pageshow", function(){
-  isPlaying = false;
-  try{ speechSynthesis.cancel(); }catch(e){}
-});
-// focus時は状態を変更しない。復帰時の停止はvisibilitychange/pagehide/pageshowで行う。
-
-// 復帰時に勝手に音が鳴らないことを最優先にする。
 function getList(){
   let list = (DATA[level] || []).filter(p => category === "all" || p.category === category);
   return list.length ? list : (DATA[level] || []);
@@ -541,55 +515,29 @@ function renderAuto(p){
     <div class="status">連続再生中：中国語 → ピンイン → 日本語</div>
   `;
 }
+function speak(text){
+  if(!audioEnabled) return Promise.resolve(false);
 
-async function resetSpeechEngine(id){
-  // Firefoxでは cancel() 直後に speak() すると発話が飲み込まれることがある。
-  // そのため新しい発話の直前だけ、短いマイクロ待機を入れて音声エンジンを安定化する。
   try{ speechSynthesis.cancel(); }catch(e){}
-  await new Promise(resolve => setTimeout(resolve, 80));
-  return id === autoId && isPlaying && audioEnabled;
-}
-
-async function speak(text){
-  if(!audioEnabled) return Promise.resolve();
-
-  const id = ++autoId;
-  isPlaying = true;
-
-  const ready = await resetSpeechEngine(id);
-  if(!ready) return;
 
   return new Promise(resolve => {
-    if(id !== autoId || !isPlaying || !audioEnabled){
-      resolve();
-      return;
-    }
-
-    const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+    const u = new SpeechSynthesisUtterance(String(text).replace(/
+/g,"。"));
     u.rate = 1.0;
     u.pitch = 1.02;
-    applyVoiceFallback(u);
+    applyChineseVoice(u);
 
-    u.onend = () => {
-      if(id === autoId) isPlaying = false;
-      resolve();
-    };
-
-    u.onerror = () => {
-      // エラー時は「聞こえていない可能性」があるため、次文へ進ませない。
-      if(id === autoId) isPlaying = false;
-      resolve();
-    };
+    u.onend = () => resolve(true);
+    // エラー時は「完了」と見なさない。連続再生では次へ進ませない。
+    u.onerror = () => resolve(false);
 
     try{
       speechSynthesis.speak(u);
     }catch(e){
-      if(id === autoId) isPlaying = false;
-      resolve();
+      resolve(false);
     }
   });
 }
-
 function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
 function estimate(text){
   const clean = String(text).replace(/\s/g,"");
@@ -601,24 +549,18 @@ function estimate(text){
   }
   return Math.max(2200, weight * 200);
 }
-async function highlightElement(text, rootEl, sessionId){
-  if(!audioEnabled) return;
+async function highlightElement(text, rootEl){
+  if(!audioEnabled) return false;
 
-  const id = sessionId || ++autoId;
-  isPlaying = true;
-
-  const ready = await resetSpeechEngine(id);
-  if(!ready) return;
-
-  if(id !== autoId || !isPlaying || !audioEnabled) return;
+  try{ speechSynthesis.cancel(); }catch(e){}
 
   rootEl.innerHTML = renderChars(text);
-  const total = Array.from(String(text ?? "")).length;
   const duration = estimate(text);
   const chars = rootEl.querySelectorAll(".char");
   const charsArray = Array.from(chars);
 
   let ended = false;
+  let ok = false;
   let last = -1;
 
   const markUntil = (i) => {
@@ -636,37 +578,30 @@ async function highlightElement(text, rootEl, sessionId){
     span.style.setProperty("text-shadow", "0 0 8px rgba(0,122,255,.24)", "important");
   });
 
-  // 同期開始の可視確認。クリック直後に先頭文字を必ず青くする。
   markUntil(0);
 
-  const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+  const u = new SpeechSynthesisUtterance(String(text).replace(/
+/g,"。"));
   u.rate = 1.0;
   u.pitch = 1.02;
-  applyVoiceFallback(u);
+  applyChineseVoice(u);
 
-  u.onend = () => {
-    ended = true;
-    if(id === autoId && isPlaying && audioEnabled) markAll();
-  };
-  u.onerror = () => {
-    // エラー時は「音声が完了した」と見なさない。次文へ進ませないため停止する。
-    ended = true;
-    if(id === autoId) isPlaying = false;
-  };
+  u.onend = () => { ended = true; ok = true; markAll(); };
+  // エラー時は次文に進ませないため false を返す。
+  u.onerror = () => { ended = true; ok = false; };
 
-  if(id !== autoId || !isPlaying || !audioEnabled){
-    ended = true;
-    return;
+  try{
+    speechSynthesis.speak(u);
+  }catch(e){
+    return false;
   }
-
-  speechSynthesis.speak(u);
 
   const start = performance.now();
   const delay = 220;
 
-  while(!ended && id === autoId && isPlaying && audioEnabled){
+  while(!ended && audioEnabled){
     await wait(100);
-    if(id !== autoId || !isPlaying || !audioEnabled) break;
+    if(!audioEnabled) break;
     const elapsed = Math.max(0, performance.now() - start - delay);
     const progress = Math.min(0.96, elapsed / duration);
     let weightedTotal = 0;
@@ -694,32 +629,35 @@ async function highlightElement(text, rootEl, sessionId){
       markUntil(i);
     }
   }
+
+  return ok;
 }
-async function speakHighlight(text, sessionId){
-  if(!audioEnabled) return;
+async function speakHighlight(text){
+  if(!audioEnabled) return false;
   const zhEl = document.querySelector("#box .zh");
-  if(zhEl) await highlightElement(text, zhEl, sessionId);
+  if(zhEl) return await highlightElement(text, zhEl);
+  return false;
 }
 async function startAuto(){
   if(!audioEnabled) return;
 
   const id = ++autoId;
-  isPlaying = true;
 
-  while(id === autoId && isPlaying && audioEnabled && (view === "continuous" || view === "random")){
+  while(id === autoId && audioEnabled && (view === "continuous" || view === "random")){
     const p = history[index] || pick();
     if(!p) break;
 
     step = 2;
     renderAuto(p);
 
-    await speakHighlight(p.zh, id);
+    const spokenOk = await speakHighlight(p.zh);
 
-    if(id !== autoId || !isPlaying || !audioEnabled || !(view === "continuous" || view === "random")) break;
+    if(!spokenOk) break;
+    if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
 
     await wait(1200);
 
-    if(id !== autoId || !isPlaying || !audioEnabled || !(view === "continuous" || view === "random")) break;
+    if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
 
     const next = pick();
     if(!next) break;
@@ -730,9 +668,6 @@ async function startAuto(){
 }
 async function playListById(id){
   stopAudio();
-
-  const sessionId = ++autoId;
-  isPlaying = true;
 
   const item = currentListItems[Number(id)];
   const el = listPanel.querySelector(`.list-item[data-id="${id}"]`);
@@ -746,7 +681,7 @@ async function playListById(id){
   document.querySelectorAll(".list-item").forEach(x => x.classList.remove("playing"));
   el.classList.add("playing");
 
-  await highlightElement(item.zh, zhEl, sessionId);
+  await highlightElement(item.zh, zhEl);
 }
 function renderList(){
   currentListItems = [];
