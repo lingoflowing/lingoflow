@@ -286,6 +286,42 @@ const startButton = document.getElementById("startButton");
 
 audioEnabled = false;
 
+
+function getBestChineseVoice() {
+
+  const voices = speechSynthesis.getVoices();
+
+  if (!voices || voices.length === 0) {
+    return null;
+  }
+
+  // zh-TW 最優先
+  let voice =
+    voices.find(v => v.lang === 'zh-TW') ||
+
+    // 台湾系・香港系
+    voices.find(v => v.lang === 'zh-HK') ||
+
+    // 中国語全般
+    voices.find(v => v.lang.startsWith('zh')) ||
+
+    // 日本語 fallback
+    voices.find(v => v.lang === 'ja-JP') ||
+
+    // 英語 fallback
+    voices.find(v => v.lang.startsWith('en')) ||
+
+    // 最後の保険
+    voices[0];
+
+  return voice;
+}
+
+// Chrome PC対策
+speechSynthesis.onvoiceschanged = () => {
+  speechSynthesis.getVoices();
+};
+
 function closeStartOverlay(){
   audioEnabled = true;
 
@@ -508,7 +544,7 @@ function speak(text){
       return;
     }
 
-    const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+    const u = (() => { const utterance = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
     u.lang = "zh-TW";
     u.rate = 1.0;
     u.pitch = 1.02;
@@ -580,7 +616,7 @@ async function highlightElement(text, rootEl, sessionId){
   // 同期開始の可視確認。クリック直後に先頭文字を必ず青くする。
   markUntil(0);
 
-  const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+  const u = (() => { const utterance = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
   u.lang = "zh-TW";
   u.rate = 1.0;
   u.pitch = 1.02;
