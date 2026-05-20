@@ -416,16 +416,14 @@ document.addEventListener("visibilitychange", function(){
 // pagehide: タブ移動・ホーム画面・スリープに強い。
 // blur: スリープボタン・アプリ切替など、visibilitychangeが遅れるケースの保険。
 window.addEventListener("pagehide", function(){ stopAllPlayback("background"); });
-window.addEventListener("blur", function(){ stopAllPlayback("background"); });
+// Firefox desktopではTTS開始時のfocus変化で音声が止まる場合があるため、blur停止は使わない。
 
 // 復帰時に自動再生はしない。再開はユーザーのタップ操作だけで行う。
 window.addEventListener("pageshow", function(){
   isPlaying = false;
   try{ speechSynthesis.cancel(); }catch(e){}
 });
-window.addEventListener("focus", function(){
-  isPlaying = false;
-});
+// focus時は状態を変更しない。復帰時の停止はvisibilitychange/pagehide/pageshowで行う。
 
 // 復帰時に勝手に音が鳴らないことを最優先にする。
 function getList(){
@@ -543,13 +541,24 @@ function renderAuto(p){
     <div class="status">連続再生中：中国語 → ピンイン → 日本語</div>
   `;
 }
-function speak(text){
+
+async function resetSpeechEngine(id){
+  // Firefoxでは cancel() 直後に speak() すると発話が飲み込まれることがある。
+  // そのため新しい発話の直前だけ、短いマイクロ待機を入れて音声エンジンを安定化する。
+  try{ speechSynthesis.cancel(); }catch(e){}
+  await new Promise(resolve => setTimeout(resolve, 80));
+  return id === autoId && isPlaying && audioEnabled;
+}
+
+async function speak(text){
   if(!audioEnabled) return Promise.resolve();
 
   const id = ++autoId;
   isPlaying = true;
 
-  speechSynthesis.cancel();
+  const ready = await resetSpeechEngine(id);
+  if(!ready) return;
+
   return new Promise(resolve => {
     if(id !== autoId || !isPlaying || !audioEnabled){
       resolve();
@@ -560,23 +569,27 @@ function speak(text){
     u.rate = 1.0;
     u.pitch = 1.02;
     applyVoiceFallback(u);
+
     u.onend = () => {
       if(id === autoId) isPlaying = false;
       resolve();
     };
+
     u.onerror = () => {
+      // エラー時は「聞こえていない可能性」があるため、次文へ進ませない。
       if(id === autoId) isPlaying = false;
       resolve();
     };
 
-    if(id !== autoId || !isPlaying || !audioEnabled){
+    try{
+      speechSynthesis.speak(u);
+    }catch(e){
+      if(id === autoId) isPlaying = false;
       resolve();
-      return;
     }
-
-    speechSynthesis.speak(u);
   });
 }
+
 function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
 function estimate(text){
   const clean = String(text).replace(/\s/g,"");
@@ -594,7 +607,8 @@ async function highlightElement(text, rootEl, sessionId){
   const id = sessionId || ++autoId;
   isPlaying = true;
 
-  speechSynthesis.cancel();
+  const ready = await resetSpeechEngine(id);
+  if(!ready) return;
 
   if(id !== autoId || !isPlaying || !audioEnabled) return;
 
@@ -635,8 +649,9 @@ async function highlightElement(text, rootEl, sessionId){
     if(id === autoId && isPlaying && audioEnabled) markAll();
   };
   u.onerror = () => {
+    // エラー時は「音声が完了した」と見なさない。次文へ進ませないため停止する。
     ended = true;
-    if(id === autoId && isPlaying && audioEnabled) markAll();
+    if(id === autoId) isPlaying = false;
   };
 
   if(id !== autoId || !isPlaying || !audioEnabled){
