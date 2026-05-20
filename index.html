@@ -274,6 +274,63 @@ button,select{
 <script>
 const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 
+// ===== LingoFlow internal analytics Step 2 =====
+// 外部送信なし。Console表示 + localStorage保存だけを行う。
+let analyticsReady = false;
+const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
+const ANALYTICS_MAX_EVENTS = 300;
+const ANALYTICS_SESSION_ID = String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
+
+function getAnalyticsEvents(){
+  try{
+    return JSON.parse(localStorage.getItem(ANALYTICS_STORAGE_KEY) || "[]");
+  }catch(err){
+    return [];
+  }
+}
+
+function saveAnalyticsEvent(event){
+  try{
+    const events = getAnalyticsEvents();
+    events.push(event);
+    const trimmed = events.slice(-ANALYTICS_MAX_EVENTS);
+    localStorage.setItem(ANALYTICS_STORAGE_KEY, JSON.stringify(trimmed));
+  }catch(err){
+    // localStorageが使えない環境でもアプリ本体は止めない。
+  }
+}
+
+function clearAnalyticsEvents(){
+  try{
+    localStorage.removeItem(ANALYTICS_STORAGE_KEY);
+    console.log("[LingoFlow Analytics] cleared");
+  }catch(err){}
+}
+
+function track(name, data = {}){
+  try{
+    const event = {
+      event: name,
+      time: new Date().toISOString(),
+      sessionId: ANALYTICS_SESSION_ID,
+      view: typeof view !== "undefined" ? view : undefined,
+      mode: typeof mode !== "undefined" ? mode : undefined,
+      level: typeof level !== "undefined" ? level : undefined,
+      category: typeof category !== "undefined" ? category : undefined,
+      index: typeof index !== "undefined" ? index : undefined,
+      step: typeof step !== "undefined" ? step : undefined,
+      ...data
+    };
+
+    saveAnalyticsEvent(event);
+    console.log("[LingoFlow Analytics]", event);
+  }catch(err){}
+}
+
+// PC確認用: Consoleで getAnalyticsEvents() / clearAnalyticsEvents() が使える。
+window.getAnalyticsEvents = getAnalyticsEvents;
+window.clearAnalyticsEvents = clearAnalyticsEvents;
+
 const categoryNames = {
   all:"全部", greeting:"挨拶", cafe:"カフェ", restaurant:"食事", shopping:"買物",
   transport:"交通", hotel:"ホテル", tourism:"観光", daily:"日常", work:"仕事", emergency:"緊急"
@@ -343,6 +400,8 @@ function closeStartOverlay(){
   if(startUnlocked) return;
   startUnlocked = true;
   audioEnabled = true;
+
+  track("start");
 
   unlockIOSAudio();
 
@@ -414,12 +473,21 @@ function stopAllPlayback(){
 
 document.addEventListener("visibilitychange", function(){
   if(document.hidden){
+    track("sleep", { reason: "visibility_hidden" });
     stopAllPlayback();
+  }else{
+    track("resume", { reason: "visibility_visible" });
   }
 });
 
-window.addEventListener("pagehide", stopAllPlayback);
-window.addEventListener("blur", stopAllPlayback);
+window.addEventListener("pagehide", function(){
+  track("sleep", { reason: "pagehide" });
+  stopAllPlayback();
+});
+window.addEventListener("blur", function(){
+  track("sleep", { reason: "window_blur" });
+  stopAllPlayback();
+});
 
 // 復帰時に自動再生はしない。再開はユーザーのタップ操作だけで行う。
 function getList(){
@@ -462,6 +530,7 @@ function cycleMode(){
   stopAudio();
   mode = mode === "speaking" ? "reading" : "speaking";
   step = 0;
+  track("mode_change", { mode });
   updateButtons();
   renderQuestion();
   if(view === "continuous" || view === "random") startAuto();
@@ -470,6 +539,7 @@ function cycleLevel(){
   stopAudio();
   level = levels[(levels.indexOf(level)+1) % levels.length];
   step = 0; history = []; index = -1;
+  track("level_change", { level });
   updateButtons();
   if(view === "list") renderList(); else nextQuestion(true);
   if(view === "continuous" || view === "random") startAuto();
@@ -478,6 +548,7 @@ function setCategory(c){
   stopAudio();
   category = c;
   step = 0; history = []; index = -1;
+  track("category_change", { category });
   if(view === "list") renderList(); else nextQuestion(true);
   if(view === "continuous" || view === "random") startAuto();
 }
@@ -493,6 +564,9 @@ function nextQuestion(forceNew){
     history.push(p); index = history.length - 1;
   }else{ index++; }
   renderQuestion();
+  if(analyticsReady){
+    track("next", { phraseCategory: p.category });
+  }
 }
 function prevQuestion(){
   stopAudio();
@@ -550,6 +624,7 @@ function speak(text){
     if(v) u.voice = v;
     u.onend = resolve;
     u.onerror = resolve;
+    track("play_audio", { audioType: "normal", textLength: String(text ?? "").length });
     speechSynthesis.speak(u);
   });
 }
@@ -611,6 +686,7 @@ async function highlightElement(text, rootEl){
     return;
   }
 
+  track("play_audio", { audioType: "highlight", textLength: String(text ?? "").length });
   speechSynthesis.speak(u);
 
   const start = performance.now();
@@ -759,6 +835,7 @@ box.addEventListener("touchend", e => {
 speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 updateButtons();
 nextQuestion(true);
+analyticsReady = true;
 
 
 </script>
