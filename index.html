@@ -286,42 +286,6 @@ const startButton = document.getElementById("startButton");
 
 audioEnabled = false;
 
-
-function getBestChineseVoice() {
-
-  const voices = speechSynthesis.getVoices();
-
-  if (!voices || voices.length === 0) {
-    return null;
-  }
-
-  // zh-TW 最優先
-  let voice =
-    voices.find(v => v.lang === 'zh-TW') ||
-
-    // 台湾系・香港系
-    voices.find(v => v.lang === 'zh-HK') ||
-
-    // 中国語全般
-    voices.find(v => v.lang.startsWith('zh')) ||
-
-    // 日本語 fallback
-    voices.find(v => v.lang === 'ja-JP') ||
-
-    // 英語 fallback
-    voices.find(v => v.lang.startsWith('en')) ||
-
-    // 最後の保険
-    voices[0];
-
-  return voice;
-}
-
-// Chrome PC対策
-speechSynthesis.onvoiceschanged = () => {
-  speechSynthesis.getVoices();
-};
-
 function closeStartOverlay(){
   audioEnabled = true;
 
@@ -353,6 +317,54 @@ if(startButton){
     e.stopPropagation();
     closeStartOverlay();
   }, true);
+}
+
+
+// ===== Chrome PC voice fallback =====
+// Chrome PCでは speechSynthesis.getVoices() が初回だけ空になることがあるため、
+// 音声一覧をキャッシュし、台湾華語を優先しつつ確実に何かの音声へフォールバックする。
+let cachedVoices = [];
+
+function refreshVoices(){
+  try{
+    const voices = speechSynthesis.getVoices();
+    if(voices && voices.length) cachedVoices = voices;
+    return cachedVoices;
+  }catch(e){
+    return cachedVoices;
+  }
+}
+
+function getBestChineseVoice(){
+  const voices = refreshVoices();
+  if(!voices || !voices.length) return null;
+
+  const norm = s => String(s || '').toLowerCase();
+
+  return (
+    voices.find(v => v.lang === 'zh-TW') ||
+    voices.find(v => norm(v.lang) === 'zh-tw') ||
+    voices.find(v => norm(v.name).includes('taiwan')) ||
+    voices.find(v => String(v.name || '').includes('臺灣')) ||
+    voices.find(v => String(v.name || '').includes('台湾')) ||
+    voices.find(v => norm(v.lang) === 'zh-hk') ||
+    voices.find(v => norm(v.lang).startsWith('zh-')) ||
+    voices.find(v => norm(v.lang).startsWith('zh')) ||
+    voices.find(v => norm(v.lang) === 'ja-jp') ||
+    voices.find(v => norm(v.lang).startsWith('en')) ||
+    voices[0]
+  );
+}
+
+function applyVoiceFallback(utterance){
+  const voice = getBestChineseVoice();
+  if(voice){
+    utterance.voice = voice;
+    utterance.lang = voice.lang || 'zh-TW';
+  }else{
+    utterance.lang = 'zh-TW';
+  }
+  return utterance;
 }
 
 function esc(s){
@@ -544,13 +556,10 @@ function speak(text){
       return;
     }
 
-    const u = (() => { const utterance = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
-    u.lang = "zh-TW";
+    const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
     u.rate = 1.0;
     u.pitch = 1.02;
-    const voices = speechSynthesis.getVoices();
-    const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
-    if(v) u.voice = v;
+    applyVoiceFallback(u);
     u.onend = () => {
       if(id === autoId) isPlaying = false;
       resolve();
@@ -616,13 +625,10 @@ async function highlightElement(text, rootEl, sessionId){
   // 同期開始の可視確認。クリック直後に先頭文字を必ず青くする。
   markUntil(0);
 
-  const u = (() => { const utterance = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
-  u.lang = "zh-TW";
+  const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
   u.rate = 1.0;
   u.pitch = 1.02;
-  const voices = speechSynthesis.getVoices();
-  const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
-  if(v) u.voice = v;
+  applyVoiceFallback(u);
 
   u.onend = () => {
     ended = true;
@@ -787,7 +793,8 @@ box.addEventListener("touchend", e => {
     if(dx < 0) nextQuestion(true); else prevQuestion();
   }
 }, {passive:true});
-speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+speechSynthesis.onvoiceschanged = () => refreshVoices();
+refreshVoices();
 updateButtons();
 nextQuestion(true);
 
