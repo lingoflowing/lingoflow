@@ -318,50 +318,6 @@ if(startButton){
   }, true);
 }
 
-
-// ===== Firefox / Chrome stable voice selection =====
-// 重要: Firefoxではユーザー操作直後の speechSynthesis.speak() が必要。
-// cancel後にsetTimeout等で待つと、ユーザー操作扱いが切れて発話が飲み込まれる場合がある。
-let cachedVoices = [];
-
-function refreshVoices(){
-  try{
-    const voices = speechSynthesis.getVoices();
-    if(voices && voices.length) cachedVoices = voices;
-    return cachedVoices;
-  }catch(e){
-    return cachedVoices;
-  }
-}
-
-function getBestChineseVoice(){
-  const voices = refreshVoices();
-  if(!voices || !voices.length) return null;
-
-  const norm = s => String(s || '').toLowerCase();
-
-  return (
-    voices.find(v => norm(v.lang) === 'zh-tw') ||
-    voices.find(v => norm(v.name).includes('taiwan')) ||
-    voices.find(v => String(v.name || '').includes('臺灣')) ||
-    voices.find(v => String(v.name || '').includes('台湾')) ||
-    voices.find(v => norm(v.lang) === 'zh-hk') ||
-    voices.find(v => norm(v.lang).startsWith('zh-')) ||
-    voices.find(v => norm(v.lang).startsWith('zh')) ||
-    null
-  );
-}
-
-function applyChineseVoice(utterance){
-  const voice = getBestChineseVoice();
-  utterance.lang = 'zh-TW';
-  if(voice){
-    utterance.voice = voice;
-    utterance.lang = voice.lang || 'zh-TW';
-  }
-  return utterance;
-}
-
 function esc(s){
   return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
 }
@@ -397,7 +353,7 @@ document.addEventListener("visibilitychange", function(){
 });
 
 window.addEventListener("pagehide", stopAllPlayback);
-// Firefox desktop対策: blurで停止するとTTS開始時のfocus変化で音声が止まる場合があるため使わない。
+window.addEventListener("blur", stopAllPlayback);
 
 // 復帰時に自動再生はしない。再開はユーザーのタップ操作だけで行う。
 function getList(){
@@ -516,26 +472,19 @@ function renderAuto(p){
   `;
 }
 function speak(text){
-  if(!audioEnabled) return Promise.resolve(false);
-
-  try{ speechSynthesis.cancel(); }catch(e){}
-
+  if(!audioEnabled) return Promise.resolve();
+  speechSynthesis.cancel();
   return new Promise(resolve => {
-    const u = new SpeechSynthesisUtterance(String(text).replace(/
-/g,"。"));
+    const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+    u.lang = "zh-TW";
     u.rate = 1.0;
     u.pitch = 1.02;
-    applyChineseVoice(u);
-
-    u.onend = () => resolve(true);
-    // エラー時は「完了」と見なさない。連続再生では次へ進ませない。
-    u.onerror = () => resolve(false);
-
-    try{
-      speechSynthesis.speak(u);
-    }catch(e){
-      resolve(false);
-    }
+    const voices = speechSynthesis.getVoices();
+    const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
+    if(v) u.voice = v;
+    u.onend = resolve;
+    u.onerror = resolve;
+    speechSynthesis.speak(u);
   });
 }
 function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
@@ -550,17 +499,16 @@ function estimate(text){
   return Math.max(2200, weight * 200);
 }
 async function highlightElement(text, rootEl){
-  if(!audioEnabled) return false;
-
-  try{ speechSynthesis.cancel(); }catch(e){}
+  if(!audioEnabled) return;
+  speechSynthesis.cancel();
 
   rootEl.innerHTML = renderChars(text);
+  const total = Array.from(String(text ?? "")).length;
   const duration = estimate(text);
   const chars = rootEl.querySelectorAll(".char");
   const charsArray = Array.from(chars);
 
   let ended = false;
-  let ok = false;
   let last = -1;
 
   const markUntil = (i) => {
@@ -578,23 +526,26 @@ async function highlightElement(text, rootEl){
     span.style.setProperty("text-shadow", "0 0 8px rgba(0,122,255,.24)", "important");
   });
 
+  // 同期開始の可視確認。クリック直後に先頭文字を必ず青くする。
   markUntil(0);
 
-  const u = new SpeechSynthesisUtterance(String(text).replace(/
-/g,"。"));
+  const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+  u.lang = "zh-TW";
   u.rate = 1.0;
   u.pitch = 1.02;
-  applyChineseVoice(u);
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
+  if(v) u.voice = v;
 
-  u.onend = () => { ended = true; ok = true; markAll(); };
-  // エラー時は次文に進ませないため false を返す。
-  u.onerror = () => { ended = true; ok = false; };
+  u.onend = () => { ended = true; markAll(); };
+  u.onerror = () => { ended = true; markAll(); };
 
-  try{
-    speechSynthesis.speak(u);
-  }catch(e){
-    return false;
+  if(!audioEnabled){
+    ended = true;
+    return;
   }
+
+  speechSynthesis.speak(u);
 
   const start = performance.now();
   const delay = 220;
@@ -629,14 +580,11 @@ async function highlightElement(text, rootEl){
       markUntil(i);
     }
   }
-
-  return ok;
 }
 async function speakHighlight(text){
-  if(!audioEnabled) return false;
+  if(!audioEnabled) return;
   const zhEl = document.querySelector("#box .zh");
-  if(zhEl) return await highlightElement(text, zhEl);
-  return false;
+  if(zhEl) await highlightElement(text, zhEl);
 }
 async function startAuto(){
   if(!audioEnabled) return;
@@ -650,9 +598,8 @@ async function startAuto(){
     step = 2;
     renderAuto(p);
 
-    const spokenOk = await speakHighlight(p.zh);
+    await speakHighlight(p.zh);
 
-    if(!spokenOk) break;
     if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
 
     await wait(1200);
@@ -743,8 +690,7 @@ box.addEventListener("touchend", e => {
     if(dx < 0) nextQuestion(true); else prevQuestion();
   }
 }, {passive:true});
-speechSynthesis.onvoiceschanged = () => refreshVoices();
-refreshVoices();
+speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 updateButtons();
 nextQuestion(true);
 
