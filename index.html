@@ -267,6 +267,7 @@ let history = [];
 let index = -1;
 let autoId = 0;
 let audioEnabled = false;
+let isPlaying = false;
 let sx = 0, sy = 0;
 let currentListItems = [];
 
@@ -284,6 +285,42 @@ const startOverlay = document.getElementById("startOverlay");
 const startButton = document.getElementById("startButton");
 
 audioEnabled = false;
+
+
+function getBestChineseVoice() {
+
+  const voices = speechSynthesis.getVoices();
+
+  if (!voices || voices.length === 0) {
+    return null;
+  }
+
+  // zh-TW 最優先
+  let voice =
+    voices.find(v => v.lang === 'zh-TW') ||
+
+    // 台湾系・香港系
+    voices.find(v => v.lang === 'zh-HK') ||
+
+    // 中国語全般
+    voices.find(v => v.lang.startsWith('zh')) ||
+
+    // 日本語 fallback
+    voices.find(v => v.lang === 'ja-JP') ||
+
+    // 英語 fallback
+    voices.find(v => v.lang.startsWith('en')) ||
+
+    // 最後の保険
+    voices[0];
+
+  return voice;
+}
+
+// Chrome PC対策
+speechSynthesis.onvoiceschanged = () => {
+  speechSynthesis.getVoices();
+};
 
 function closeStartOverlay(){
   audioEnabled = true;
@@ -322,10 +359,19 @@ function esc(s){
   return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
 }
 function stopAudio(){
+  // すべての再生系処理を無効化する唯一の停止口。
+  // autoIdを進めることで、進行中の連続再生ループ・ハイライト・待機処理を安全に破棄する。
   autoId++;
+  isPlaying = false;
+
   try{
     speechSynthesis.pause();
     speechSynthesis.cancel();
+  }catch(e){}
+
+  try{
+    document.querySelectorAll(".char.done").forEach(el => el.classList.remove("done"));
+    document.querySelectorAll(".list-item.playing").forEach(el => el.classList.remove("playing"));
   }catch(e){}
 }
 
@@ -336,26 +382,40 @@ function showStartOverlay(){
   }
 }
 
-function stopAllPlayback(){
-  // スリープ・別タブ移動では「音声と連続再生ループ」だけ止める。
-  // audioEnabled は false にしない。false にすると復帰後に連続再生を再開できなくなる。
-  autoId++;
-  try{
-    speechSynthesis.pause();
-    speechSynthesis.cancel();
-  }catch(e){}
+function stopAllPlayback(reason){
+  // スリープ・別タブ移動・ページ離脱では必ず完全停止。
+  // audioEnabled は維持する。復帰後に勝手に再生せず、次のユーザー操作だけで再開可能にするため。
+  stopAudio();
+
+  if(reason === "background"){
+    try{
+      document.body.dataset.playbackStopped = "background";
+    }catch(e){}
+  }
 }
 
 document.addEventListener("visibilitychange", function(){
   if(document.hidden){
-    stopAllPlayback();
+    stopAllPlayback("background");
   }
 });
 
-window.addEventListener("pagehide", stopAllPlayback);
-window.addEventListener("blur", stopAllPlayback);
+// iPhone Safari / Chrome on iOS 対策。
+// pagehide: タブ移動・ホーム画面・スリープに強い。
+// blur: スリープボタン・アプリ切替など、visibilitychangeが遅れるケースの保険。
+window.addEventListener("pagehide", function(){ stopAllPlayback("background"); });
+window.addEventListener("blur", function(){ stopAllPlayback("background"); });
 
 // 復帰時に自動再生はしない。再開はユーザーのタップ操作だけで行う。
+window.addEventListener("pageshow", function(){
+  isPlaying = false;
+  try{ speechSynthesis.cancel(); }catch(e){}
+});
+window.addEventListener("focus", function(){
+  isPlaying = false;
+});
+
+// 復帰時に勝手に音が鳴らないことを最優先にする。
 function getList(){
   let list = (DATA[level] || []).filter(p => category === "all" || p.category === category);
   return list.length ? list : (DATA[level] || []);
@@ -473,17 +533,38 @@ function renderAuto(p){
 }
 function speak(text){
   if(!audioEnabled) return Promise.resolve();
+
+  const id = ++autoId;
+  isPlaying = true;
+
   speechSynthesis.cancel();
   return new Promise(resolve => {
-    const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+    if(id !== autoId || !isPlaying || !audioEnabled){
+      resolve();
+      return;
+    }
+
+    const u = (() => { const utterance = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
     u.lang = "zh-TW";
     u.rate = 1.0;
     u.pitch = 1.02;
     const voices = speechSynthesis.getVoices();
     const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
     if(v) u.voice = v;
-    u.onend = resolve;
-    u.onerror = resolve;
+    u.onend = () => {
+      if(id === autoId) isPlaying = false;
+      resolve();
+    };
+    u.onerror = () => {
+      if(id === autoId) isPlaying = false;
+      resolve();
+    };
+
+    if(id !== autoId || !isPlaying || !audioEnabled){
+      resolve();
+      return;
+    }
+
     speechSynthesis.speak(u);
   });
 }
@@ -498,9 +579,15 @@ function estimate(text){
   }
   return Math.max(2200, weight * 200);
 }
-async function highlightElement(text, rootEl){
+async function highlightElement(text, rootEl, sessionId){
   if(!audioEnabled) return;
+
+  const id = sessionId || ++autoId;
+  isPlaying = true;
+
   speechSynthesis.cancel();
+
+  if(id !== autoId || !isPlaying || !audioEnabled) return;
 
   rootEl.innerHTML = renderChars(text);
   const total = Array.from(String(text ?? "")).length;
@@ -529,7 +616,7 @@ async function highlightElement(text, rootEl){
   // 同期開始の可視確認。クリック直後に先頭文字を必ず青くする。
   markUntil(0);
 
-  const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
+  const u = (() => { const utterance = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
   u.lang = "zh-TW";
   u.rate = 1.0;
   u.pitch = 1.02;
@@ -537,10 +624,16 @@ async function highlightElement(text, rootEl){
   const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
   if(v) u.voice = v;
 
-  u.onend = () => { ended = true; markAll(); };
-  u.onerror = () => { ended = true; markAll(); };
+  u.onend = () => {
+    ended = true;
+    if(id === autoId && isPlaying && audioEnabled) markAll();
+  };
+  u.onerror = () => {
+    ended = true;
+    if(id === autoId && isPlaying && audioEnabled) markAll();
+  };
 
-  if(!audioEnabled){
+  if(id !== autoId || !isPlaying || !audioEnabled){
     ended = true;
     return;
   }
@@ -550,9 +643,9 @@ async function highlightElement(text, rootEl){
   const start = performance.now();
   const delay = 220;
 
-  while(!ended && audioEnabled){
+  while(!ended && id === autoId && isPlaying && audioEnabled){
     await wait(100);
-    if(!audioEnabled) break;
+    if(id !== autoId || !isPlaying || !audioEnabled) break;
     const elapsed = Math.max(0, performance.now() - start - delay);
     const progress = Math.min(0.96, elapsed / duration);
     let weightedTotal = 0;
@@ -581,30 +674,31 @@ async function highlightElement(text, rootEl){
     }
   }
 }
-async function speakHighlight(text){
+async function speakHighlight(text, sessionId){
   if(!audioEnabled) return;
   const zhEl = document.querySelector("#box .zh");
-  if(zhEl) await highlightElement(text, zhEl);
+  if(zhEl) await highlightElement(text, zhEl, sessionId);
 }
 async function startAuto(){
   if(!audioEnabled) return;
 
   const id = ++autoId;
+  isPlaying = true;
 
-  while(id === autoId && audioEnabled && (view === "continuous" || view === "random")){
+  while(id === autoId && isPlaying && audioEnabled && (view === "continuous" || view === "random")){
     const p = history[index] || pick();
     if(!p) break;
 
     step = 2;
     renderAuto(p);
 
-    await speakHighlight(p.zh);
+    await speakHighlight(p.zh, id);
 
-    if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
+    if(id !== autoId || !isPlaying || !audioEnabled || !(view === "continuous" || view === "random")) break;
 
     await wait(1200);
 
-    if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
+    if(id !== autoId || !isPlaying || !audioEnabled || !(view === "continuous" || view === "random")) break;
 
     const next = pick();
     if(!next) break;
@@ -615,6 +709,9 @@ async function startAuto(){
 }
 async function playListById(id){
   stopAudio();
+
+  const sessionId = ++autoId;
+  isPlaying = true;
 
   const item = currentListItems[Number(id)];
   const el = listPanel.querySelector(`.list-item[data-id="${id}"]`);
@@ -628,7 +725,7 @@ async function playListById(id){
   document.querySelectorAll(".list-item").forEach(x => x.classList.remove("playing"));
   el.classList.add("playing");
 
-  await highlightElement(item.zh, zhEl);
+  await highlightElement(item.zh, zhEl, sessionId);
 }
 function renderList(){
   currentListItems = [];
