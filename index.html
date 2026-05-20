@@ -224,6 +224,12 @@ button,select{
   -webkit-user-select: none;
 }
 
+
+/* ===== iOS audio unlock feedback ===== */
+.start-note.audio-unlocked{
+  color:#005bbb;
+}
+
 </style>
 </head>
 <body>
@@ -305,15 +311,45 @@ const startCard = document.querySelector(".start-card");
 audioEnabled = false;
 let startUnlocked = false;
 
+function unlockIOSAudio(){
+  // iPhone Safari/Chrome 対策:
+  // iOSは「ユーザーのタップ直後」に speechSynthesis.speak() しないと、
+  // その後の音声再生をブロックすることがある。
+  // ここで極短い日本語を一度だけ発話して音声エンジンを開く。
+  try{
+    if(!("speechSynthesis" in window)) return;
+
+    speechSynthesis.cancel();
+    speechSynthesis.getVoices();
+
+    const u = new SpeechSynthesisUtterance("開始");
+    u.lang = "ja-JP";
+    u.volume = 0.01;
+    u.rate = 1;
+    u.pitch = 1;
+
+    speechSynthesis.speak(u);
+
+    // 発話キューだけ残る事故を避けるため少し後でキャンセル。
+    // ユーザー操作直後の unlock は済んでいる。
+    setTimeout(() => {
+      try{ speechSynthesis.cancel(); }catch(err){}
+    }, 220);
+
+  }catch(err){}
+}
+
 function closeStartOverlay(){
   if(startUnlocked) return;
   startUnlocked = true;
   audioEnabled = true;
 
-  try{
-    speechSynthesis.cancel();
-    speechSynthesis.getVoices();
-  }catch(err){}
+  unlockIOSAudio();
+
+  const note = document.querySelector(".start-note");
+  if(note){
+    note.classList.add("audio-unlocked");
+  }
 
   if(startOverlay){
     startOverlay.classList.add("hidden");
