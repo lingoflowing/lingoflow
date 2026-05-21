@@ -7,6 +7,9 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
+<!-- LingoFlow app version: 2026-05-21-kpi-session-v3 -->
+<meta name="lingoflow-app-version" content="2026-05-21-kpi-session-v3">
+
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -279,7 +282,14 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const ANALYTICS_SESSION_ID = String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
+const LINGOFLOW_APP_VERSION = "2026-05-21-kpi-session-v3";
+window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
+function createAnalyticsSessionId(){
+  return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
+}
+let ANALYTICS_SESSION_ID = createAnalyticsSessionId();
+let analyticsSessionStartedAt = Date.now();
+let analyticsSessionEndSent = false;
 
 // ===== Anonymous user analytics v1 =====
 // 個人情報を使わず、同じブラウザ内だけでDAU / Returning / Retentionを測る。
@@ -366,6 +376,35 @@ function saveAnalyticsEvent(event){
   }
 }
 
+function getSessionDurationSec(){
+  return Math.max(0, Math.round((Date.now() - analyticsSessionStartedAt) / 1000));
+}
+
+function startNewAnalyticsSession(reason){
+  ANALYTICS_SESSION_ID = createAnalyticsSessionId();
+  analyticsSessionStartedAt = Date.now();
+  analyticsSessionEndSent = false;
+  track("session_start", {
+    reason,
+    resumed_session: true
+  });
+}
+
+function getCurrentPhraseContext(){
+  try{
+    const p = history[index] || null;
+    return {
+      phraseCategory: p ? p.category : null,
+      phraseZhLength: p ? String(p.zh || "").length : 0
+    };
+  }catch(err){
+    return {
+      phraseCategory: null,
+      phraseZhLength: 0
+    };
+  }
+}
+
 function clearAnalyticsEvents(){
   try{
     localStorage.removeItem(ANALYTICS_STORAGE_KEY);
@@ -380,13 +419,16 @@ function track(name, data = {}){
       time: new Date().toISOString(),
       sessionId: ANALYTICS_SESSION_ID,
       userId: getStoredUserId() || undefined,
+      appVersion: LINGOFLOW_APP_VERSION,
       localDate: getLocalDateString(),
+      sessionDurationSec: getSessionDurationSec(),
       view: typeof view !== "undefined" ? view : undefined,
       mode: typeof mode !== "undefined" ? mode : undefined,
       level: typeof level !== "undefined" ? level : undefined,
       category: typeof category !== "undefined" ? category : undefined,
       index: typeof index !== "undefined" ? index : undefined,
       step: typeof step !== "undefined" ? step : undefined,
+      ...getCurrentPhraseContext(),
       ...data
     };
 
@@ -398,9 +440,24 @@ function track(name, data = {}){
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(event)
+      body: JSON.stringify(event),
+      keepalive: true
     }).catch(() => {});
   }catch(err){}
+}
+
+function trackSessionEnd(reason){
+  if(analyticsSessionEndSent) return;
+  analyticsSessionEndSent = true;
+  track("session_end", {
+    reason,
+    session_duration_sec: getSessionDurationSec(),
+    duration_bucket:
+      getSessionDurationSec() < 60 ? "under_1min" :
+      getSessionDurationSec() < 180 ? "1_3min" :
+      getSessionDurationSec() < 600 ? "3_10min" :
+      getSessionDurationSec() < 1800 ? "10_30min" : "over_30min"
+  });
 }
 
 // PC確認用: Consoleで getAnalyticsEvents() / clearAnalyticsEvents() が使える。
@@ -487,7 +544,10 @@ window.getLingoFlowUserAnalytics = function(){
     userId: getStoredUserId(),
     firstVisitDate: localStorage.getItem(ANALYTICS_FIRST_VISIT_KEY),
     lastVisitDate: localStorage.getItem(ANALYTICS_LAST_VISIT_KEY),
-    visitDates: getVisitDates()
+    visitDates: getVisitDates(),
+    appVersion: LINGOFLOW_APP_VERSION,
+    sessionId: ANALYTICS_SESSION_ID,
+    sessionDurationSec: getSessionDurationSec()
   };
 };
 
@@ -510,6 +570,48 @@ let autoId = 0;
 let audioEnabled = false;
 let sx = 0, sy = 0;
 let currentListItems = [];
+
+
+// ===== Speech error cleanup v3 =====
+// speechSynthesis.cancel() による想定内の中断を audio_error として数えない。
+// KPIでは本当のエラーだけ audio_error、ユーザー操作やタブ移動による停止は audio_interrupted に分ける。
+let speechCancelExpectedUntil = 0;
+let speechCancelExpectedReason = "";
+
+function markExpectedSpeechCancel(reason = "cancel"){
+  speechCancelExpectedUntil = Date.now() + 1200;
+  speechCancelExpectedReason = reason;
+}
+
+function safeCancelSpeech(reason = "cancel"){
+  try{
+    markExpectedSpeechCancel(reason);
+    speechSynthesis.cancel();
+  }catch(err){}
+}
+
+function isExpectedSpeechError(e){
+  const errorName = e && e.error ? String(e.error).toLowerCase() : "";
+  return Date.now() < speechCancelExpectedUntil ||
+    errorName === "interrupted" ||
+    errorName === "canceled" ||
+    errorName === "cancelled";
+}
+
+function handleSpeechError(e, audioType, text){
+  const payload = {
+    audioType,
+    textLength: String(text ?? "").length,
+    speechError: e && e.error ? String(e.error) : "unknown",
+    cancelReason: speechCancelExpectedReason || null
+  };
+
+  if(isExpectedSpeechError(e)){
+    track("audio_interrupted", payload);
+  }else{
+    track("audio_error", payload);
+  }
+}
 
 const box = document.getElementById("box");
 const listPanel = document.getElementById("listPanel");
@@ -536,7 +638,7 @@ function unlockIOSAudio(){
   try{
     if(!("speechSynthesis" in window)) return;
 
-    speechSynthesis.cancel();
+    safeCancelSpeech("unlock_before");
     speechSynthesis.getVoices();
 
     const u = new SpeechSynthesisUtterance("開始");
@@ -550,7 +652,7 @@ function unlockIOSAudio(){
     // 発話キューだけ残る事故を避けるため少し後でキャンセル。
     // ユーザー操作直後の unlock は済んでいる。
     setTimeout(() => {
-      try{ speechSynthesis.cancel(); }catch(err){}
+      safeCancelSpeech("unlock_cleanup");
     }, 220);
 
   }catch(err){}
@@ -610,7 +712,7 @@ function stopAudio(){
   autoId++;
   try{
     speechSynthesis.pause();
-    speechSynthesis.cancel();
+    safeCancelSpeech("stop_playback");
   }catch(e){}
 }
 
@@ -627,22 +729,33 @@ function stopAllPlayback(){
   autoId++;
   try{
     speechSynthesis.pause();
-    speechSynthesis.cancel();
+    safeCancelSpeech("stop_playback");
   }catch(e){}
 }
 
 document.addEventListener("visibilitychange", function(){
   if(document.hidden){
+    track("visibility_hidden", { reason: "visibility_hidden" });
     track("sleep", { reason: "visibility_hidden" });
+    trackSessionEnd("visibility_hidden");
     stopAllPlayback();
   }else{
+    const wasSessionEnded = analyticsSessionEndSent;
+    if(wasSessionEnded){
+      startNewAnalyticsSession("visibility_visible");
+    }
+    track("visibility_visible", { reason: "visibility_visible" });
     track("resume", { reason: "visibility_visible" });
   }
 });
 
 window.addEventListener("pagehide", function(){
   track("sleep", { reason: "pagehide" });
+  trackSessionEnd("pagehide");
   stopAllPlayback();
+});
+window.addEventListener("beforeunload", function(){
+  trackSessionEnd("beforeunload");
 });
 window.addEventListener("blur", function(){
   track("sleep", { reason: "window_blur" });
@@ -773,7 +886,7 @@ function renderAuto(p){
 }
 function speak(text){
   if(!audioEnabled) return Promise.resolve();
-  speechSynthesis.cancel();
+  safeCancelSpeech("before_normal_speak");
   return new Promise(resolve => {
     const u = new SpeechSynthesisUtterance(String(text).replace(/\n/g,"。"));
     u.lang = "zh-TW";
@@ -782,8 +895,14 @@ function speak(text){
     const voices = speechSynthesis.getVoices();
     const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
     if(v) u.voice = v;
-    u.onend = resolve;
-    u.onerror = resolve;
+    u.onend = () => {
+      track("audio_complete", { audioType: "normal", textLength: String(text ?? "").length });
+      resolve();
+    };
+    u.onerror = (e) => {
+      handleSpeechError(e, "normal", text);
+      resolve();
+    };
     track("play_audio", { audioType: "normal", textLength: String(text ?? "").length });
     speechSynthesis.speak(u);
   });
@@ -801,7 +920,7 @@ function estimate(text){
 }
 async function highlightElement(text, rootEl){
   if(!audioEnabled) return;
-  speechSynthesis.cancel();
+  safeCancelSpeech("before_highlight_speak");
 
   rootEl.innerHTML = renderChars(text);
   const total = Array.from(String(text ?? "")).length;
@@ -838,8 +957,16 @@ async function highlightElement(text, rootEl){
   const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
   if(v) u.voice = v;
 
-  u.onend = () => { ended = true; markAll(); };
-  u.onerror = () => { ended = true; markAll(); };
+  u.onend = () => {
+    ended = true;
+    markAll();
+    track("audio_complete", { audioType: "highlight", textLength: String(text ?? "").length });
+  };
+  u.onerror = (e) => {
+    ended = true;
+    markAll();
+    handleSpeechError(e, "highlight", text);
+  };
 
   if(!audioEnabled){
     ended = true;
