@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LingoFlow Analytics Viewer</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #14213d;
+      --muted: #667085;
+      --line: #e5e7eb;
+      --blue: #2563eb;
+      --green: #059669;
+      --orange: #d97706;
+      --red: #dc2626;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(245, 247, 251, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: 0.01em;
+    }
+
+    .sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 14px 48px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button, select {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .notice {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-note {
+      margin-top: 5px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .ok { color: var(--green); }
+    .warn { color: var(--orange); }
+    .bad { color: var(--red); }
+    .blue { color: var(--blue); }
+
+    h2 {
+      font-size: 17px;
+      margin: 24px 0 10px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f9fafb;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: #f3f4f6;
+      color: #374151;
+      font-size: 12px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    details {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      margin-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 14px;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+
+    .empty {
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-value {
+        font-size: 25px;
+      }
+
+      header {
+        padding: 12px;
+      }
+
+      main {
+        padding: 14px 10px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>LingoFlow Analytics Viewer</h1>
+        <div class="sub" id="lastUpdated">localStorage 解析ビュー</div>
+      </div>
+      <div class="toolbar">
+        <select id="versionSelect" aria-label="appVersion filter"></select>
+        <select id="rangeSelect" aria-label="date range filter">
+          <option value="24h">直近24時間</option>
+          <option value="7d">直近7日</option>
+          <option value="all">全期間</option>
+        </select>
+        <button class="primary" id="refreshBtn">再集計</button>
+        <button id="copyBtn">JSONコピー</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="notice">
+      このページは localStorage を読むだけです。音声再生・POST送信・index.html の変更は行いません。
+    </div>
+
+    <section id="app"></section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const TARGET_DEFAULT_VERSION = "2026-05-21-kpi-session-v3";
+
+    let latestSummary = null;
+
+    function safeParse(value) {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return null;
+      }
+    }
+
+    function parseTime(value) {
+      if (!value) return null;
+
+      if (typeof value === "number") {
+        if (value > 1000000000000) return new Date(value);
+        if (value > 1000000000) return new Date(value * 1000);
+        return null;
+      }
+
+      if (typeof value === "string") {
+        const d = new Date(value);
+        if (!Number.isNaN(d.getTime())) return d;
+      }
+
+      return null;
+    }
+
+    function eventNameOf(obj) {
+      return obj.event || obj.event_name || obj.name || obj.type || obj.action || "";
+    }
+
+    function timestampOf(obj) {
+      return obj.ts || obj.timestamp || obj.time || obj.createdAt || obj.date || "";
+    }
+
+    function versionOf(obj) {
+      return obj.appVersion || obj.version || "(unknown)";
+    }
+
+    function userIdOf(obj) {
+      return obj.unique_user_id || obj.user_id || obj.uid || obj.userId || "(unknown)";
+    }
+
+    function flattenEvents(input, out = [], sourceKey = "") {
+      if (!input) return out;
+
+      if (Array.isArray(input)) {
+        input.forEach(item => flattenEvents(item, out, sourceKey));
+        return out;
+      }
+
+      if (typeof input === "object") {
+        const eventName = eventNameOf(input);
+
+        if (eventName) {
+          const parsedTime = parseTime(timestampOf(input));
+          out.push({
+            ...input,
+            __event: String(eventName),
+            __time: parsedTime,
+            __timeText: parsedTime ? parsedTime.toLocaleString() : "",
+            __day: parsedTime ? toLocalDay(parsedTime) : "",
+            __version: versionOf(input),
+            __userId: userIdOf(input),
+            __sourceKey: sourceKey
+          });
+          return out;
+        }
+
+        Object.values(input).forEach(value => {
+          if (value && typeof value === "object") {
+            flattenEvents(value, out, sourceKey);
+          }
+        });
+      }
+
+      return out;
+    }
+
+    function toLocalDay(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function countBy(items, fn) {
+      return items.reduce((acc, item) => {
+        const key = fn(item) || "(unknown)";
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function sum(values) {
+      return values.reduce((a, b) => a + b, 0);
+    }
+
+    function rate(num, den) {
+      if (!den) return null;
+      return Math.round((num / den) * 1000) / 10;
+    }
+
+    function fmt(value) {
+      if (value === null || value === undefined || value === "") return "-";
+      return String(value);
+    }
+
+    function fmtPct(value) {
+      if (value === null || value === undefined) return "-";
+      return `${value}%`;
+    }
+
+    function classForRate(metric, value) {
+      if (value === null || value === undefined) return "";
+
+      if (metric === "audio_error") {
+        if (value === 0) return "ok";
+        if (value <= 5) return "warn";
+        return "bad";
+      }
+
+      if (metric === "audio_complete") {
+        if (value >= 70) return "ok";
+        if (value >= 40) return "warn";
+        return "bad";
+      }
+
+      if (metric === "audio_interrupted") {
+        if (value <= 20) return "ok";
+        if (value <= 50) return "warn";
+        return "bad";
+      }
+
+      return "";
+    }
+
+    function readLocalStorageEvents() {
+      const rawKeys = [];
+      const events = [];
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        rawKeys.push(key);
+
+        const parsed = safeParse(localStorage.getItem(key));
+        if (parsed) {
+          flattenEvents(parsed, events, key);
+        }
+      }
+
+      events.sort((a, b) => {
+        const at = a.__time ? a.__time.getTime() : 0;
+        const bt = b.__time ? b.__time.getTime() : 0;
+        return bt - at;
+      });
+
+      return { rawKeys, events };
+    }
+
+    function filterByRange(events, range) {
+      if (range === "all") return events;
+
+      const now = Date.now();
+      const ms = range === "7d"
+        ? 7 * 24 * 60 * 60 * 1000
+        : 24 * 60 * 60 * 1000;
+
+      return events.filter(e => {
+        if (!e.__time || Number.isNaN(e.__time.getTime())) return true;
+        return e.__time.getTime() >= now - ms;
+      });
+    }
+
+    function buildRetention(events) {
+      const byUser = new Map();
+
+      events.forEach(e => {
+        const userId = e.__userId || "(unknown)";
+        if (!byUser.has(userId)) byUser.set(userId, []);
+        byUser.get(userId).push(e);
+      });
+
+      const rows = [];
+
+      byUser.forEach((items, userId) => {
+        const days = Array.from(new Set(
+          items.map(e => e.__day).filter(Boolean)
+        )).sort();
+
+        const firstDay = days[0] || "";
+        const lastDay = days[days.length - 1] || "";
+
+        let d1 = false;
+        let d3 = false;
+        let d7 = false;
+
+        if (firstDay) {
+          const first = new Date(firstDay + "T00:00:00");
+          const dayDiffs = days.map(day => {
+            const d = new Date(day + "T00:00:00");
+            return Math.round((d.getTime() - first.getTime()) / (24 * 60 * 60 * 1000));
+          });
+
+          d1 = dayDiffs.some(x => x >= 1);
+          d3 = dayDiffs.some(x => x >= 3);
+          d7 = dayDiffs.some(x => x >= 7);
+        }
+
+        rows.push({
+          userId,
+          firstDay,
+          lastDay,
+          activeDays: days.length,
+          activeDayList: days.join(", "),
+          returning: days.length >= 2,
+          d1,
+          d3,
+          d7
+        });
+      });
+
+      return rows.sort((a, b) => b.activeDays - a.activeDays);
+    }
+
+    function summarize() {
+      const selectedVersion = document.getElementById("versionSelect").value || "all";
+      const selectedRange = document.getElementById("rangeSelect").value || "24h";
+
+      const { rawKeys, events } = readLocalStorageEvents();
+      const allVersions = countBy(events, e => e.__version);
+
+      let versionFiltered = events;
+      if (selectedVersion !== "all") {
+        versionFiltered = events.filter(e => e.__version === selectedVersion);
+      }
+
+      const rangeFiltered = filterByRange(versionFiltered, selectedRange);
+
+      const counts = countBy(rangeFiltered, e => e.__event);
+      const countsAll = countBy(events, e => e.__event);
+
+      const playAudio = counts.play_audio || 0;
+      const audioComplete = counts.audio_complete || 0;
+      const audioInterrupted = counts.audio_interrupted || 0;
+      const audioError = counts.audio_error || 0;
+
+      const sessionDurations = rangeFiltered
+        .filter(e => e.__event === "session_end")
+        .map(e => Number(e.session_duration_sec || e.duration_sec || e.duration || 0))
+        .filter(n => Number.isFinite(n) && n > 0);
+
+      const avgSessionSec = sessionDurations.length
+        ? Math.round(sum(sessionDurations) / sessionDurations.length)
+        : null;
+
+      const uniqueUsers = new Set(
+        rangeFiltered.map(e => e.__userId).filter(Boolean)
+      );
+
+      const activeDays = Array.from(new Set(
+        rangeFiltered.map(e => e.__day).filter(Boolean)
+      )).sort();
+
+      const retentionRows = buildRetention(events.filter(e => e.__version !== "(unknown)" || selectedVersion === "all"));
+
+      latestSummary = {
+        checkedAt: new Date().toISOString(),
+        selectedVersion,
+        selectedRange,
+        localStorageKeys: rawKeys,
+        totalEventsDetected: events.length,
+        filteredEventsDetected: rangeFiltered.length,
+        appVersionsDetected: allVersions,
+        kpi: {
+          dau_local_unique_user_count: uniqueUsers.size,
+          active_days_detected: activeDays,
+          session_start: counts.session_start || 0,
+          session_end: counts.session_end || 0,
+          avg_session_duration_sec: avgSessionSec,
+          play_audio: playAudio,
+          audio_complete: audioComplete,
+          audio_complete_rate_percent: rate(audioComplete, playAudio),
+          audio_interrupted: audioInterrupted,
+          audio_interrupted_rate_percent: rate(audioInterrupted, playAudio),
+          audio_error: audioError,
+          audio_error_rate_percent: rate(audioError, playAudio),
+          sleep: counts.sleep || 0,
+          resume: counts.resume || 0,
+          visibility_hidden: counts.visibility_hidden || 0,
+          visibility_visible: counts.visibility_visible || 0,
+          next: counts.next || 0,
+          start: counts.start || 0,
+          daily_active: counts.daily_active || 0,
+          retention_check: counts.retention_check || 0,
+          returning_user: counts.returning_user || 0
+        },
+        eventCounts_filtered: counts,
+        eventCounts_all: countsAll,
+        recentEvents: rangeFiltered.slice(0, 80).map(e => ({
+          time: e.__timeText,
+          day: e.__day,
+          event: e.__event,
+          appVersion: e.__version,
+          userId: e.__userId,
+          sourceKey: e.__sourceKey,
+          session_duration_sec: e.session_duration_sec || e.duration_sec || e.duration || ""
+        })),
+        retentionRows
+      };
+
+      render(latestSummary);
+      document.getElementById("lastUpdated").textContent =
+        `最終集計: ${new Date().toLocaleString()} / ${selectedVersion} / ${selectedRange}`;
+    }
+
+    function renderVersionSelect(events) {
+      const select = document.getElementById("versionSelect");
+      const current = select.value || TARGET_DEFAULT_VERSION;
+
+      const versions = Array.from(new Set(
+        events.map(e => e.__version).filter(Boolean)
+      )).sort();
+
+      select.innerHTML = "";
+
+      const allOpt = document.createElement("option");
+      allOpt.value = "all";
+      allOpt.textContent = "全バージョン";
+      select.appendChild(allOpt);
+
+      versions.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        select.appendChild(opt);
+      });
+
+      if (versions.includes(current)) {
+        select.value = current;
+      } else if (versions.includes(TARGET_DEFAULT_VERSION)) {
+        select.value = TARGET_DEFAULT_VERSION;
+      } else {
+        select.value = "all";
+      }
+    }
+
+    function metricCard(label, value, note = "", cls = "") {
+      return `
+        <div class="card">
+          <div class="metric-label">${label}</div>
+          <div class="metric-value ${cls}">${fmt(value)}</div>
+          <div class="metric-note">${note}</div>
+        </div>
+      `;
+    }
+
+    function objectTable(obj, headers = ["項目", "値"]) {
+      const rows = Object.entries(obj || {})
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, v]) => `<tr><td class="mono">${escapeHtml(k)}</td><td>${escapeHtml(String(v))}</td></tr>`)
+        .join("");
+
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>${headers[0]}</th><th>${headers[1]}</th></tr>
+            </thead>
+            <tbody>${rows || `<tr><td colspan="2">データなし</td></tr>`}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function eventsTable(events) {
+      const rows = events.map(e => `
+        <tr>
+          <td>${escapeHtml(e.time || "-")}</td>
+          <td><span class="pill">${escapeHtml(e.event || "-")}</span></td>
+          <td class="mono">${escapeHtml(e.appVersion || "-")}</td>
+          <td class="mono">${escapeHtml(e.userId || "-")}</td>
+          <td>${escapeHtml(String(e.session_duration_sec || ""))}</td>
+        </tr>
+      `).join("");
+
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>時刻</th>
+                <th>イベント</th>
+                <th>appVersion</th>
+                <th>user</th>
+                <th>session秒</th>
+              </tr>
+            </thead>
+            <tbody>${rows || `<tr><td colspan="5">データなし</td></tr>`}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function retentionTable(rows) {
+      const html = rows.map(r => `
+        <tr>
+          <td class="mono">${escapeHtml(r.userId)}</td>
+          <td>${escapeHtml(r.firstDay || "-")}</td>
+          <td>${escapeHtml(r.lastDay || "-")}</td>
+          <td>${r.activeDays}</td>
+          <td>${r.returning ? "Yes" : "No"}</td>
+          <td>${r.d1 ? "Yes" : "-"}</td>
+          <td>${r.d3 ? "Yes" : "-"}</td>
+          <td>${r.d7 ? "Yes" : "-"}</td>
+          <td>${escapeHtml(r.activeDayList || "-")}</td>
+        </tr>
+      `).join("");
+
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>user</th>
+                <th>first</th>
+                <th>last</th>
+                <th>active days</th>
+                <th>returning</th>
+                <th>D1</th>
+                <th>D3</th>
+                <th>D7</th>
+                <th>active day list</th>
+              </tr>
+            </thead>
+            <tbody>${html || `<tr><td colspan="9">データなし</td></tr>`}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function render(summary) {
+      const kpi = summary.kpi;
+      const app = document.getElementById("app");
+
+      const completeRate = kpi.audio_complete_rate_percent;
+      const interruptedRate = kpi.audio_interrupted_rate_percent;
+      const errorRate = kpi.audio_error_rate_percent;
+
+      app.innerHTML = `
+        <div class="grid">
+          ${metricCard("DAU local", kpi.dau_local_unique_user_count, "この端末/localStorage基準", "blue")}
+          ${metricCard("play_audio", kpi.play_audio, "音声再生数")}
+          ${metricCard("audio_complete率", fmtPct(completeRate), "完了 / 再生", classForRate("audio_complete", completeRate))}
+          ${metricCard("audio_error率", fmtPct(errorRate), "エラー / 再生", classForRate("audio_error", errorRate))}
+          ${metricCard("session_start", kpi.session_start, "開始セッション")}
+          ${metricCard("session_end", kpi.session_end, "終了セッション")}
+          ${metricCard("平均session秒", kpi.avg_session_duration_sec, "session_end基準")}
+          ${metricCard("interrupted率", fmtPct(interruptedRate), "中断 / 再生", classForRate("audio_interrupted", interruptedRate))}
+          ${metricCard("sleep", kpi.sleep, "安全停止系イベント")}
+          ${metricCard("resume", kpi.resume, "復帰イベント")}
+          ${metricCard("visibility_hidden", kpi.visibility_hidden, "非表示")}
+          ${metricCard("visibility_visible", kpi.visibility_visible, "再表示")}
+        </div>
+
+        <h2>判定メモ</h2>
+        <div class="card">
+          ${judgeHtml(kpi)}
+        </div>
+
+        <h2>appVersion別イベント数</h2>
+        ${objectTable(summary.appVersionsDetected, ["appVersion", "イベント数"])}
+
+        <h2>イベント数：選択条件内</h2>
+        ${objectTable(summary.eventCounts_filtered, ["event", "count"])}
+
+        <h2>Retention確認</h2>
+        ${retentionTable(summary.retentionRows)}
+
+        <h2>直近イベント</h2>
+        ${eventsTable(summary.recentEvents)}
+
+        <details>
+          <summary>集計JSON</summary>
+          <pre>${escapeHtml(JSON.stringify(summary, null, 2))}</pre>
+        </details>
+      `;
+    }
+
+    function judgeHtml(kpi) {
+      const lines = [];
+
+      if ((kpi.audio_error || 0) === 0) {
+        lines.push(`<p class="ok">audio_error は 0。v3の音声エラー修正は成功と見てよいです。</p>`);
+      } else {
+        lines.push(`<p class="bad">audio_error が残っています。まず error 内容の確認が必要です。</p>`);
+      }
+
+      if ((kpi.audio_interrupted_rate_percent || 0) >= 70) {
+        lines.push(`<p class="warn">audio_interrupted率が高いです。ただし next / sleep / mode_change などの検証操作が多い場合は自然です。</p>`);
+      }
+
+      if ((kpi.audio_complete_rate_percent || 0) < 30 && (kpi.play_audio || 0) > 0) {
+        lines.push(`<p class="warn">audio_complete率は低めです。ただし検証中は低く出やすいので、放置再生テストで再確認してください。</p>`);
+      }
+
+      if ((kpi.sleep || 0) > (kpi.resume || 0) * 3 && (kpi.sleep || 0) >= 5) {
+        lines.push(`<p class="warn">sleep が resume よりかなり多いです。安全側の停止としては許容。ただし将来は reason 分解した方がよいです。</p>`);
+      }
+
+      if ((kpi.session_start || 0) > 0 && (kpi.session_end || 0) > 0) {
+        lines.push(`<p class="ok">session_start / session_end は記録されています。</p>`);
+      }
+
+      if (!lines.length) {
+        lines.push(`<p>大きな異常は見つかりません。</p>`);
+      }
+
+      return lines.join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", () => {
+      summarize();
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      if (!latestSummary) summarize();
+
+      const text = JSON.stringify(latestSummary, null, 2);
+
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Analytics JSON をコピーしました。");
+      } catch {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        alert("Analytics JSON をコピーしました。");
+      }
+    });
+
+    document.getElementById("versionSelect").addEventListener("change", summarize);
+    document.getElementById("rangeSelect").addEventListener("change", summarize);
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const { events } = readLocalStorageEvents();
+      renderVersionSelect(events);
+      summarize();
+    });
+  </script>
+</body>
+</html>
