@@ -279,7 +279,13 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const ANALYTICS_SESSION_ID = String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
+const LINGOFLOW_APP_VERSION = "2026-05-21-kpi-session-v2";
+function createAnalyticsSessionId(){
+  return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
+}
+let ANALYTICS_SESSION_ID = createAnalyticsSessionId();
+let analyticsSessionStartedAt = Date.now();
+let analyticsSessionEndSent = false;
 
 // ===== Anonymous user analytics v1 =====
 // 個人情報を使わず、同じブラウザ内だけでDAU / Returning / Retentionを測る。
@@ -366,6 +372,35 @@ function saveAnalyticsEvent(event){
   }
 }
 
+function getSessionDurationSec(){
+  return Math.max(0, Math.round((Date.now() - analyticsSessionStartedAt) / 1000));
+}
+
+function startNewAnalyticsSession(reason){
+  ANALYTICS_SESSION_ID = createAnalyticsSessionId();
+  analyticsSessionStartedAt = Date.now();
+  analyticsSessionEndSent = false;
+  track("session_start", {
+    reason,
+    resumed_session: true
+  });
+}
+
+function getCurrentPhraseContext(){
+  try{
+    const p = history[index] || null;
+    return {
+      phraseCategory: p ? p.category : null,
+      phraseZhLength: p ? String(p.zh || "").length : 0
+    };
+  }catch(err){
+    return {
+      phraseCategory: null,
+      phraseZhLength: 0
+    };
+  }
+}
+
 function clearAnalyticsEvents(){
   try{
     localStorage.removeItem(ANALYTICS_STORAGE_KEY);
@@ -380,13 +415,16 @@ function track(name, data = {}){
       time: new Date().toISOString(),
       sessionId: ANALYTICS_SESSION_ID,
       userId: getStoredUserId() || undefined,
+      appVersion: LINGOFLOW_APP_VERSION,
       localDate: getLocalDateString(),
+      sessionDurationSec: getSessionDurationSec(),
       view: typeof view !== "undefined" ? view : undefined,
       mode: typeof mode !== "undefined" ? mode : undefined,
       level: typeof level !== "undefined" ? level : undefined,
       category: typeof category !== "undefined" ? category : undefined,
       index: typeof index !== "undefined" ? index : undefined,
       step: typeof step !== "undefined" ? step : undefined,
+      ...getCurrentPhraseContext(),
       ...data
     };
 
@@ -398,9 +436,24 @@ function track(name, data = {}){
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(event)
+      body: JSON.stringify(event),
+      keepalive: true
     }).catch(() => {});
   }catch(err){}
+}
+
+function trackSessionEnd(reason){
+  if(analyticsSessionEndSent) return;
+  analyticsSessionEndSent = true;
+  track("session_end", {
+    reason,
+    session_duration_sec: getSessionDurationSec(),
+    duration_bucket:
+      getSessionDurationSec() < 60 ? "under_1min" :
+      getSessionDurationSec() < 180 ? "1_3min" :
+      getSessionDurationSec() < 600 ? "3_10min" :
+      getSessionDurationSec() < 1800 ? "10_30min" : "over_30min"
+  });
 }
 
 // PC確認用: Consoleで getAnalyticsEvents() / clearAnalyticsEvents() が使える。
@@ -487,7 +540,10 @@ window.getLingoFlowUserAnalytics = function(){
     userId: getStoredUserId(),
     firstVisitDate: localStorage.getItem(ANALYTICS_FIRST_VISIT_KEY),
     lastVisitDate: localStorage.getItem(ANALYTICS_LAST_VISIT_KEY),
-    visitDates: getVisitDates()
+    visitDates: getVisitDates(),
+    appVersion: LINGOFLOW_APP_VERSION,
+    sessionId: ANALYTICS_SESSION_ID,
+    sessionDurationSec: getSessionDurationSec()
   };
 };
 
@@ -633,16 +689,27 @@ function stopAllPlayback(){
 
 document.addEventListener("visibilitychange", function(){
   if(document.hidden){
+    track("visibility_hidden", { reason: "visibility_hidden" });
     track("sleep", { reason: "visibility_hidden" });
+    trackSessionEnd("visibility_hidden");
     stopAllPlayback();
   }else{
+    const wasSessionEnded = analyticsSessionEndSent;
+    if(wasSessionEnded){
+      startNewAnalyticsSession("visibility_visible");
+    }
+    track("visibility_visible", { reason: "visibility_visible" });
     track("resume", { reason: "visibility_visible" });
   }
 });
 
 window.addEventListener("pagehide", function(){
   track("sleep", { reason: "pagehide" });
+  trackSessionEnd("pagehide");
   stopAllPlayback();
+});
+window.addEventListener("beforeunload", function(){
+  trackSessionEnd("beforeunload");
 });
 window.addEventListener("blur", function(){
   track("sleep", { reason: "window_blur" });
@@ -782,8 +849,14 @@ function speak(text){
     const voices = speechSynthesis.getVoices();
     const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
     if(v) u.voice = v;
-    u.onend = resolve;
-    u.onerror = resolve;
+    u.onend = () => {
+      track("audio_complete", { audioType: "normal", textLength: String(text ?? "").length });
+      resolve();
+    };
+    u.onerror = () => {
+      track("audio_error", { audioType: "normal", textLength: String(text ?? "").length });
+      resolve();
+    };
     track("play_audio", { audioType: "normal", textLength: String(text ?? "").length });
     speechSynthesis.speak(u);
   });
@@ -838,8 +911,16 @@ async function highlightElement(text, rootEl){
   const v = voices.find(x => x.lang === "zh-TW" || x.name.toLowerCase().includes("taiwan") || x.name.includes("臺灣") || x.name.includes("台湾"));
   if(v) u.voice = v;
 
-  u.onend = () => { ended = true; markAll(); };
-  u.onerror = () => { ended = true; markAll(); };
+  u.onend = () => {
+    ended = true;
+    markAll();
+    track("audio_complete", { audioType: "highlight", textLength: String(text ?? "").length });
+  };
+  u.onerror = () => {
+    ended = true;
+    markAll();
+    track("audio_error", { audioType: "highlight", textLength: String(text ?? "").length });
+  };
 
   if(!audioEnabled){
     ended = true;
