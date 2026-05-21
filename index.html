@@ -281,6 +281,72 @@ const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
 const ANALYTICS_SESSION_ID = String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
 
+// ===== Anonymous user analytics v1 =====
+// 個人情報を使わず、同じブラウザ内だけでDAU / Returning / Retentionを測る。
+const ANALYTICS_USER_ID_KEY = "lingoflow_user_id_v1";
+const ANALYTICS_FIRST_VISIT_KEY = "lingoflow_first_visit_date_v1";
+const ANALYTICS_LAST_VISIT_KEY = "lingoflow_last_visit_date_v1";
+const ANALYTICS_VISIT_DATES_KEY = "lingoflow_visit_dates_v1";
+
+function getLocalDateString(date = new Date()){
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function dateDiffDays(fromDateString, toDateString){
+  const from = new Date(`${fromDateString}T00:00:00`);
+  const to = new Date(`${toDateString}T00:00:00`);
+  return Math.floor((to - from) / 86400000);
+}
+
+function createAnonymousUserId(){
+  try{
+    if(window.crypto && typeof window.crypto.randomUUID === "function"){
+      return "lf_" + window.crypto.randomUUID();
+    }
+  }catch(err){}
+  return "lf_" + String(Date.now()) + "_" + Math.random().toString(36).slice(2, 12);
+}
+
+function getStoredUserId(){
+  try{
+    return localStorage.getItem(ANALYTICS_USER_ID_KEY) || "";
+  }catch(err){
+    return "";
+  }
+}
+
+function getOrCreateUserId(){
+  try{
+    let userId = localStorage.getItem(ANALYTICS_USER_ID_KEY);
+    if(!userId){
+      userId = createAnonymousUserId();
+      localStorage.setItem(ANALYTICS_USER_ID_KEY, userId);
+    }
+    return userId;
+  }catch(err){
+    return "";
+  }
+}
+
+function getVisitDates(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(ANALYTICS_VISIT_DATES_KEY) || "[]");
+    return Array.isArray(raw) ? raw.filter(Boolean) : [];
+  }catch(err){
+    return [];
+  }
+}
+
+function saveVisitDates(visitDates){
+  try{
+    const uniqueDates = Array.from(new Set(visitDates)).slice(-400);
+    localStorage.setItem(ANALYTICS_VISIT_DATES_KEY, JSON.stringify(uniqueDates));
+  }catch(err){}
+}
+
 function getAnalyticsEvents(){
   try{
     return JSON.parse(localStorage.getItem(ANALYTICS_STORAGE_KEY) || "[]");
@@ -313,6 +379,8 @@ function track(name, data = {}){
       event: name,
       time: new Date().toISOString(),
       sessionId: ANALYTICS_SESSION_ID,
+      userId: getStoredUserId() || undefined,
+      localDate: getLocalDateString(),
       view: typeof view !== "undefined" ? view : undefined,
       mode: typeof mode !== "undefined" ? mode : undefined,
       level: typeof level !== "undefined" ? level : undefined,
@@ -338,6 +406,90 @@ function track(name, data = {}){
 // PC確認用: Consoleで getAnalyticsEvents() / clearAnalyticsEvents() が使える。
 window.getAnalyticsEvents = getAnalyticsEvents;
 window.clearAnalyticsEvents = clearAnalyticsEvents;
+
+function initUserAnalytics(){
+  try{
+    const today = getLocalDateString();
+    const userIdBefore = getStoredUserId();
+    const userId = getOrCreateUserId();
+    const isNewUser = !userIdBefore && !!userId;
+
+    let firstVisitDate = localStorage.getItem(ANALYTICS_FIRST_VISIT_KEY);
+    const lastVisitDate = localStorage.getItem(ANALYTICS_LAST_VISIT_KEY) || "";
+    let visitDates = getVisitDates();
+
+    if(!firstVisitDate){
+      firstVisitDate = today;
+      localStorage.setItem(ANALYTICS_FIRST_VISIT_KEY, firstVisitDate);
+    }
+
+    const isNewDailyVisit = !visitDates.includes(today);
+
+    if(isNewUser){
+      track("user_init", {
+        user_id: userId,
+        date: today,
+        first_visit_date: firstVisitDate
+      });
+    }
+
+    if(isNewDailyVisit){
+      visitDates.push(today);
+      saveVisitDates(visitDates);
+
+      track("daily_active", {
+        user_id: userId,
+        date: today,
+        first_visit_date: firstVisitDate,
+        last_visit_date: lastVisitDate || null,
+        visit_count: visitDates.length
+      });
+
+      if(visitDates.length >= 2){
+        track("returning_user", {
+          user_id: userId,
+          date: today,
+          first_visit_date: firstVisitDate,
+          last_visit_date: lastVisitDate || null,
+          visit_count: visitDates.length,
+          days_since_first_visit: dateDiffDays(firstVisitDate, today)
+        });
+      }
+
+      track("retention_check", {
+        user_id: userId,
+        date: today,
+        first_visit_date: firstVisitDate,
+        last_visit_date: lastVisitDate || null,
+        visit_count: visitDates.length,
+        days_since_first_visit: dateDiffDays(firstVisitDate, today)
+      });
+    }
+
+    localStorage.setItem(ANALYTICS_LAST_VISIT_KEY, today);
+
+    track("session_start", {
+      user_id: userId,
+      date: today,
+      first_visit_date: firstVisitDate,
+      last_visit_date: lastVisitDate || null,
+      visit_count: visitDates.length,
+      is_new_daily_visit: isNewDailyVisit
+    });
+  }catch(err){
+    // ユーザー解析に失敗しても、学習アプリ本体は止めない。
+  }
+}
+
+// PC確認用
+window.getLingoFlowUserAnalytics = function(){
+  return {
+    userId: getStoredUserId(),
+    firstVisitDate: localStorage.getItem(ANALYTICS_FIRST_VISIT_KEY),
+    lastVisitDate: localStorage.getItem(ANALYTICS_LAST_VISIT_KEY),
+    visitDates: getVisitDates()
+  };
+};
 
 const categoryNames = {
   all:"全部", greeting:"挨拶", cafe:"カフェ", restaurant:"食事", shopping:"買物",
@@ -841,6 +993,7 @@ box.addEventListener("touchend", e => {
   }
 }, {passive:true});
 speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+initUserAnalytics();
 updateButtons();
 nextQuestion(true);
 analyticsReady = true;
