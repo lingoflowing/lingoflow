@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-21-kpi-session-v3 -->
-<meta name="lingoflow-app-version" content="2026-05-21-kpi-session-v3">
+<!-- LingoFlow app version: 2026-05-22-question-highlight-next-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-22-question-highlight-next-v1">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -282,7 +282,7 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-21-kpi-session-v3";
+const LINGOFLOW_APP_VERSION = "2026-05-22-question-highlight-next-v1";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -852,22 +852,50 @@ function nextStep(){
     startAuto();
     return;
   }
+
   if(!history[index]) return;
-  if(step < 2){ step++; renderQuestion(); }
-  else{ speak(history[index].zh); }
+
+  if(step < 2){
+    step++;
+    renderQuestion();
+    return;
+  }
+
+  // 問題モードでは、全表示後の次クリックで次の問題へ進む。
+  nextQuestion(true);
 }
 function renderQuestion(){
   const p = history[index];
   if(!p) return;
+
   const order = mode === "speaking" ? ["jp","zh","pinyin"] : ["zh","pinyin","jp"];
   const visible = step + 1;
-  box.innerHTML = order.map((key,i) => `
-    <div class="line ${i < visible ? "" : "hidden-line"}">
-      <div class="${key}">${esc(p[key])}</div>
+
+  const shouldSpeakZh =
+    (mode === "reading" && step === 1) ||
+    (mode === "speaking" && step === 2);
+
+  box.innerHTML = order.map((key,i) => {
+    const isVisible = i < visible;
+    const content =
+      key === "zh" && isVisible && shouldSpeakZh
+        ? renderChars(p.zh)
+        : esc(p[key]);
+
+    return `
+      <div class="line ${isVisible ? "" : "hidden-line"}">
+        <div class="${key}">${content}</div>
+      </div>
+    `;
+  }).join("") + `
+    <div class="status">
+      ${step < 2 ? "画面をクリックすると次を表示します。" : "画面をクリックすると次の問題へ進みます。"}
     </div>
-  `).join("");
-  if(mode === "reading" && step === 1) speak(p.zh);
-  if(mode === "speaking" && step === 2) speak(p.zh);
+  `;
+
+  if(shouldSpeakZh){
+    speakHighlight(p.zh);
+  }
 }
 function renderChars(text){
   return Array.from(String(text ?? "")).map((ch,i) => {
