@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-22-question-highlight-next-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-22-question-highlight-next-v1">
+<!-- LingoFlow app version: 2026-05-22-view-cycle-guard-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-22-view-cycle-guard-v1">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -282,7 +282,7 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-22-question-highlight-next-v1";
+const LINGOFLOW_APP_VERSION = "2026-05-22-view-cycle-guard-v1";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -570,6 +570,8 @@ let autoId = 0;
 let audioEnabled = false;
 let sx = 0, sy = 0;
 let currentListItems = [];
+let lastViewCycleAt = 0;
+
 
 
 // ===== Speech error cleanup v3 =====
@@ -798,7 +800,20 @@ function setView(v){
     else renderQuestion();
   }
 }
-function cycleView(){ setView(views[(views.indexOf(view)+1) % views.length]); }
+function cycleView(){
+  // 表示切替ボタンの二重発火・連打によるスキップ防止。
+  // 1回の操作で必ず1段階だけ進める。
+  const now = Date.now();
+  if(now - lastViewCycleAt < 450) return;
+  lastViewCycleAt = now;
+
+  const currentIndex = views.indexOf(view);
+  const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % views.length : 0;
+  const nextView = views[nextIndex];
+
+  setView(nextView);
+  track("view_change", { view: nextView });
+}
 function cycleMode(){
   stopAudio();
   mode = mode === "speaking" ? "reading" : "speaking";
