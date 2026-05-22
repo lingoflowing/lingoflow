@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" type="image/png" href="/favicon.png?v=3">
+<link rel="icon" type="image/png" href="/favicon.png?v=4">
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-22-ja-audio-auto-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-22-ja-audio-auto-v1">
+<!-- LingoFlow app version: 2026-05-22-ui-refresh-no-ryu-icon-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-22-ui-refresh-no-ryu-icon-v1">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -317,15 +317,228 @@ button,select{
   }
 }
 
+
+
+/* ===== LingoFlow visual UI refresh / no Ryu icon v1 ===== */
+:root{
+  --lf-blue:#007aff;
+  --lf-blue-deep:#0754c9;
+  --lf-blue-soft:#eaf4ff;
+  --lf-ink:#0b1f3f;
+  --lf-muted:#60708a;
+  --lf-card:rgba(255,255,255,.82);
+  --lf-border:rgba(148,190,255,.34);
+}
+body{
+  background:
+    radial-gradient(circle at 86% 12%, rgba(0,122,255,.20), transparent 34%),
+    radial-gradient(circle at 8% 0%, rgba(255,255,255,.95), transparent 32%),
+    linear-gradient(135deg,#f8fbff 0%,#eaf4ff 46%,#d8ebff 100%) !important;
+  color:var(--lf-ink) !important;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:auto 0 0 0;
+  height:28vh;
+  pointer-events:none;
+  background:
+    linear-gradient(0deg, rgba(255,255,255,.92), rgba(255,255,255,0)),
+    radial-gradient(ellipse at 22% 80%, rgba(0,122,255,.08), transparent 42%);
+  z-index:-1;
+}
+.app{
+  background:rgba(255,255,255,.58) !important;
+  border:1px solid rgba(255,255,255,.88) !important;
+  box-shadow:0 24px 70px rgba(15,49,98,.15) !important;
+}
+.controls{
+  background:rgba(255,255,255,.88) !important;
+  border:1px solid rgba(255,255,255,.92) !important;
+  box-shadow:0 12px 34px rgba(15,49,98,.12) !important;
+}
+.controls button,
+.controls select{
+  background:rgba(255,255,255,.78) !important;
+  color:var(--lf-ink) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 4px 12px rgba(15,49,98,.07) !important;
+  font-weight:900 !important;
+}
+#viewBtn{
+  background:linear-gradient(135deg,#0a84ff,#006fe6) !important;
+  color:white !important;
+  border-color:rgba(0,122,255,.45) !important;
+  box-shadow:0 8px 20px rgba(0,122,255,.26) !important;
+}
+.box,
+.list{
+  background:var(--lf-card) !important;
+  border:1px solid rgba(255,255,255,.94) !important;
+  border-radius:28px !important;
+  box-shadow:0 18px 46px rgba(15,49,98,.12), inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+.question-nav{
+  padding:4px !important;
+  border-radius:999px !important;
+  background:rgba(241,247,255,.78) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8) !important;
+}
+.question-nav button{
+  background:transparent !important;
+  border:0 !important;
+  color:#41516a !important;
+  box-shadow:none !important;
+}
+.question-nav button[data-qnav="replay"]{
+  background:rgba(0,122,255,.10) !important;
+  color:var(--lf-blue-deep) !important;
+}
+.question-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:4px 0 18px;
+}
+.phrase-chip{
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  padding:5px 12px;
+  border-radius:999px;
+  color:white;
+  background:linear-gradient(135deg,#5eb2ff,#007aff);
+  font-weight:900;
+  font-size:15px;
+  box-shadow:0 8px 18px rgba(0,122,255,.22);
+}
+.phrase-count{
+  color:#475569;
+  font-size:15px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+.zh{
+  color:#0875f5 !important;
+  font-size:34px !important;
+  line-height:1.35 !important;
+  text-shadow:0 6px 22px rgba(0,122,255,.10);
+}
+.pinyin{
+  color:#1464c8 !important;
+  font-size:23px !important;
+  line-height:1.42 !important;
+}
+.jp{
+  color:#17233b !important;
+  font-size:23px !important;
+  line-height:1.48 !important;
+}
+.line{
+  margin:0 0 18px !important;
+}
+.status,
+.list-status{
+  background:rgba(234,244,255,.92) !important;
+  color:#0754c9 !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+.list-item{
+  margin:0 0 10px;
+  padding:15px 14px !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  background:rgba(255,255,255,.66);
+  box-shadow:0 8px 22px rgba(15,49,98,.06);
+}
+.list-item.playing{
+  background:rgba(234,244,255,.90) !important;
+  outline:2px solid rgba(0,122,255,.20) !important;
+}
+.category-title{
+  color:#0754c9 !important;
+  margin-top:22px !important;
+}
+.level-title{
+  color:#6b7c96 !important;
+}
+#startOverlay{
+  background:
+    radial-gradient(circle at 88% 12%, rgba(0,122,255,.24), transparent 34%),
+    linear-gradient(135deg,#f8fbff,#e7f3ff 54%,#ffffff) !important;
+}
+.start-card{
+  background:rgba(255,255,255,.78) !important;
+  border:1px solid rgba(255,255,255,.96) !important;
+  box-shadow:0 28px 74px rgba(15,49,98,.18) !important;
+}
+.logo-mark{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,#0a84ff,#006fe6) !important;
+  box-shadow:0 16px 36px rgba(0,122,255,.30) !important;
+}
+.logo-mark::before{
+  content:"";
+  position:absolute;
+  inset:-20% -45%;
+  background:linear-gradient(110deg, transparent 34%, rgba(255,255,255,.24) 48%, transparent 62%);
+  transform:rotate(-12deg);
+}
+.logo-wave{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  width:44px;
+  height:40px;
+}
+.logo-wave i{
+  display:block;
+  width:6px;
+  border-radius:999px;
+  background:#fff;
+  box-shadow:0 0 12px rgba(255,255,255,.55);
+}
+.logo-wave i:nth-child(1){height:14px;opacity:.78}
+.logo-wave i:nth-child(2){height:26px;opacity:.92}
+.logo-wave i:nth-child(3){height:36px}
+.logo-wave i:nth-child(4){height:20px;opacity:.86}
+.logo-title{
+  color:var(--lf-ink) !important;
+  letter-spacing:.1px !important;
+}
+.logo-subtitle{
+  color:#37506f !important;
+}
+.start-button{
+  background:linear-gradient(135deg,#0a84ff,#006fe6) !important;
+  box-shadow:0 14px 28px rgba(0,122,255,.28) !important;
+}
+.char.done{
+  color:#007aff!important;
+  text-shadow:0 0 12px rgba(0,122,255,.30)!important;
+}
+@media(max-width:520px){
+  .zh{font-size:31px !important;}
+  .pinyin,.jp{font-size:21px !important;}
+  .box,.list{border-radius:24px !important;}
+  .phrase-chip{font-size:14px;min-height:28px;padding:4px 10px;}
+  .phrase-count{font-size:14px;}
+}
+
 </style>
 </head>
 <body>
 
 <div id="startOverlay">
   <div class="start-card">
-    <div class="logo-mark">流</div>
+    <div class="logo-mark" aria-label="LingoFlow icon"><span class="logo-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
     <h1 class="logo-title">LingoFlow</h1>
-    <p class="logo-subtitle">台湾華語を、聞き流しで自然に学ぶ。</p>
+    <p class="logo-subtitle">耳から覚える、毎日つづく。<br>台湾華語を自然に学ぶ。</p>
     <button id="startButton" class="start-button" type="button">タップして開始</button>
     <div class="start-note">音声は開始後だけ再生されます。<br>電車・会社・カフェでも安心して開けます。</div>
   </div>
@@ -366,7 +579,7 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-22-ja-audio-auto-v1";
+const LINGOFLOW_APP_VERSION = "2026-05-22-ui-refresh-no-ryu-icon-v1";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -978,6 +1191,15 @@ function renderQuestion(options = {}){
     </div>
   `;
 
+  const totalInFilter = Math.max(1, getList().length || history.length || 1);
+  const shownIndex = Math.max(1, Math.min(index + 1, totalInFilter));
+  const metaHtml = `
+    <div class="question-meta">
+      <span class="phrase-chip">${esc(categoryNames[p.category] || "台湾華語")}</span>
+      <span class="phrase-count">${shownIndex} / ${totalInFilter}</span>
+    </div>
+  `;
+
   const linesHtml = order.map((key,i) => {
     const isVisible = i < visible;
     const content = key === "zh" && isVisible && shouldSpeakZh
@@ -997,7 +1219,7 @@ function renderQuestion(options = {}){
     </div>
   `;
 
-  box.innerHTML = navHtml + linesHtml + statusHtml;
+  box.innerHTML = navHtml + metaHtml + linesHtml + statusHtml;
 
   if(shouldSpeakZh){
     speakHighlight(p.zh);
@@ -1030,7 +1252,14 @@ function renderChars(text){
   }).join("");
 }
 function renderAuto(p){
+  const totalInFilter = Math.max(1, getList().length || history.length || 1);
+  const shownIndex = Math.max(1, Math.min(index + 1, totalInFilter));
+
   box.innerHTML = `
+    <div class="question-meta auto-meta">
+      <span class="phrase-chip">${esc(categoryNames[p.category] || "聞き流し")}</span>
+      <span class="phrase-count">${shownIndex} / ${totalInFilter}</span>
+    </div>
     <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
     <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
     <div class="line"><div class="jp">${esc(p.jp)}</div></div>
@@ -1284,7 +1513,7 @@ async function playListById(id){
 }
 function renderList(){
   currentListItems = [];
-  let out = '<div class="list-status">一覧クリック: 音声に合わせて中国語が青色に進みます</div>';
+  let out = '<div class="list-status">一覧クリック：音声に合わせて中国語が青色に進みます</div>';
 
   Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
     let html = `<div class="category-title">${categoryNames[cat]}</div>`;
