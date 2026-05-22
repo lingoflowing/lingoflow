@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-22-question-inline-nav-grid-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-22-question-inline-nav-grid-v1">
+<!-- LingoFlow app version: 2026-05-22-stable-layout-width-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-22-stable-layout-width-v1">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -20,14 +20,22 @@
 
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
+html{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  overflow-y:scroll;
+  overflow-x:hidden;
+  scrollbar-gutter:stable;
+}
+body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Microsoft JhengHei",sans-serif;
   background:linear-gradient(120deg,#e9f4ff,#f7fbff);
   color:#111827;
 }
 .app{
-  width:calc(100vw - 16px);
+  width:min(760px, calc(100% - 16px));
   max-width:760px;
   margin:8px auto;
   padding:10px;
@@ -45,9 +53,9 @@ button,select{
   height:42px;border:0;border-radius:999px;background:#007aff;color:#fff;
   font-size:20px;font-weight:800;padding:0 16px;box-shadow:0 3px 10px rgba(0,122,255,.24);cursor:pointer;
 }
-#viewBtn{width:148px;min-width:148px;max-width:148px;flex:0 0 148px;text-align:center}
-#modeBtn,#levelBtn{width:86px;min-width:86px;max-width:86px;flex:0 0 86px;text-align:center}
-#categorySelect{width:126px;min-width:126px;max-width:126px;flex:0 0 126px;text-align:center}
+#viewBtn{min-width:128px}
+#modeBtn,#levelBtn{min-width:86px}
+#categorySelect{min-width:116px;max-width:150px}
 .box,.list{
   background:rgba(255,255,255,.68);
   border:1px solid rgba(255,255,255,.9);
@@ -68,53 +76,17 @@ button,select{
 .category-title{color:#007aff;font-size:18px;font-weight:900;margin:18px 0 8px}
 .level-title{color:#64748b;font-size:16px;font-weight:900;margin:12px 0 6px}
 .status{margin-top:12px;padding:10px 12px;border-radius:14px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:15px}
-.question-actions{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin:0 0 16px;
-  padding:10px 10px;
-  border-radius:16px;
-  background:rgba(238,246,255,.86);
-  border:1px solid rgba(0,122,255,.12);
-}
-.question-action-btn{
-  height:38px;
-  min-width:96px;
-  padding:0 14px;
-  font-size:15px;
-  font-weight:900;
-  border-radius:999px;
-  background:#ffffff;
-  color:#007aff;
-  border:1px solid rgba(0,122,255,.24);
-  box-shadow:0 3px 10px rgba(15,23,42,.08);
-}
-.question-action-btn.primary{
-  background:#007aff;
-  color:#ffffff;
-  border-color:#007aff;
-}
-.question-action-btn:disabled{
-  opacity:.42;
-  cursor:not-allowed;
-  box-shadow:none;
-}
 .list-status{margin:0 0 10px;padding:8px 10px;border-radius:12px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:14px}
 .char{display:inline;color:#111827!important;transition:color .06s linear,text-shadow .06s linear}
 .char.done{color:#007aff!important;text-shadow:0 0 8px rgba(0,122,255,.24)!important}
 .error{background:#fff1f2;color:#9f1239;padding:14px;border-radius:14px;font-weight:800;line-height:1.6}
 @media(max-width:520px){
-  .app{width:100vw;margin:0;border-radius:0;min-height:100vh}
+  .app{width:100%;margin:0;border-radius:0;min-height:100vh}
   .controls{gap:5px;overflow-x:auto}
   button,select{height:38px;font-size:16px;padding:0 10px;flex:0 0 auto}
-  #viewBtn{width:124px;min-width:124px;max-width:124px;flex:0 0 124px;text-align:center}
-  #modeBtn,#levelBtn{width:68px;min-width:68px;max-width:68px;flex:0 0 68px;text-align:center}
-  #categorySelect{width:96px;min-width:96px;max-width:96px;flex:0 0 96px;text-align:center}
-  .question-actions{gap:6px;justify-content:space-between}
-  .question-action-btn{height:36px;min-width:0;flex:1;font-size:14px;padding:0 8px}
+  #viewBtn{min-width:104px}
+  #modeBtn,#levelBtn{min-width:68px}
+  #categorySelect{min-width:92px}
   .zh,.pinyin,.jp{font-size:21px}
   .box,.list{min-height:calc(100vh - 90px);padding:18px 14px}
 }
@@ -127,12 +99,14 @@ button,select{
   transform:translateX(-50%) !important;
   z-index:99999 !important;
 
-  width:calc(100vw - 16px) !important;
+  width:min(760px, calc(100% - 16px)) !important;
   max-width:760px !important;
 
-  display:flex !important;
+  display:grid !important;
+  grid-template-columns:172px 86px 86px 126px !important;
   gap:8px !important;
   align-items:center !important;
+  justify-content:start !important;
 
   padding:10px !important;
   margin:0 !important;
@@ -150,7 +124,7 @@ button,select{
 
 @media(max-width:520px){
   .controls{
-    width:100vw !important;
+    width:100% !important;
     left:0 !important;
     right:0 !important;
     transform:none !important;
@@ -270,237 +244,76 @@ button,select{
 }
 
 
-/* ===== Static question navigation + fixed-width menu v2 ===== */
-#viewBtn{
-  width:172px !important;
-  min-width:172px !important;
-  max-width:172px !important;
-  flex:0 0 172px !important;
-  text-align:center !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-}
-#modeBtn,#levelBtn{
-  width:86px !important;
-  min-width:86px !important;
-  max-width:86px !important;
-  flex:0 0 86px !important;
-  text-align:center !important;
-  white-space:nowrap !important;
-}
-#categorySelect{
-  width:126px !important;
-  min-width:126px !important;
-  max-width:126px !important;
-  flex:0 0 126px !important;
-  text-align:center !important;
-}
-.controls{
-  justify-content:flex-start !important;
-}
-.question-nav{
-  position:fixed !important;
-  top:64px !important;
-  left:50% !important;
-  transform:translateX(-50%) !important;
-  z-index:99998 !important;
-  width:calc(100vw - 16px) !important;
-  max-width:760px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:8px !important;
-  padding:10px !important;
-  background:rgba(255,255,255,.94) !important;
-  backdrop-filter:blur(16px) !important;
-  border-radius:0 0 18px 18px !important;
-  box-shadow:0 8px 24px rgba(15,23,42,.10) !important;
-}
-.question-nav.hidden-panel{
-  display:none !important;
-}
-.question-nav-btn{
-  height:38px !important;
-  min-width:104px !important;
-  padding:0 14px !important;
-  font-size:15px !important;
-  font-weight:900 !important;
-  border-radius:999px !important;
-  background:#ffffff !important;
-  color:#007aff !important;
-  border:1px solid rgba(0,122,255,.24) !important;
-  box-shadow:0 3px 10px rgba(15,23,42,.08) !important;
-}
-.question-nav-btn.primary{
-  background:#007aff !important;
-  color:#ffffff !important;
-  border-color:#007aff !important;
-}
-.question-nav-btn:disabled{
-  opacity:.42 !important;
-  cursor:not-allowed !important;
-}
-body.question-nav-visible .box{
-  margin-top:142px !important;
-}
-body:not(.question-nav-visible) .box,
-body:not(.question-nav-visible) .list{
-  margin-top:82px !important;
-}
-@media(max-width:520px){
+/* ===== Stable layout / fixed menu width v1 ===== */
+@media (min-width:521px){
+  html{
+    overflow-y:scroll !important;
+    scrollbar-gutter:stable !important;
+  }
+  .app{
+    width:min(760px, calc(100% - 16px)) !important;
+    max-width:760px !important;
+  }
+  .controls{
+    width:min(760px, calc(100% - 16px)) !important;
+    max-width:760px !important;
+    display:grid !important;
+    grid-template-columns:172px 86px 86px 126px !important;
+    gap:8px !important;
+    justify-content:start !important;
+    align-items:center !important;
+  }
   #viewBtn{
+    width:172px !important;
+    min-width:172px !important;
+    max-width:172px !important;
+  }
+  #modeBtn,
+  #levelBtn{
+    width:86px !important;
+    min-width:86px !important;
+    max-width:86px !important;
+  }
+  #categorySelect{
     width:126px !important;
     min-width:126px !important;
     max-width:126px !important;
-    flex:0 0 126px !important;
-  }
-  #modeBtn,#levelBtn{
-    width:68px !important;
-    min-width:68px !important;
-    max-width:68px !important;
-    flex:0 0 68px !important;
-  }
-  #categorySelect{
-    width:92px !important;
-    min-width:92px !important;
-    max-width:92px !important;
-    flex:0 0 92px !important;
-  }
-  .question-nav{
-    top:58px !important;
-    left:0 !important;
-    right:0 !important;
-    transform:none !important;
-    width:100vw !important;
-    max-width:none !important;
-    overflow-x:auto !important;
-    justify-content:flex-start !important;
-    border-radius:0 0 14px 14px !important;
-  }
-  .question-nav-btn{
-    min-width:96px !important;
-    flex:0 0 auto !important;
-  }
-  body.question-nav-visible .box{
-    margin-top:132px !important;
-  }
-  body:not(.question-nav-visible) .box,
-  body:not(.question-nav-visible) .list{
-    margin-top:76px !important;
   }
 }
 
-
-
-/* ===== VERIFIED FIX: inline question nav + stable grid menu ===== */
-.controls{
-  display:grid !important;
-  grid-template-columns:172px 86px 86px 126px !important;
-  justify-content:flex-start !important;
-  align-items:center !important;
-  column-gap:8px !important;
+/* ===== Question mode navigation v1 ===== */
+.question-nav{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:8px;
+  margin:0 0 16px;
+  position:relative;
+  z-index:5;
 }
-#viewBtn{
-  width:172px !important;
-  min-width:172px !important;
-  max-width:172px !important;
-  grid-column:1 !important;
-  justify-self:stretch !important;
-  text-align:center !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  flex:none !important;
+.question-nav button{
+  height:38px;
+  padding:0 8px;
+  border-radius:999px;
+  background:#eef6ff;
+  color:#005bbb;
+  border:1px solid #bfdbfe;
+  box-shadow:none;
+  font-size:15px;
+  font-weight:900;
+  white-space:nowrap;
 }
-#modeBtn{
-  width:86px !important;
-  min-width:86px !important;
-  max-width:86px !important;
-  grid-column:2 !important;
-  justify-self:stretch !important;
-  flex:none !important;
-}
-#levelBtn{
-  width:86px !important;
-  min-width:86px !important;
-  max-width:86px !important;
-  grid-column:3 !important;
-  justify-self:stretch !important;
-  flex:none !important;
-}
-#categorySelect{
-  width:126px !important;
-  min-width:126px !important;
-  max-width:126px !important;
-  grid-column:4 !important;
-  justify-self:stretch !important;
-  flex:none !important;
-}
-/* 古い固定ナビは使わない。問題モードの操作ボタンは box 内に表示する。 */
-#questionNav{
-  display:none !important;
-}
-body.question-nav-visible .box,
-body:not(.question-nav-visible) .box,
-body:not(.question-nav-visible) .list{
-  margin-top:82px !important;
-}
-.question-actions{
-  display:grid !important;
-  grid-template-columns:1fr 1.35fr 1fr !important;
-  gap:8px !important;
-  align-items:center !important;
-  margin:0 0 18px !important;
-  padding:10px !important;
-  border-radius:16px !important;
-  background:rgba(238,246,255,.92) !important;
-  border:1px solid rgba(0,122,255,.16) !important;
-}
-.question-action-btn{
-  width:100% !important;
-  min-width:0 !important;
-  height:40px !important;
-  padding:0 10px !important;
-  font-size:15px !important;
-  font-weight:900 !important;
-  border-radius:999px !important;
-  background:#ffffff !important;
-  color:#007aff !important;
-  border:1px solid rgba(0,122,255,.24) !important;
-  box-shadow:0 3px 10px rgba(15,23,42,.08) !important;
-  cursor:pointer !important;
-}
-.question-action-btn.primary{
-  background:#007aff !important;
-  color:#ffffff !important;
-  border-color:#007aff !important;
-}
-.question-action-btn:disabled{
-  opacity:.42 !important;
-  cursor:not-allowed !important;
+.question-nav button:active{
+  transform:translateY(1px);
 }
 @media(max-width:520px){
-  .controls{
-    grid-template-columns:126px 68px 68px 92px !important;
-    column-gap:5px !important;
-    overflow-x:auto !important;
+  .question-nav{
+    gap:6px;
+    margin-bottom:14px;
   }
-  #viewBtn{width:126px !important;min-width:126px !important;max-width:126px !important;}
-  #modeBtn,#levelBtn{width:68px !important;min-width:68px !important;max-width:68px !important;}
-  #categorySelect{width:92px !important;min-width:92px !important;max-width:92px !important;}
-  body.question-nav-visible .box,
-  body:not(.question-nav-visible) .box,
-  body:not(.question-nav-visible) .list{
-    margin-top:76px !important;
-  }
-  .question-actions{
-    grid-template-columns:1fr 1.25fr 1fr !important;
-    gap:6px !important;
-    padding:8px !important;
-  }
-  .question-action-btn{
-    height:38px !important;
-    font-size:14px !important;
-    padding:0 6px !important;
+  .question-nav button{
+    height:36px;
+    font-size:13px;
+    padding:0 6px;
   }
 }
 
@@ -537,13 +350,6 @@ body:not(.question-nav-visible) .list{
       <option value="emergency">緊急</option>
     </select>
   </div>
-
-  <div id="questionNav" class="question-nav hidden-panel" aria-label="問題操作">
-    <button id="questionPrevBtn" class="question-nav-btn" type="button">← 前</button>
-    <button id="questionReplayBtn" class="question-nav-btn primary" type="button">↻ もう一度</button>
-    <button id="questionNextBtn" class="question-nav-btn" type="button">次 →</button>
-  </div>
-
   <div id="box" class="box"></div>
   <div id="listPanel" class="list hidden-panel"></div>
 </div>
@@ -560,7 +366,7 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-22-question-inline-nav-grid-v1";
+const LINGOFLOW_APP_VERSION = "2026-05-22-stable-layout-width-v1";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -849,7 +655,7 @@ let audioEnabled = false;
 let sx = 0, sy = 0;
 let currentListItems = [];
 let lastViewCycleAt = 0;
-
+const VIEW_CYCLE_GUARD_MS = 450;
 
 
 // ===== Speech error cleanup v3 =====
@@ -899,10 +705,6 @@ const viewBtn = document.getElementById("viewBtn");
 const modeBtn = document.getElementById("modeBtn");
 const levelBtn = document.getElementById("levelBtn");
 const categorySelect = document.getElementById("categorySelect");
-const questionNav = document.getElementById("questionNav");
-const questionPrevBtn = document.getElementById("questionPrevBtn");
-const questionReplayBtn = document.getElementById("questionReplayBtn");
-const questionNextBtn = document.getElementById("questionNextBtn");
 
 
 // ===== Start overlay / audio permission: fixed version =====
@@ -1061,15 +863,6 @@ function updateButtons(){
   viewBtn.textContent = view === "question" ? "問題" :
                         view === "list" ? "一覧" :
                         view === "continuous" ? "連続再生" : "ランダム再生";
-
-  const isQuestionView = view === "question";
-  if(questionNav){
-    questionNav.classList.toggle("hidden-panel", !isQuestionView);
-  }
-  document.body.classList.toggle("question-nav-visible", isQuestionView);
-  if(questionPrevBtn){
-    questionPrevBtn.disabled = !isQuestionView || index <= 0;
-  }
 }
 function setView(v){
   stopAudio();
@@ -1092,18 +885,14 @@ function setView(v){
   }
 }
 function cycleView(){
-  // 表示切替ボタンの二重発火・連打によるスキップ防止。
-  // 1回の操作で必ず1段階だけ進める。
   const now = Date.now();
-  if(now - lastViewCycleAt < 450) return;
+  if(now - lastViewCycleAt < VIEW_CYCLE_GUARD_MS) return;
   lastViewCycleAt = now;
 
   const currentIndex = views.indexOf(view);
-  const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % views.length : 0;
-  const nextView = views[nextIndex];
-
+  const nextView = views[(currentIndex + 1) % views.length];
+  track("view_change", { from: view, to: nextView });
   setView(nextView);
-  track("view_change", { view: nextView });
 }
 function cycleMode(){
   stopAudio();
@@ -1149,12 +938,7 @@ function nextQuestion(forceNew){
 }
 function prevQuestion(){
   stopAudio();
-  if(index > 0){
-    index--;
-    step = 0;
-    renderQuestion();
-  }
-  updateButtons();
+  if(index > 0){ index--; step = 0; renderQuestion(); }
 }
 function nextStep(){
   // 連続再生・ランダム再生がスリープ等で止まった後は、
@@ -1173,8 +957,7 @@ function nextStep(){
   }
 
   // 問題モードでは、全表示後の次クリックで次の問題へ進む。
-  // 前の問題に戻った後は、履歴上の次の問題へ自然に戻れる。
-  nextQuestion(false);
+  nextQuestion(true);
 }
 function renderQuestion(options = {}){
   const p = history[index];
@@ -1182,18 +965,24 @@ function renderQuestion(options = {}){
 
   const order = mode === "speaking" ? ["jp","zh","pinyin"] : ["zh","pinyin","jp"];
   const visible = step + 1;
+  const shouldSpeakZh = !options.suppressAutoSpeak && (
+    (mode === "reading" && step === 1) ||
+    (mode === "speaking" && step === 2)
+  );
 
-  const shouldSpeakZh =
-    !options.suppressSpeak &&
-    ((mode === "reading" && step === 1) ||
-    (mode === "speaking" && step === 2));
+  const navHtml = `
+    <div class="question-nav" aria-label="問題操作">
+      <button type="button" data-qnav="prev">← 前</button>
+      <button type="button" data-qnav="replay">↻ もう一度</button>
+      <button type="button" data-qnav="next">次 →</button>
+    </div>
+  `;
 
   const linesHtml = order.map((key,i) => {
     const isVisible = i < visible;
-    const shouldRenderZhChars =
-      key === "zh" && isVisible && (shouldSpeakZh || options.forceZhChars);
-
-    const content = shouldRenderZhChars ? renderChars(p.zh) : esc(p[key]);
+    const content = key === "zh" && isVisible && shouldSpeakZh
+      ? renderChars(p.zh)
+      : esc(p[key]);
 
     return `
       <div class="line ${isVisible ? "" : "hidden-line"}">
@@ -1202,68 +991,37 @@ function renderQuestion(options = {}){
     `;
   }).join("");
 
-  const questionActionsHtml = view === "question" ? `
-    <div class="question-actions" aria-label="問題操作">
-      <button class="question-action-btn" type="button" data-question-action="prev" ${index <= 0 ? "disabled" : ""}>← 前</button>
-      <button class="question-action-btn primary" type="button" data-question-action="replay">↻ もう一度</button>
-      <button class="question-action-btn" type="button" data-question-action="next">次 →</button>
-    </div>
-  ` : "";
-
-  box.innerHTML = questionActionsHtml + linesHtml + `
+  const statusHtml = `
     <div class="status">
-      ${step < 2
-        ? "画面クリックで次を表示。必要に応じて「前」「もう一度」「次」も使えます。"
-        : "画面クリックで次の問題へ。もう一度聞く場合は「↻ もう一度」を押してください。"}
+      ${step < 2 ? "画面をクリックすると次を表示します。" : "画面をクリックすると次の問題へ進みます。"}
     </div>
   `;
 
-  updateButtons();
+  box.innerHTML = navHtml + linesHtml + statusHtml;
 
   if(shouldSpeakZh){
     speakHighlight(p.zh);
   }
 }
-function ensureQuestionZhVisibleForReplay(){
-  // 「もう一度」では、今見えている中国語を必ず .char に分割し直して
-  // 青色ハイライトを再実行できる状態にする。
-  if(mode === "speaking" && step < 1){
-    step = 1;
-  }
-  if(mode === "reading" && step < 0){
-    step = 0;
-  }
-  renderQuestion({ suppressSpeak: true, forceZhChars: true });
-}
 function replayCurrentQuestion(){
   const p = history[index];
   if(!p) return;
-
-  stopAudio();
-  ensureQuestionZhVisibleForReplay();
-  track("question_replay", { phraseCategory: p.category, mode, step });
+  step = 2;
+  renderQuestion({ suppressAutoSpeak: true });
+  track("question_replay", { phraseCategory: p.category || null });
   speakHighlight(p.zh);
 }
-function handleQuestionAction(action){
-  if(view !== "question") return;
-
-  if(action === "prev"){
-    track("question_prev", { fromIndex: index });
-    prevQuestion();
-    return;
-  }
-
-  if(action === "replay"){
-    replayCurrentQuestion();
-    return;
-  }
-
-  if(action === "next"){
-    track("question_next_button", { fromIndex: index });
-    nextQuestion(false);
+function goPrevQuestion(){
+  const before = index;
+  prevQuestion();
+  if(index !== before){
+    track("question_prev", { index });
   }
 }
-
+function goNextQuestion(){
+  nextQuestion(false);
+  track("question_next_manual", { index });
+}
 function renderChars(text){
   return Array.from(String(text ?? "")).map((ch,i) => {
     if(ch === "\n") return "<br>";
@@ -1501,49 +1259,31 @@ listPanel.addEventListener("click", function(e){
   playListById(id);
 }, true);
 
-if(questionPrevBtn){
-  questionPrevBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    prevQuestion();
-  });
-}
-if(questionReplayBtn){
-  questionReplayBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    replayCurrentQuestion();
-  });
-}
-if(questionNextBtn){
-  questionNextBtn.addEventListener("click", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    nextQuestion(false);
-  });
-}
+box.addEventListener("click", function(e){
+  const btn = e.target.closest("[data-qnav]");
+  if(!btn || !box.contains(btn)) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const action = btn.getAttribute("data-qnav");
+  if(action === "prev") goPrevQuestion();
+  if(action === "replay") replayCurrentQuestion();
+  if(action === "next") goNextQuestion();
+}, true);
 
 viewBtn.addEventListener("click", cycleView);
 modeBtn.addEventListener("click", cycleMode);
 levelBtn.addEventListener("click", cycleLevel);
 categorySelect.addEventListener("change", e => setCategory(e.target.value));
-box.addEventListener("click", function(e){
-  const actionButton = e.target.closest(".question-action-btn");
-  if(actionButton && box.contains(actionButton)){
-    e.preventDefault();
-    e.stopPropagation();
-    if(actionButton.disabled) return;
-    handleQuestionAction(actionButton.dataset.questionAction);
-    return;
-  }
-  nextStep();
-});
+box.addEventListener("click", nextStep);
 box.addEventListener("touchstart", e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
 box.addEventListener("touchend", e => {
+  if(e.target.closest("[data-qnav]")) return;
   const dx = e.changedTouches[0].clientX - sx;
   const dy = e.changedTouches[0].clientY - sy;
   if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){
-    if(dx < 0) nextQuestion(false); else prevQuestion();
+    if(dx < 0) nextQuestion(true); else prevQuestion();
   }
 }, {passive:true});
 speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
