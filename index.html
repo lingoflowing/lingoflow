@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-22-ja-audio-auto-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-22-ja-audio-auto-v1">
+<!-- LingoFlow app version: 2026-05-22-ogp-ui-pro-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-22-ogp-ui-pro-v1">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -19,6 +19,17 @@
 <link rel="icon" href="/favicon.png">
 
 <style>
+:root{
+  --lf-blue:#007aff;
+  --lf-blue-2:#0a84ff;
+  --lf-blue-3:#4aa3ff;
+  --lf-ink:#071a3a;
+  --lf-muted:#64748b;
+  --lf-soft:#eef6ff;
+  --lf-card:rgba(255,255,255,.88);
+  --lf-line:rgba(15,49,98,.08);
+  --lf-shadow:0 20px 60px rgba(15,49,98,.14);
+}
 *{box-sizing:border-box}
 html{
   margin:0;
@@ -27,118 +38,420 @@ html{
   overflow-y:scroll;
   overflow-x:hidden;
   scrollbar-gutter:stable;
+  -webkit-text-size-adjust:100%;
 }
-body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Microsoft JhengHei",sans-serif;
-  background:linear-gradient(120deg,#e9f4ff,#f7fbff);
-  color:#111827;
+  margin:0;
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Hiragino Sans","Yu Gothic","Microsoft JhengHei",sans-serif;
+  color:var(--lf-ink);
+  background:
+    radial-gradient(circle at 78% 4%, rgba(0,122,255,.22) 0 160px, transparent 330px),
+    radial-gradient(circle at 12% 14%, rgba(74,163,255,.16) 0 120px, transparent 300px),
+    linear-gradient(135deg,#f8fbff 0%,#eaf4ff 48%,#f7fbff 100%);
 }
-.app{
-  width:min(760px, calc(100% - 16px));
-  max-width:760px;
-  margin:8px auto;
-  padding:10px;
-  min-height:calc(100vh - 16px);
-  background:rgba(255,255,255,.75);
-  border:1px solid rgba(255,255,255,.9);
-  border-radius:22px;
-  box-shadow:0 16px 50px rgba(15,23,42,.12);
-}
-.controls{
-  position:sticky;top:0;z-index:10;display:flex;gap:8px;align-items:center;
-  padding:8px 0 12px;background:rgba(255,255,255,.82);backdrop-filter:blur(16px);
+body::before{
+  content:"";
+  position:fixed;
+  inset:auto 0 0 0;
+  height:170px;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, transparent, rgba(255,255,255,.75) 46%, rgba(0,122,255,.12)),
+    radial-gradient(1200px 150px at 50% 105%, rgba(0,122,255,.38), transparent 72%);
+  z-index:-1;
 }
 button,select{
-  height:42px;border:0;border-radius:999px;background:#007aff;color:#fff;
-  font-size:20px;font-weight:800;padding:0 16px;box-shadow:0 3px 10px rgba(0,122,255,.24);cursor:pointer;
+  font:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
-#viewBtn{min-width:128px}
-#modeBtn,#levelBtn{min-width:86px}
-#categorySelect{min-width:116px;max-width:150px}
-.box,.list{
-  background:rgba(255,255,255,.68);
-  border:1px solid rgba(255,255,255,.9);
+.app{
+  width:min(760px, calc(100% - 18px));
+  max-width:760px;
+  margin:10px auto;
+  padding:14px;
+  min-height:calc(100vh - 20px);
+  border-radius:34px;
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(255,255,255,.94);
+  box-shadow:0 28px 90px rgba(15,49,98,.13);
+  backdrop-filter:blur(22px);
+}
+.app-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:4px 4px 12px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+.logo-mark{
+  width:48px;
+  height:48px;
+  flex:0 0 48px;
+  border-radius:17px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,#22a5ff 0%,#007aff 62%,#0062d6 100%);
+  color:white;
+  box-shadow:0 12px 30px rgba(0,122,255,.26), inset 0 1px 1px rgba(255,255,255,.35);
+}
+.logo-wave{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  width:30px;
+  height:24px;
+}
+.logo-wave i{
+  display:block;
+  width:4px;
+  border-radius:999px;
+  background:currentColor;
+  opacity:.98;
+}
+.logo-wave i:nth-child(1){height:12px;opacity:.74}
+.logo-wave i:nth-child(2){height:22px}
+.logo-wave i:nth-child(3){height:30px}
+.logo-wave i:nth-child(4){height:18px;opacity:.82}
+.brand-title{
+  font-size:25px;
+  line-height:1.05;
+  font-weight:950;
+  letter-spacing:.2px;
+  color:var(--lf-ink);
+}
+.brand-subtitle{
+  margin-top:5px;
+  font-size:12px;
+  font-weight:850;
+  color:var(--lf-blue);
+  letter-spacing:.05em;
+}
+.header-gear{
+  width:38px;
+  height:38px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.76);
+  border:1px solid rgba(0,122,255,.10);
+  box-shadow:0 8px 18px rgba(15,49,98,.08);
+  color:var(--lf-blue);
+}
+.header-gear svg{width:19px;height:19px;display:block}
+.controls{
+  position:sticky;
+  top:8px;
+  z-index:30;
+  display:grid;
+  grid-template-columns:1.38fr .86fr .86fr 1.04fr;
+  gap:8px;
+  align-items:center;
+  padding:8px;
+  margin:0 0 14px;
+  border-radius:24px;
+  background:rgba(255,255,255,.76);
+  border:1px solid rgba(255,255,255,.92);
+  box-shadow:0 16px 42px rgba(15,49,98,.10), inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter:blur(18px);
+}
+.controls button,
+.controls select{
+  min-width:0;
+  height:48px;
+  border:0;
   border-radius:18px;
-  min-height:360px;
-  padding:20px 18px;
+  padding:0 12px;
+  color:#0f2548;
+  background:rgba(243,248,255,.86);
+  border:1px solid rgba(0,122,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  font-size:14px;
+  font-weight:950;
+  letter-spacing:.01em;
 }
-.line{margin:0 0 22px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
-.zh,.pinyin,.jp{font-size:24px;font-weight:800;line-height:1.55;letter-spacing:.3px}
-.zh{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:.5px}
-.pinyin{color:#111827}
-.jp{color:#1f2937}
+.controls button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  white-space:nowrap;
+}
+#viewBtn{
+  color:white;
+  background:linear-gradient(145deg,#138dff 0%,#006fed 70%,#005fd1 100%);
+  border-color:rgba(0,122,255,.44);
+  box-shadow:0 12px 24px rgba(0,122,255,.24), inset 0 1px 1px rgba(255,255,255,.28);
+}
+.control-icon{
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:rgba(255,255,255,.52);
+  color:currentColor;
+}
+#viewBtn .control-icon{background:rgba(255,255,255,.20)}
+.control-icon svg{width:17px;height:17px;display:block}
+.control-label{overflow:hidden;text-overflow:ellipsis}
+select#categorySelect{
+  appearance:none;
+  -webkit-appearance:none;
+  padding-right:30px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #007aff 50%),
+    linear-gradient(135deg, #007aff 50%, transparent 50%),
+    linear-gradient(135deg, rgba(243,248,255,.86), rgba(243,248,255,.86));
+  background-position:
+    calc(100% - 18px) 20px,
+    calc(100% - 12px) 20px,
+    0 0;
+  background-size:6px 6px,6px 6px,100% 100%;
+  background-repeat:no-repeat;
+}
+.box,.list{
+  position:relative;
+  overflow:hidden;
+  min-height:430px;
+  padding:24px;
+  border-radius:30px;
+  background:var(--lf-card);
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:var(--lf-shadow), inset 0 1px 0 rgba(255,255,255,.92);
+}
+.box::after,.list::after{
+  content:"";
+  position:absolute;
+  inset:-80px -120px auto auto;
+  width:260px;
+  height:260px;
+  border-radius:999px;
+  background:radial-gradient(circle, rgba(0,122,255,.12), transparent 62%);
+  pointer-events:none;
+}
+.question-card-top,
+.auto-card-top{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 18px;
+}
+.meta-left{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  min-height:29px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:linear-gradient(135deg,rgba(0,122,255,.14),rgba(74,163,255,.10));
+  color:#0068d8;
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.02em;
+}
+.chip svg{width:14px;height:14px}
+.counter{
+  font-size:18px;
+  line-height:1;
+  font-weight:950;
+  color:#23395d;
+  white-space:nowrap;
+}
+.card-main{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 92px;
+  gap:18px;
+  align-items:center;
+}
+.lines-wrap{min-width:0}
+.line{
+  margin:0 0 17px;
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
+.zh,.pinyin,.jp{
+  font-weight:900;
+  line-height:1.45;
+  letter-spacing:.2px;
+}
+.zh{
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  font-size:44px;
+  color:#087cff;
+  letter-spacing:.6px;
+}
+.pinyin{
+  font-size:26px;
+  color:#1174df;
+  font-style:italic;
+}
+.jp{
+  font-size:24px;
+  color:#12223f;
+  font-weight:820;
+}
 .hidden-line{visibility:hidden}
-.hidden-panel{display:none}
-.list-item{padding:16px 8px;border-bottom:1px solid rgba(0,0,0,.08);border-radius:12px;cursor:pointer;user-select:none}
-.list-item:active{background:rgba(0,122,255,.08)}
-.list-item.playing{background:rgba(0,122,255,.06);outline:2px solid rgba(0,122,255,.20)}
-.category-title{color:#007aff;font-size:18px;font-weight:900;margin:18px 0 8px}
-.level-title{color:#64748b;font-size:16px;font-weight:900;margin:12px 0 6px}
-.status{margin-top:12px;padding:10px 12px;border-radius:14px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:15px}
-.list-status{margin:0 0 10px;padding:8px 10px;border-radius:12px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:14px}
+.hidden-panel{display:none!important}
+.voice-button{
+  width:76px;
+  height:76px;
+  border:0;
+  border-radius:28px;
+  display:grid;
+  place-items:center;
+  color:white;
+  background:linear-gradient(145deg,#138dff 0%,#006fe8 78%);
+  box-shadow:0 18px 35px rgba(0,122,255,.28), inset 0 1px 1px rgba(255,255,255,.36);
+}
+.voice-button svg{width:34px;height:34px;display:block}
+.progress-dots{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin:8px 0 0;
+}
+.progress-dots i{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background:#d9e6f6;
+}
+.progress-dots i.active{background:var(--lf-blue);box-shadow:0 0 0 4px rgba(0,122,255,.10)}
+.level-card{
+  position:relative;
+  z-index:2;
+  margin-top:22px;
+  padding:12px 14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.74);
+  border:1px solid rgba(15,49,98,.06);
+  box-shadow:0 8px 22px rgba(15,49,98,.06);
+}
+.level-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-size:14px;
+  font-weight:950;
+  color:#23395d;
+}
+.level-row span:first-child{color:#475569}
+.level-progress{
+  height:9px;
+  overflow:hidden;
+  margin-top:10px;
+  border-radius:999px;
+  background:#e7eef8;
+}
+.level-progress i{
+  display:block;
+  height:100%;
+  width:0%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#007aff,#55b5ff);
+  box-shadow:0 0 16px rgba(0,122,255,.28);
+}
+.status{
+  position:relative;
+  z-index:2;
+  margin-top:16px;
+  padding:11px 13px;
+  border-radius:16px;
+  background:#eef6ff;
+  color:#005bbb;
+  font-weight:900;
+  font-size:14px;
+  line-height:1.45;
+}
+.question-nav{
+  position:relative;
+  z-index:3;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin:18px 0 0;
+}
+.question-nav button{
+  height:42px;
+  padding:0 8px;
+  border:0;
+  border-radius:999px;
+  color:#005bbb;
+  background:rgba(238,246,255,.92);
+  border:1px solid rgba(0,122,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+  font-size:14px;
+  font-weight:950;
+  white-space:nowrap;
+}
+.question-nav button:active,.controls button:active,.voice-button:active{transform:translateY(1px)}
 .char{display:inline;color:#111827!important;transition:color .06s linear,text-shadow .06s linear}
 .char.done{color:#007aff!important;text-shadow:0 0 8px rgba(0,122,255,.24)!important}
-.error{background:#fff1f2;color:#9f1239;padding:14px;border-radius:14px;font-weight:800;line-height:1.6}
-@media(max-width:520px){
-  .app{width:100%;margin:0;border-radius:0;min-height:100vh}
-  .controls{gap:5px;overflow-x:auto}
-  button,select{height:38px;font-size:16px;padding:0 10px;flex:0 0 auto}
-  #viewBtn{min-width:104px}
-  #modeBtn,#levelBtn{min-width:68px}
-  #categorySelect{min-width:92px}
-  .zh,.pinyin,.jp{font-size:21px}
-  .box,.list{min-height:calc(100vh - 90px);padding:18px 14px}
+.list-status{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 16px;
+  padding:13px 14px;
+  border-radius:18px;
+  background:#eef6ff;
+  color:#005bbb;
+  font-weight:950;
+  font-size:14px;
 }
-
-/* ===== FIXED MENU FORCE OVERRIDE ===== */
-.controls{
-  position:fixed !important;
-  top:0 !important;
-  left:50% !important;
-  transform:translateX(-50%) !important;
-  z-index:99999 !important;
-
-  width:min(760px, calc(100% - 16px)) !important;
-  max-width:760px !important;
-
-  display:grid !important;
-  grid-template-columns:172px 86px 86px 126px !important;
-  gap:8px !important;
-  align-items:center !important;
-  justify-content:start !important;
-
-  padding:10px !important;
-  margin:0 !important;
-
-  background:rgba(255,255,255,.94) !important;
-  backdrop-filter:blur(16px) !important;
-  border-radius:0 0 18px 18px !important;
-  box-shadow:0 8px 24px rgba(15,23,42,.12) !important;
+.category-title{
+  position:relative;
+  z-index:2;
+  color:#006fe6;
+  font-size:18px;
+  font-weight:950;
+  margin:22px 0 9px;
 }
-
-.box,
-.list{
-  margin-top:82px !important;
+.level-title{
+  position:relative;
+  z-index:2;
+  color:#64748b;
+  font-size:14px;
+  font-weight:950;
+  margin:15px 0 8px;
 }
-
-@media(max-width:520px){
-  .controls{
-    width:100% !important;
-    left:0 !important;
-    right:0 !important;
-    transform:none !important;
-    overflow-x:auto !important;
-    border-radius:0 0 14px 14px !important;
-  }
-
-  .box,
-  .list{
-    margin-top:76px !important;
-  }
+.list-item{
+  position:relative;
+  z-index:2;
+  padding:16px;
+  margin:0 0 10px;
+  border-radius:20px;
+  cursor:pointer;
+  user-select:none;
+  background:rgba(255,255,255,.66);
+  border:1px solid rgba(15,49,98,.06);
+  box-shadow:0 6px 16px rgba(15,49,98,.05);
 }
-
-
+.list-item:active{background:rgba(0,122,255,.08)}
+.list-item.playing{background:rgba(0,122,255,.07);outline:2px solid rgba(0,122,255,.22)}
+.error{background:#fff1f2;color:#9f1239;padding:14px;border-radius:18px;font-weight:900;line-height:1.6}
 /* ===== LingoFlow Start Overlay ===== */
 #startOverlay{
   position:fixed;
@@ -149,194 +462,120 @@ button,select{
   align-items:center;
   justify-content:center;
   padding:24px;
-  background:linear-gradient(135deg,#eaf4ff,#ffffff);
+  background:
+    radial-gradient(circle at 76% 12%, rgba(0,122,255,.20), transparent 32%),
+    linear-gradient(135deg,#f7fbff,#eaf4ff 48%,#ffffff);
+  touch-action:manipulation;
 }
-
-#startOverlay.hidden{
-  display:none !important;
-}
-
+#startOverlay.hidden{display:none!important}
+#startOverlay,#startOverlay *{-webkit-tap-highlight-color:transparent}
 .start-card{
-  width:min(420px, 92vw);
-  padding:28px 22px;
-  border-radius:28px;
-  background:rgba(255,255,255,.82);
-  border:1px solid rgba(255,255,255,.95);
-  box-shadow:0 20px 60px rgba(15,23,42,.16);
+  width:min(430px,92vw);
+  padding:30px 24px;
+  border-radius:32px;
+  background:rgba(255,255,255,.84);
+  border:1px solid rgba(255,255,255,.96);
+  box-shadow:0 24px 70px rgba(15,49,98,.16);
   text-align:center;
-  backdrop-filter:blur(16px);
+  backdrop-filter:blur(18px);
+  touch-action:manipulation;
+  user-select:none;
+  -webkit-user-select:none;
 }
-
-.logo-mark{
-  width:76px;
-  height:76px;
-  margin:0 auto 14px;
-  border-radius:24px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#007aff;
-  color:#fff;
-  font-size:34px;
-  font-weight:900;
-  box-shadow:0 12px 30px rgba(0,122,255,.28);
-}
-
+.start-card .logo-mark{width:78px;height:78px;margin:0 auto 16px;border-radius:26px}
+.start-card .logo-wave{transform:scale(1.35)}
 .logo-title{
-  font-size:34px;
-  font-weight:900;
+  font-size:36px;
+  font-weight:950;
   letter-spacing:.2px;
-  margin:0 0 8px;
-  color:#0f172a;
+  margin:0 0 9px;
+  color:var(--lf-ink);
 }
-
 .logo-subtitle{
   font-size:16px;
-  font-weight:700;
-  line-height:1.55;
+  font-weight:850;
+  line-height:1.62;
   color:#475569;
   margin:0 0 22px;
 }
-
 .start-button{
   width:100%;
-  height:52px;
+  height:54px;
   border:0;
   border-radius:999px;
-  background:#007aff;
+  background:linear-gradient(145deg,#138dff,#006fe6);
   color:white;
-  font-size:20px;
-  font-weight:900;
-  box-shadow:0 10px 24px rgba(0,122,255,.26);
-  cursor:pointer;
+  font-size:19px;
+  font-weight:950;
+  box-shadow:0 12px 26px rgba(0,122,255,.28);
 }
-
 .start-note{
   margin-top:14px;
   font-size:13px;
-  font-weight:700;
+  font-weight:800;
   color:#64748b;
   line-height:1.5;
 }
-
-
-/* ===== Mobile tap reliability fix ===== */
-#startOverlay,
-#startOverlay *{
-  -webkit-tap-highlight-color: transparent;
+.start-note.audio-unlocked{color:#005bbb}
+@media(max-width:640px){
+  .app{width:100%;margin:0;border-radius:0;min-height:100vh;padding:12px;background:rgba(255,255,255,.48)}
+  .app-header{padding:2px 2px 10px}
+  .brand-title{font-size:22px}
+  .brand-subtitle{font-size:11px}
+  .logo-mark{width:44px;height:44px;flex-basis:44px;border-radius:16px}
+  .controls{top:0;grid-template-columns:1fr 1fr;gap:7px;padding:7px;border-radius:22px;margin-bottom:12px}
+  .controls button,.controls select{height:44px;border-radius:16px;font-size:13px;padding:0 10px}
+  #categorySelect{grid-column:span 2}
+  .box,.list{min-height:calc(100vh - 172px);padding:18px;border-radius:28px}
+  .card-main{grid-template-columns:minmax(0,1fr) 70px;gap:12px}
+  .voice-button{width:64px;height:64px;border-radius:23px}
+  .voice-button svg{width:29px;height:29px}
+  .zh{font-size:38px}
+  .pinyin{font-size:23px}
+  .jp{font-size:21px}
+  .question-nav{gap:6px}
+  .question-nav button{height:38px;font-size:13px;padding:0 5px}
 }
-
-#startOverlay{
-  touch-action: manipulation;
+@media(max-width:380px){
+  .zh{font-size:34px}
+  .pinyin{font-size:21px}
+  .jp{font-size:19px}
+  .controls button,.controls select{font-size:12px}
+  .control-icon{width:21px;height:21px;flex-basis:21px}
 }
-
-.start-card,
-.start-button{
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-
-/* ===== iOS audio unlock feedback ===== */
-.start-note.audio-unlocked{
-  color:#005bbb;
-}
-
-
-/* ===== Stable layout / fixed menu width v1 ===== */
-@media (min-width:521px){
-  html{
-    overflow-y:scroll !important;
-    scrollbar-gutter:stable !important;
-  }
-  .app{
-    width:min(760px, calc(100% - 16px)) !important;
-    max-width:760px !important;
-  }
-  .controls{
-    width:min(760px, calc(100% - 16px)) !important;
-    max-width:760px !important;
-    display:grid !important;
-    grid-template-columns:172px 86px 86px 126px !important;
-    gap:8px !important;
-    justify-content:start !important;
-    align-items:center !important;
-  }
-  #viewBtn{
-    width:172px !important;
-    min-width:172px !important;
-    max-width:172px !important;
-  }
-  #modeBtn,
-  #levelBtn{
-    width:86px !important;
-    min-width:86px !important;
-    max-width:86px !important;
-  }
-  #categorySelect{
-    width:126px !important;
-    min-width:126px !important;
-    max-width:126px !important;
-  }
-}
-
-/* ===== Question mode navigation v1 ===== */
-.question-nav{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:8px;
-  margin:0 0 16px;
-  position:relative;
-  z-index:5;
-}
-.question-nav button{
-  height:38px;
-  padding:0 8px;
-  border-radius:999px;
-  background:#eef6ff;
-  color:#005bbb;
-  border:1px solid #bfdbfe;
-  box-shadow:none;
-  font-size:15px;
-  font-weight:900;
-  white-space:nowrap;
-}
-.question-nav button:active{
-  transform:translateY(1px);
-}
-@media(max-width:520px){
-  .question-nav{
-    gap:6px;
-    margin-bottom:14px;
-  }
-  .question-nav button{
-    height:36px;
-    font-size:13px;
-    padding:0 6px;
-  }
-}
-
 </style>
 </head>
 <body>
 
 <div id="startOverlay">
   <div class="start-card">
-    <div class="logo-mark">流</div>
+    <div class="logo-mark" aria-label="LingoFlow icon"><span class="logo-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
     <h1 class="logo-title">LingoFlow</h1>
-    <p class="logo-subtitle">台湾華語を、聞き流しで自然に学ぶ。</p>
+    <p class="logo-subtitle">耳から覚える、毎日つづく。<br>台湾華語を聞き流しで自然に学ぶ。</p>
     <button id="startButton" class="start-button" type="button">タップして開始</button>
-    <div class="start-note">音声は開始後だけ再生されます。<br>電車・会社・カフェでも安心して開けます。</div>
+    <div class="start-note">音声は開始後だけ再生されます。<br>タブ復帰・スリープ復帰で勝手に鳴りません。</div>
   </div>
 </div>
 
 <div class="app">
-  <div class="controls">
+  <header class="app-header" aria-label="LingoFlow header">
+    <div class="brand">
+      <div class="logo-mark" aria-label="LingoFlow icon"><span class="logo-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+      <div>
+        <div class="brand-title">LingoFlow</div>
+        <div class="brand-subtitle">耳から覚える、毎日つづく。</div>
+      </div>
+    </div>
+    <div class="header-gear" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4Z" stroke="currentColor" stroke-width="2"/><path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.5-2.4 1a7 7 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7 7 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5c-.1.5-.1 1-.1 1.5s0 1 .1 1.5l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7 7 0 0 0 2.6-1.5l2.4 1 2-3.5-2-1.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </div>
+  </header>
+
+  <div class="controls" role="toolbar" aria-label="学習メニュー">
     <button id="viewBtn" type="button">問題</button>
     <button id="modeBtn" type="button">話す</button>
     <button id="levelBtn" type="button">初級</button>
-    <select id="categorySelect">
+    <select id="categorySelect" aria-label="カテゴリ">
       <option value="all">全部</option>
       <option value="greeting">挨拶</option>
       <option value="cafe">カフェ</option>
@@ -350,6 +589,7 @@ button,select{
       <option value="emergency">緊急</option>
     </select>
   </div>
+
   <div id="box" class="box"></div>
   <div id="listPanel" class="list hidden-panel"></div>
 </div>
@@ -366,7 +606,7 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-22-ja-audio-auto-v1";
+const LINGOFLOW_APP_VERSION = "2026-05-22-ogp-ui-pro-v1";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -857,12 +1097,50 @@ function pick(){
   const list = getList();
   return list[Math.floor(Math.random() * list.length)];
 }
+
+function iconMarkup(name){
+  const icons = {
+    question:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 17h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M9.2 9a3 3 0 1 1 4.9 2.3c-1.1.8-2.1 1.4-2.1 3" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    list:'<svg viewBox="0 0 24 24" fill="none"><path d="M8 6h11M8 12h11M8 18h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+    listen:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M7 12h2v7H7a3 3 0 0 1-3-3v-1a3 3 0 0 1 3-3ZM17 12h-2v7h2a3 3 0 0 0 3-3v-1a3 3 0 0 0-3-3Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>',
+    random:'<svg viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M4 7h3c3 0 4.6 10 8 10h6M21 17l-5 4M21 17l-5-4M4 17h3c1.3 0 2.4-.9 3.4-2.2M14 7c.8-.5 1.6-.8 2.6-.8H21" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    mic:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 14a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v4a4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="2.1"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>',
+    book:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H5V4ZM19 4h-5a3 3 0 0 0-3 3" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/></svg>',
+    level:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 20V10M12 20V5M19 20v-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    tag:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 7a3 3 0 0 1 3-3h4.5a3 3 0 0 1 2.1.9l6.5 6.5a2.5 2.5 0 0 1 0 3.5l-5.2 5.2a2.5 2.5 0 0 1-3.5 0L4.9 13.6A3 3 0 0 1 4 11.5V7Z" stroke="currentColor" stroke-width="2"/><path d="M8.5 8.5h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+    speaker:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9.5a4 4 0 0 1 0 5M18.5 7a7.5 7.5 0 0 1 0 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+  };
+  return icons[name] || '';
+}
+function controlMarkup(icon, label){
+  return `<span class="control-icon" aria-hidden="true">${iconMarkup(icon)}</span><span class="control-label">${esc(label)}</span>`;
+}
+function categoryLabel(cat){ return categoryNames[cat] || categoryNames.all || "全部"; }
+function currentListCount(){ return getList().length || 1; }
+function progressPercent(){
+  const count = currentListCount();
+  return Math.max(8, Math.min(100, Math.round(((Math.max(index,0) + 1) / count) * 100)));
+}
+function viewLabel(){
+  return view === "question" ? "問題" : view === "list" ? "リスト" : view === "continuous" ? "聞き流し" : "ランダム";
+}
+function viewIcon(){
+  return view === "question" ? "question" : view === "list" ? "list" : view === "continuous" ? "listen" : "random";
+}
+function dotsHtml(active = 0){
+  return `<div class="progress-dots" aria-hidden="true"><i class="${active >= 0 ? 'active' : ''}"></i><i class="${active >= 1 ? 'active' : ''}"></i><i class="${active >= 2 ? 'active' : ''}"></i><i></i><i></i></div>`;
+}
+function levelCardHtml(){
+  return `<div class="level-card"><div class="level-row"><span>${esc(levelNames[level])}レベル</span><strong>${Math.max(index,0) + 1} / ${currentListCount()}</strong></div><div class="level-progress"><i style="width:${progressPercent()}%"></i></div></div>`;
+}
+
 function updateButtons(){
-  modeBtn.textContent = mode === "speaking" ? "話す" : "読む";
-  levelBtn.textContent = levelNames[level];
-  viewBtn.textContent = view === "question" ? "問題" :
-                        view === "list" ? "一覧" :
-                        view === "continuous" ? "連続再生" : "ランダム再生";
+  modeBtn.innerHTML = controlMarkup(mode === "speaking" ? "mic" : "book", mode === "speaking" ? "話す" : "読む");
+  levelBtn.innerHTML = controlMarkup("level", levelNames[level]);
+  viewBtn.innerHTML = controlMarkup(viewIcon(), viewLabel());
+  viewBtn.setAttribute("aria-label", `表示を${viewLabel()}に切替中。クリックで次の表示へ`);
+  modeBtn.setAttribute("aria-label", `学習順序: ${mode === "speaking" ? "話す" : "読む"}`);
+  levelBtn.setAttribute("aria-label", `レベル: ${levelNames[level]}`);
 }
 function setView(v){
   stopAudio();
@@ -970,14 +1248,6 @@ function renderQuestion(options = {}){
     (mode === "speaking" && step === 2)
   );
 
-  const navHtml = `
-    <div class="question-nav" aria-label="問題操作">
-      <button type="button" data-qnav="prev">← 前</button>
-      <button type="button" data-qnav="replay">↻ もう一度</button>
-      <button type="button" data-qnav="next">次 →</button>
-    </div>
-  `;
-
   const linesHtml = order.map((key,i) => {
     const isVisible = i < visible;
     const content = key === "zh" && isVisible && shouldSpeakZh
@@ -991,13 +1261,32 @@ function renderQuestion(options = {}){
     `;
   }).join("");
 
-  const statusHtml = `
-    <div class="status">
-      ${step < 2 ? "画面をクリックすると次を表示します。" : "画面をクリックすると次の問題へ進みます。"}
+  const navHtml = `
+    <div class="question-nav" aria-label="問題操作">
+      <button type="button" data-qnav="prev">← 前</button>
+      <button type="button" data-qnav="replay">↻ もう一度</button>
+      <button type="button" data-qnav="next">次 →</button>
     </div>
   `;
 
-  box.innerHTML = navHtml + linesHtml + statusHtml;
+  const statusText = step < 2 ? "カードをタップすると次を表示します。" : "カードをタップすると次の問題へ進みます。";
+
+  box.innerHTML = `
+    <div class="question-card-top">
+      <div class="meta-left">
+        <span class="chip">${iconMarkup("tag")} ${esc(categoryLabel(p.category))}</span>
+        <span class="chip">${mode === "speaking" ? "話す" : "読む"}</span>
+      </div>
+      <div class="counter">${Math.max(index,0) + 1} / ${currentListCount()}</div>
+    </div>
+    <div class="card-main">
+      <div class="lines-wrap">${linesHtml}${dotsHtml(step)}</div>
+      <button type="button" class="voice-button" data-qnav="replay" aria-label="もう一度聞く">${iconMarkup("speaker")}</button>
+    </div>
+    ${levelCardHtml()}
+    <div class="status">${statusText}</div>
+    ${navHtml}
+  `;
 
   if(shouldSpeakZh){
     speakHighlight(p.zh);
@@ -1030,10 +1319,25 @@ function renderChars(text){
   }).join("");
 }
 function renderAuto(p){
+  const autoLabel = view === "random" ? "ランダム再生" : "聞き流し";
   box.innerHTML = `
-    <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
-    <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
-    <div class="line"><div class="jp">${esc(p.jp)}</div></div>
+    <div class="auto-card-top">
+      <div class="meta-left">
+        <span class="chip">${iconMarkup(view === "random" ? "random" : "listen")} ${autoLabel}</span>
+        <span class="chip">${esc(categoryLabel(p.category))}</span>
+      </div>
+      <div class="counter">${Math.max(index,0) + 1} / ${currentListCount()}</div>
+    </div>
+    <div class="card-main">
+      <div class="lines-wrap">
+        <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
+        <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
+        <div class="line"><div class="jp">${esc(p.jp)}</div></div>
+        ${dotsHtml(2)}
+      </div>
+      <div class="voice-button" aria-hidden="true">${iconMarkup("speaker")}</div>
+    </div>
+    ${levelCardHtml()}
     <div class="status">自動再生中：中国語音声 → 日本語音声 → 次の文</div>
   `;
 }
@@ -1284,7 +1588,7 @@ async function playListById(id){
 }
 function renderList(){
   currentListItems = [];
-  let out = '<div class="list-status">一覧クリック: 音声に合わせて中国語が青色に進みます</div>';
+  let out = `<div class="list-status">${iconMarkup("listen")} 一覧クリック：音声に合わせて中国語が青色に進みます</div>`;
 
   Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
     let html = `<div class="category-title">${categoryNames[cat]}</div>`;
