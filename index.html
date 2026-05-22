@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-22-stable-layout-width-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-22-stable-layout-width-v1">
+<!-- LingoFlow app version: 2026-05-22-ja-audio-toggle-v2 -->
+<meta name="lingoflow-app-version" content="2026-05-22-ja-audio-toggle-v2">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -56,6 +56,7 @@ button,select{
 #viewBtn{min-width:128px}
 #modeBtn,#levelBtn{min-width:86px}
 #categorySelect{min-width:116px;max-width:150px}
+#audioModeBtn{min-width:142px}
 .box,.list{
   background:rgba(255,255,255,.68);
   border:1px solid rgba(255,255,255,.9);
@@ -80,6 +81,16 @@ button,select{
 .char{display:inline;color:#111827!important;transition:color .06s linear,text-shadow .06s linear}
 .char.done{color:#007aff!important;text-shadow:0 0 8px rgba(0,122,255,.24)!important}
 .error{background:#fff1f2;color:#9f1239;padding:14px;border-radius:14px;font-weight:800;line-height:1.6}
+#audioModeBtn{
+  background:#64748b;
+  color:#fff;
+}
+#audioModeBtn.on{
+  background:#007aff;
+}
+#audioModeBtn.off{
+  background:#64748b;
+}
 @media(max-width:520px){
   .app{width:100%;margin:0;border-radius:0;min-height:100vh}
   .controls{gap:5px;overflow-x:auto}
@@ -87,6 +98,7 @@ button,select{
   #viewBtn{min-width:104px}
   #modeBtn,#levelBtn{min-width:68px}
   #categorySelect{min-width:92px}
+  #audioModeBtn{min-width:118px}
   .zh,.pinyin,.jp{font-size:21px}
   .box,.list{min-height:calc(100vh - 90px);padding:18px 14px}
 }
@@ -103,7 +115,7 @@ button,select{
   max-width:760px !important;
 
   display:grid !important;
-  grid-template-columns:172px 86px 86px 126px !important;
+  grid-template-columns:172px 86px 86px 126px 142px !important;
   gap:8px !important;
   align-items:center !important;
   justify-content:start !important;
@@ -258,7 +270,7 @@ button,select{
     width:min(760px, calc(100% - 16px)) !important;
     max-width:760px !important;
     display:grid !important;
-    grid-template-columns:172px 86px 86px 126px !important;
+    grid-template-columns:172px 86px 86px 126px 142px !important;
     gap:8px !important;
     justify-content:start !important;
     align-items:center !important;
@@ -278,6 +290,11 @@ button,select{
     width:126px !important;
     min-width:126px !important;
     max-width:126px !important;
+  }
+  #audioModeBtn{
+    width:142px !important;
+    min-width:142px !important;
+    max-width:142px !important;
   }
 }
 
@@ -349,6 +366,7 @@ button,select{
       <option value="work">仕事</option>
       <option value="emergency">緊急</option>
     </select>
+    <button id="audioModeBtn" class="off" type="button">中文のみ</button>
   </div>
   <div id="box" class="box"></div>
   <div id="listPanel" class="list hidden-panel"></div>
@@ -366,7 +384,7 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-22-stable-layout-width-v1";
+const LINGOFLOW_APP_VERSION = "2026-05-22-ja-audio-toggle-v2";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -705,6 +723,10 @@ const viewBtn = document.getElementById("viewBtn");
 const modeBtn = document.getElementById("modeBtn");
 const levelBtn = document.getElementById("levelBtn");
 const categorySelect = document.getElementById("categorySelect");
+const audioModeBtn = document.getElementById("audioModeBtn");
+
+const JA_AUDIO_PREF_KEY = "lingoflow_ja_audio_enabled_v1";
+let jaAudioEnabled = false;
 
 
 // ===== Start overlay / audio permission: fixed version =====
@@ -857,12 +879,118 @@ function pick(){
   const list = getList();
   return list[Math.floor(Math.random() * list.length)];
 }
+function loadJaAudioPreference(){
+  try{
+    jaAudioEnabled = localStorage.getItem(JA_AUDIO_PREF_KEY) === "1";
+  }catch(err){
+    jaAudioEnabled = false;
+  }
+}
+
+function saveJaAudioPreference(){
+  try{
+    localStorage.setItem(JA_AUDIO_PREF_KEY, jaAudioEnabled ? "1" : "0");
+  }catch(err){}
+}
+
+function updateAudioModeButton(){
+  if(!audioModeBtn) return;
+  audioModeBtn.textContent = jaAudioEnabled ? "中文＋日本語" : "中文のみ";
+  audioModeBtn.classList.toggle("on", jaAudioEnabled);
+  audioModeBtn.classList.toggle("off", !jaAudioEnabled);
+  audioModeBtn.setAttribute("aria-pressed", jaAudioEnabled ? "true" : "false");
+}
+
+function toggleJaAudioMode(){
+  stopAudio();
+  jaAudioEnabled = !jaAudioEnabled;
+  saveJaAudioPreference();
+  updateAudioModeButton();
+  track("ja_audio_mode_change", { enabled: jaAudioEnabled });
+}
+
+function pickJapaneseVoice(){
+  try{
+    const voices = speechSynthesis.getVoices();
+    return voices.find(x => x.lang === "ja-JP") ||
+           voices.find(x => String(x.lang || "").toLowerCase().startsWith("ja")) ||
+           voices.find(x => String(x.name || "").toLowerCase().includes("japanese")) ||
+           voices.find(x => String(x.name || "").includes("日本"));
+  }catch(err){
+    return null;
+  }
+}
+
+function handleJaSpeechError(e, context, text){
+  const payload = {
+    audioType: "ja",
+    context,
+    textLength: String(text ?? "").length,
+    speechError: e && e.error ? String(e.error) : "unknown",
+    cancelReason: speechCancelExpectedReason || null
+  };
+
+  if(isExpectedSpeechError(e)){
+    track("ja_audio_interrupted", payload);
+  }else{
+    track("ja_audio_error", payload);
+  }
+}
+
+function speakJapanese(text, context = "ja"){
+  if(!audioEnabled || !jaAudioEnabled || document.hidden) return Promise.resolve();
+  const normalizedText = String(text ?? "").replace(/\n/g, "。").trim();
+  if(!normalizedText) return Promise.resolve();
+
+  return new Promise(resolve => {
+    try{
+      const u = new SpeechSynthesisUtterance(normalizedText);
+      u.lang = "ja-JP";
+      u.rate = 1.0;
+      u.pitch = 1.0;
+
+      const v = pickJapaneseVoice();
+      if(v) u.voice = v;
+
+      u.onend = () => {
+        track("ja_audio_complete", { audioType: "ja", context, textLength: normalizedText.length });
+        resolve();
+      };
+
+      u.onerror = (e) => {
+        handleJaSpeechError(e, context, normalizedText);
+        resolve();
+      };
+
+      track("ja_audio_play", { audioType: "ja", context, textLength: normalizedText.length });
+      speechSynthesis.speak(u);
+    }catch(err){
+      track("ja_audio_error", { audioType: "ja", context, textLength: normalizedText.length, speechError: String(err && err.message ? err.message : err) });
+      resolve();
+    }
+  });
+}
+
+function canContinueAudioSequence(id){
+  return id === autoId && audioEnabled && !document.hidden;
+}
+
+async function speakZhThenMaybeJa(zhText, jpText, context, id = autoId){
+  await speakHighlight(zhText);
+  if(!jaAudioEnabled || !jpText) return;
+  if(!canContinueAudioSequence(id)) return;
+  await wait(500);
+  if(!canContinueAudioSequence(id)) return;
+  await speakJapanese(jpText, context);
+}
+
 function updateButtons(){
   modeBtn.textContent = mode === "speaking" ? "話す" : "読む";
   levelBtn.textContent = levelNames[level];
   viewBtn.textContent = view === "question" ? "問題" :
                         view === "list" ? "一覧" :
                         view === "continuous" ? "連続再生" : "ランダム再生";
+  updateAudioModeButton();
 }
 function setView(v){
   stopAudio();
@@ -999,8 +1127,14 @@ function renderQuestion(options = {}){
 
   box.innerHTML = navHtml + linesHtml + statusHtml;
 
+  const sequenceId = autoId;
   if(shouldSpeakZh){
-    speakHighlight(p.zh);
+    speakZhThenMaybeJa(p.zh, step === 2 ? p.jp : "", "question", sequenceId);
+  }else if(jaAudioEnabled && step === 2 && !options.suppressAutoSpeak){
+    wait(0).then(async () => {
+      if(!canContinueAudioSequence(sequenceId)) return;
+      await speakJapanese(p.jp, "question");
+    });
   }
 }
 function replayCurrentQuestion(){
@@ -1009,7 +1143,8 @@ function replayCurrentQuestion(){
   step = 2;
   renderQuestion({ suppressAutoSpeak: true });
   track("question_replay", { phraseCategory: p.category || null });
-  speakHighlight(p.zh);
+  const sequenceId = autoId;
+  speakZhThenMaybeJa(p.zh, p.jp, "question_replay", sequenceId);
 }
 function goPrevQuestion(){
   const before = index;
@@ -1030,11 +1165,14 @@ function renderChars(text){
   }).join("");
 }
 function renderAuto(p){
+  const statusText = jaAudioEnabled
+    ? "連続再生中：中国語音声 → 日本語音声 → 次の文"
+    : "連続再生中：中国語 → ピンイン → 日本語";
   box.innerHTML = `
     <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
     <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
     <div class="line"><div class="jp">${esc(p.jp)}</div></div>
-    <div class="status">連続再生中：中国語 → ピンイン → 日本語</div>
+    <div class="status">${statusText}</div>
   `;
 }
 function speak(text){
@@ -1180,7 +1318,7 @@ async function startAuto(){
     step = 2;
     renderAuto(p);
 
-    await speakHighlight(p.zh);
+    await speakZhThenMaybeJa(p.zh, p.jp, "auto", id);
 
     if(id !== autoId || !audioEnabled || !(view === "continuous" || view === "random")) break;
 
@@ -1210,7 +1348,14 @@ async function playListById(id){
   document.querySelectorAll(".list-item").forEach(x => x.classList.remove("playing"));
   el.classList.add("playing");
 
+  const sequenceId = autoId;
   await highlightElement(item.zh, zhEl);
+  if(jaAudioEnabled && canContinueAudioSequence(sequenceId) && view === "list"){
+    await wait(500);
+    if(canContinueAudioSequence(sequenceId) && view === "list"){
+      await speakJapanese(item.jp, "list");
+    }
+  }
 }
 function renderList(){
   currentListItems = [];
@@ -1275,6 +1420,7 @@ box.addEventListener("click", function(e){
 viewBtn.addEventListener("click", cycleView);
 modeBtn.addEventListener("click", cycleMode);
 levelBtn.addEventListener("click", cycleLevel);
+if(audioModeBtn) audioModeBtn.addEventListener("click", toggleJaAudioMode);
 categorySelect.addEventListener("change", e => setCategory(e.target.value));
 box.addEventListener("click", nextStep);
 box.addEventListener("touchstart", e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
@@ -1288,6 +1434,7 @@ box.addEventListener("touchend", e => {
 }, {passive:true});
 speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 initUserAnalytics();
+loadJaAudioPreference();
 updateButtons();
 nextQuestion(true);
 analyticsReady = true;
