@@ -3,142 +3,346 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" type="image/png" href="/favicon.png?v=4">
+<link rel="icon" type="image/png" href="/favicon.png?v=20260522se1">
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-22-ui-refresh-no-ryu-icon-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-22-ui-refresh-no-ryu-icon-v1">
+<!-- LingoFlow app version: 2026-05-22-compact-ui-no-scroll-v3 -->
+<meta name="lingoflow-app-version" content="2026-05-22-compact-ui-no-scroll-v3">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://lingoflowing.com/ogp.png">
+<meta property="og:image" content="https://lingoflowing.com/ogp.png?v=20260522se1">
 <meta property="og:url" content="https://lingoflowing.com">
 
-<link rel="icon" href="/favicon.png">
 
 <style>
+
+:root{
+  --lf-blue:#007aff;
+  --lf-blue-2:#0a84ff;
+  --lf-ink:#071a3a;
+  --lf-muted:#64748b;
+  --lf-soft:#eef6ff;
+  --lf-card:rgba(255,255,255,.90);
+  --lf-line:rgba(15,49,98,.08);
+  --lf-shadow:0 18px 48px rgba(15,49,98,.11);
+}
 *{box-sizing:border-box}
 html{
   margin:0;
   width:100%;
-  min-height:100%;
-  overflow-y:scroll;
-  overflow-x:hidden;
-  scrollbar-gutter:stable;
+  height:100%;
+  overflow:hidden;
+  -webkit-text-size-adjust:100%;
 }
-body{margin:0;width:100%;min-height:100%;overflow-x:hidden}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Microsoft JhengHei",sans-serif;
-  background:linear-gradient(120deg,#e9f4ff,#f7fbff);
-  color:#111827;
-}
-.app{
-  width:min(760px, calc(100% - 16px));
-  max-width:760px;
-  margin:8px auto;
-  padding:10px;
-  min-height:calc(100vh - 16px);
-  background:rgba(255,255,255,.75);
-  border:1px solid rgba(255,255,255,.9);
-  border-radius:22px;
-  box-shadow:0 16px 50px rgba(15,23,42,.12);
-}
-.controls{
-  position:sticky;top:0;z-index:10;display:flex;gap:8px;align-items:center;
-  padding:8px 0 12px;background:rgba(255,255,255,.82);backdrop-filter:blur(16px);
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Hiragino Sans","Yu Gothic","Microsoft JhengHei",sans-serif;
+  color:var(--lf-ink);
+  background:linear-gradient(135deg,#f8fbff 0%,#edf6ff 52%,#ffffff 100%);
 }
 button,select{
-  height:42px;border:0;border-radius:999px;background:#007aff;color:#fff;
-  font-size:20px;font-weight:800;padding:0 16px;box-shadow:0 3px 10px rgba(0,122,255,.24);cursor:pointer;
+  font:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
-#viewBtn{min-width:128px}
-#modeBtn,#levelBtn{min-width:86px}
-#categorySelect{min-width:116px;max-width:150px}
+.app{
+  width:min(760px,100%);
+  max-width:760px;
+  height:100dvh;
+  min-height:0;
+  margin:0 auto;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  background:rgba(255,255,255,.42);
+}
+.app-header{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:2px 2px 0;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  width:100%;
+}
+.logo-mark{
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,#25a6ff 0%,#007aff 68%,#0062d6 100%);
+  color:white;
+  box-shadow:0 8px 20px rgba(0,122,255,.20), inset 0 1px 1px rgba(255,255,255,.36);
+}
+.logo-wave{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  width:24px;
+  height:20px;
+}
+.logo-wave i{
+  display:block;
+  width:3px;
+  border-radius:999px;
+  background:currentColor;
+}
+.logo-wave i:nth-child(1){height:10px;opacity:.76}
+.logo-wave i:nth-child(2){height:17px}
+.logo-wave i:nth-child(3){height:22px}
+.logo-wave i:nth-child(4){height:13px;opacity:.82}
+.brand-copy{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.brand-title{
+  flex:0 0 auto;
+  font-size:21px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.15px;
+  color:var(--lf-ink);
+}
+.brand-subtitle{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:12px;
+  font-weight:850;
+  color:var(--lf-blue);
+  letter-spacing:.02em;
+}
+.header-gear{display:none!important}
+.controls{
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1.12fr;
+  gap:6px;
+  align-items:center;
+  padding:0;
+  margin:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+.controls button,
+.controls select{
+  min-width:0;
+  width:100%;
+  height:39px;
+  border:1px solid rgba(0,122,255,.10);
+  border-radius:999px;
+  padding:0 8px;
+  color:#15345f;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 6px 16px rgba(15,49,98,.06), inset 0 1px 0 rgba(255,255,255,.9);
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.01em;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#viewBtn{
+  color:white;
+  background:linear-gradient(145deg,#168dff 0%,#006fe8 72%);
+  border-color:rgba(0,122,255,.42);
+  box-shadow:0 9px 20px rgba(0,122,255,.20), inset 0 1px 1px rgba(255,255,255,.25);
+}
+.control-icon{display:none!important}
+.control-label{display:inline;overflow:hidden;text-overflow:ellipsis}
+select#categorySelect{
+  appearance:none;
+  -webkit-appearance:none;
+  padding-right:18px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #007aff 50%),
+    linear-gradient(135deg, #007aff 50%, transparent 50%),
+    linear-gradient(135deg, rgba(255,255,255,.84), rgba(255,255,255,.84));
+  background-position:
+    calc(100% - 13px) 17px,
+    calc(100% - 8px) 17px,
+    0 0;
+  background-size:5px 5px,5px 5px,100% 100%;
+  background-repeat:no-repeat;
+}
 .box,.list{
-  background:rgba(255,255,255,.68);
-  border:1px solid rgba(255,255,255,.9);
-  border-radius:18px;
-  min-height:360px;
-  padding:20px 18px;
+  flex:1 1 auto;
+  min-height:0;
+  position:relative;
+  overflow:hidden;
+  padding:16px;
+  border-radius:26px;
+  background:var(--lf-card);
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:var(--lf-shadow), inset 0 1px 0 rgba(255,255,255,.92);
 }
-.line{margin:0 0 22px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
-.zh,.pinyin,.jp{font-size:24px;font-weight:800;line-height:1.55;letter-spacing:.3px}
-.zh{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:.5px}
-.pinyin{color:#111827}
-.jp{color:#1f2937}
+.list{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.box::after,.list::after{display:none}
+.question-card-top,
+.auto-card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 0 12px;
+}
+.meta-left{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  overflow:hidden;
+}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  min-height:26px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#eef6ff;
+  color:#0068d8;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.chip svg{display:none}
+.counter{
+  flex:0 0 auto;
+  font-size:14px;
+  line-height:1;
+  font-weight:900;
+  color:#38516f;
+  white-space:nowrap;
+}
+.card-main{
+  min-height:0;
+  display:block;
+}
+.lines-wrap{min-width:0}
+.line{
+  margin:0 0 11px;
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
+.zh,.pinyin,.jp{
+  font-weight:900;
+  line-height:1.34;
+  letter-spacing:.15px;
+}
+.zh{
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  font-size:clamp(30px, 7.8vw, 42px);
+  color:#087cff;
+  letter-spacing:.35px;
+}
+.pinyin{
+  font-size:clamp(19px, 5.0vw, 25px);
+  color:#1174df;
+  font-style:italic;
+}
+.jp{
+  font-size:clamp(18px, 4.8vw, 24px);
+  color:#12223f;
+  font-weight:820;
+}
 .hidden-line{visibility:hidden}
-.hidden-panel{display:none}
-.list-item{padding:16px 8px;border-bottom:1px solid rgba(0,0,0,.08);border-radius:12px;cursor:pointer;user-select:none}
-.list-item:active{background:rgba(0,122,255,.08)}
-.list-item.playing{background:rgba(0,122,255,.06);outline:2px solid rgba(0,122,255,.20)}
-.category-title{color:#007aff;font-size:18px;font-weight:900;margin:18px 0 8px}
-.level-title{color:#64748b;font-size:16px;font-weight:900;margin:12px 0 6px}
-.status{margin-top:12px;padding:10px 12px;border-radius:14px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:15px}
-.list-status{margin:0 0 10px;padding:8px 10px;border-radius:12px;background:#eef6ff;color:#005bbb;font-weight:800;font-size:14px}
+.hidden-panel{display:none!important}
+.voice-button{display:none!important}
+.progress-dots{display:none!important}
+.level-card{display:none!important}
+.status{
+  margin-top:10px;
+  padding:9px 11px;
+  border-radius:14px;
+  background:#f1f7ff;
+  color:#005bbb;
+  font-weight:850;
+  font-size:13px;
+  line-height:1.35;
+}
+.question-nav{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  margin:12px 0 0;
+}
+.question-nav button{
+  height:37px;
+  padding:0 6px;
+  border:0;
+  border-radius:999px;
+  color:#005bbb;
+  background:#eef6ff;
+  border:1px solid rgba(0,122,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+  font-size:13px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.question-nav button:active,.controls button:active{transform:translateY(1px)}
 .char{display:inline;color:#111827!important;transition:color .06s linear,text-shadow .06s linear}
 .char.done{color:#007aff!important;text-shadow:0 0 8px rgba(0,122,255,.24)!important}
-.error{background:#fff1f2;color:#9f1239;padding:14px;border-radius:14px;font-weight:800;line-height:1.6}
-@media(max-width:520px){
-  .app{width:100%;margin:0;border-radius:0;min-height:100vh}
-  .controls{gap:5px;overflow-x:auto}
-  button,select{height:38px;font-size:16px;padding:0 10px;flex:0 0 auto}
-  #viewBtn{min-width:104px}
-  #modeBtn,#levelBtn{min-width:68px}
-  #categorySelect{min-width:92px}
-  .zh,.pinyin,.jp{font-size:21px}
-  .box,.list{min-height:calc(100vh - 90px);padding:18px 14px}
+.list-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 12px;
+  padding:10px 11px;
+  border-radius:16px;
+  background:#eef6ff;
+  color:#005bbb;
+  font-weight:900;
+  font-size:13px;
 }
-
-/* ===== FIXED MENU FORCE OVERRIDE ===== */
-.controls{
-  position:fixed !important;
-  top:0 !important;
-  left:50% !important;
-  transform:translateX(-50%) !important;
-  z-index:99999 !important;
-
-  width:min(760px, calc(100% - 16px)) !important;
-  max-width:760px !important;
-
-  display:grid !important;
-  grid-template-columns:172px 86px 86px 126px !important;
-  gap:8px !important;
-  align-items:center !important;
-  justify-content:start !important;
-
-  padding:10px !important;
-  margin:0 !important;
-
-  background:rgba(255,255,255,.94) !important;
-  backdrop-filter:blur(16px) !important;
-  border-radius:0 0 18px 18px !important;
-  box-shadow:0 8px 24px rgba(15,23,42,.12) !important;
+.category-title{
+  color:#006fe6;
+  font-size:16px;
+  font-weight:950;
+  margin:18px 0 8px;
 }
-
-.box,
-.list{
-  margin-top:82px !important;
+.level-title{
+  color:#64748b;
+  font-size:13px;
+  font-weight:950;
+  margin:13px 0 7px;
 }
-
-@media(max-width:520px){
-  .controls{
-    width:100% !important;
-    left:0 !important;
-    right:0 !important;
-    transform:none !important;
-    overflow-x:auto !important;
-    border-radius:0 0 14px 14px !important;
-  }
-
-  .box,
-  .list{
-    margin-top:76px !important;
-  }
+.list-item{
+  padding:13px;
+  margin:0 0 9px;
+  border-radius:18px;
+  cursor:pointer;
+  user-select:none;
+  background:rgba(255,255,255,.68);
+  border:1px solid rgba(15,49,98,.06);
+  box-shadow:0 5px 14px rgba(15,49,98,.045);
 }
-
-
+.list-item:active{background:rgba(0,122,255,.08)}
+.list-item.playing{background:rgba(0,122,255,.07);outline:2px solid rgba(0,122,255,.20)}
+.error{background:#fff1f2;color:#9f1239;padding:14px;border-radius:18px;font-weight:900;line-height:1.6}
 /* ===== LingoFlow Start Overlay ===== */
 #startOverlay{
   position:fixed;
@@ -148,386 +352,464 @@ button,select{
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:24px;
-  background:linear-gradient(135deg,#eaf4ff,#ffffff);
+  padding:22px;
+  background:linear-gradient(135deg,#f8fbff,#eaf4ff 54%,#ffffff);
+  touch-action:manipulation;
 }
-
-#startOverlay.hidden{
-  display:none !important;
-}
-
+#startOverlay.hidden{display:none!important}
+#startOverlay,#startOverlay *{-webkit-tap-highlight-color:transparent}
 .start-card{
-  width:min(420px, 92vw);
-  padding:28px 22px;
-  border-radius:28px;
-  background:rgba(255,255,255,.82);
-  border:1px solid rgba(255,255,255,.95);
-  box-shadow:0 20px 60px rgba(15,23,42,.16);
+  width:min(390px,92vw);
+  padding:26px 22px;
+  border-radius:30px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(255,255,255,.96);
+  box-shadow:0 24px 70px rgba(15,49,98,.15);
   text-align:center;
-  backdrop-filter:blur(16px);
+  backdrop-filter:blur(18px);
+  touch-action:manipulation;
+  user-select:none;
+  -webkit-user-select:none;
 }
-
-.logo-mark{
-  width:76px;
-  height:76px;
-  margin:0 auto 14px;
-  border-radius:24px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#007aff;
-  color:#fff;
-  font-size:34px;
-  font-weight:900;
-  box-shadow:0 12px 30px rgba(0,122,255,.28);
-}
-
+.start-card .logo-mark{width:70px;height:70px;margin:0 auto 16px;border-radius:24px}
+.start-card .logo-wave{transform:scale(1.3)}
 .logo-title{
   font-size:34px;
-  font-weight:900;
+  font-weight:950;
   letter-spacing:.2px;
   margin:0 0 8px;
-  color:#0f172a;
+  color:var(--lf-ink);
 }
-
 .logo-subtitle{
-  font-size:16px;
-  font-weight:700;
-  line-height:1.55;
+  font-size:15px;
+  font-weight:850;
+  line-height:1.5;
   color:#475569;
-  margin:0 0 22px;
+  margin:0 0 20px;
 }
-
 .start-button{
   width:100%;
   height:52px;
   border:0;
   border-radius:999px;
-  background:#007aff;
+  background:linear-gradient(145deg,#138dff,#006fe6);
   color:white;
-  font-size:20px;
-  font-weight:900;
-  box-shadow:0 10px 24px rgba(0,122,255,.26);
-  cursor:pointer;
+  font-size:18px;
+  font-weight:950;
+  box-shadow:0 12px 26px rgba(0,122,255,.26);
 }
-
 .start-note{
-  margin-top:14px;
-  font-size:13px;
-  font-weight:700;
+  margin-top:12px;
+  font-size:12px;
+  font-weight:800;
   color:#64748b;
-  line-height:1.5;
+  line-height:1.45;
 }
-
-
-/* ===== Mobile tap reliability fix ===== */
-#startOverlay,
-#startOverlay *{
-  -webkit-tap-highlight-color: transparent;
+.start-note.audio-unlocked{color:#005bbb}
+@media(max-width:640px){
+  .app{padding:8px;gap:7px}
+  .brand-title{font-size:20px}
+  .brand-subtitle{font-size:11px}
+  .logo-mark{width:35px;height:35px;flex-basis:35px;border-radius:13px}
+  .logo-wave{transform:scale(.88)}
+  .controls{grid-template-columns:1fr 1fr 1fr 1.10fr;gap:5px}
+  .controls button,.controls select{height:37px;font-size:13px;padding:0 6px}
+  .box,.list{padding:14px;border-radius:24px}
+  .question-card-top,.auto-card-top{margin-bottom:10px}
+  .status{font-size:12px;padding:8px 10px;margin-top:8px}
+  .question-nav{margin-top:10px}
+  .question-nav button{height:35px;font-size:12px}
 }
-
-#startOverlay{
-  touch-action: manipulation;
+@media(max-width:380px){
+  .app{padding:7px;gap:6px}
+  .app-header{padding-top:0}
+  .logo-mark{width:32px;height:32px;flex-basis:32px;border-radius:12px}
+  .brand{gap:7px}
+  .brand-copy{gap:6px}
+  .brand-title{font-size:18px}
+  .brand-subtitle{font-size:10px}
+  .controls button,.controls select{height:34px;font-size:12px;padding:0 4px}
+  select#categorySelect{padding-right:15px;background-position:calc(100% - 11px) 15px,calc(100% - 7px) 15px,0 0;background-size:4px 4px,4px 4px,100% 100%}
+  .box,.list{padding:12px;border-radius:22px}
+  .chip{font-size:11px;min-height:24px;padding:4px 8px}
+  .counter{font-size:12px}
+  .line{margin-bottom:8px}
+  .status{display:none}
+  .question-nav{margin-top:8px;gap:5px}
+  .question-nav button{height:32px;font-size:12px}
 }
-
-.start-card,
-.start-button{
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-
-/* ===== iOS audio unlock feedback ===== */
-.start-note.audio-unlocked{
-  color:#005bbb;
-}
-
-
-/* ===== Stable layout / fixed menu width v1 ===== */
-@media (min-width:521px){
-  html{
-    overflow-y:scroll !important;
-    scrollbar-gutter:stable !important;
-  }
-  .app{
-    width:min(760px, calc(100% - 16px)) !important;
-    max-width:760px !important;
-  }
-  .controls{
-    width:min(760px, calc(100% - 16px)) !important;
-    max-width:760px !important;
-    display:grid !important;
-    grid-template-columns:172px 86px 86px 126px !important;
-    gap:8px !important;
-    justify-content:start !important;
-    align-items:center !important;
-  }
-  #viewBtn{
-    width:172px !important;
-    min-width:172px !important;
-    max-width:172px !important;
-  }
-  #modeBtn,
-  #levelBtn{
-    width:86px !important;
-    min-width:86px !important;
-    max-width:86px !important;
-  }
-  #categorySelect{
-    width:126px !important;
-    min-width:126px !important;
-    max-width:126px !important;
-  }
-}
-
-/* ===== Question mode navigation v1 ===== */
-.question-nav{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:8px;
-  margin:0 0 16px;
-  position:relative;
-  z-index:5;
-}
-.question-nav button{
-  height:38px;
-  padding:0 8px;
-  border-radius:999px;
-  background:#eef6ff;
-  color:#005bbb;
-  border:1px solid #bfdbfe;
-  box-shadow:none;
-  font-size:15px;
-  font-weight:900;
-  white-space:nowrap;
-}
-.question-nav button:active{
-  transform:translateY(1px);
-}
-@media(max-width:520px){
-  .question-nav{
-    gap:6px;
-    margin-bottom:14px;
-  }
-  .question-nav button{
-    height:36px;
-    font-size:13px;
-    padding:0 6px;
-  }
+@media(max-height:600px){
+  .app{padding:6px;gap:5px}
+  .app-header{padding:0}
+  .logo-mark{width:31px;height:31px;flex-basis:31px;border-radius:11px}
+  .brand-title{font-size:18px}
+  .brand-subtitle{font-size:10px}
+  .controls button,.controls select{height:33px;font-size:12px}
+  .box,.list{padding:11px;border-radius:20px}
+  .question-card-top,.auto-card-top{margin-bottom:8px}
+  .line{margin-bottom:7px}
+  .zh{font-size:clamp(27px, 7.0vw, 36px);line-height:1.24}
+  .pinyin{font-size:clamp(17px, 4.5vw, 22px);line-height:1.24}
+  .jp{font-size:clamp(16px, 4.3vw, 20px);line-height:1.28}
+  .status{display:none}
+  .question-nav{margin-top:8px}
+  .question-nav button{height:31px;font-size:11px}
 }
 
 
 
-/* ===== LingoFlow visual UI refresh / no Ryu icon v1 ===== */
-:root{
-  --lf-blue:#007aff;
-  --lf-blue-deep:#0754c9;
-  --lf-blue-soft:#eaf4ff;
-  --lf-ink:#0b1f3f;
-  --lf-muted:#60708a;
-  --lf-card:rgba(255,255,255,.82);
-  --lf-border:rgba(148,190,255,.34);
-}
-body{
-  background:
-    radial-gradient(circle at 86% 12%, rgba(0,122,255,.20), transparent 34%),
-    radial-gradient(circle at 8% 0%, rgba(255,255,255,.95), transparent 32%),
-    linear-gradient(135deg,#f8fbff 0%,#eaf4ff 46%,#d8ebff 100%) !important;
-  color:var(--lf-ink) !important;
-}
-body::before{
-  content:"";
-  position:fixed;
-  inset:auto 0 0 0;
-  height:28vh;
-  pointer-events:none;
-  background:
-    linear-gradient(0deg, rgba(255,255,255,.92), rgba(255,255,255,0)),
-    radial-gradient(ellipse at 22% 80%, rgba(0,122,255,.08), transparent 42%);
-  z-index:-1;
-}
+/* ===== iPhone SE clean menu / honest UI v1 ===== */
 .app{
-  background:rgba(255,255,255,.58) !important;
-  border:1px solid rgba(255,255,255,.88) !important;
-  box-shadow:0 24px 70px rgba(15,49,98,.15) !important;
+  padding:8px !important;
+  gap:6px !important;
+}
+.app-header{
+  min-height:34px !important;
+  padding:0 1px !important;
+}
+.brand{gap:8px !important;}
+.logo-mark{
+  width:34px !important;
+  height:34px !important;
+  flex-basis:34px !important;
+  border-radius:12px !important;
+  box-shadow:0 6px 14px rgba(0,122,255,.16), inset 0 1px 1px rgba(255,255,255,.34) !important;
+}
+.logo-wave{transform:scale(.84) !important;}
+.brand-copy{gap:7px !important;}
+.brand-title{font-size:19px !important;line-height:1 !important;}
+.brand-subtitle{font-size:11px !important;font-weight:800 !important;}
+.controls{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:3px !important;
+  align-items:center !important;
+  padding:3px !important;
+  margin:0 !important;
+  min-width:0 !important;
+  width:100% !important;
+  overflow:visible !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.72) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:0 6px 18px rgba(15,49,98,.045), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+.controls button,.controls select{
+  min-width:0 !important;
+  width:100% !important;
+  height:31px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:#17345e !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  line-height:31px !important;
+  letter-spacing:0 !important;
+  text-align:center !important;
+  text-align-last:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+#viewBtn{
+  color:white !important;
+  background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important;
+  box-shadow:0 5px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.25) !important;
+}
+select#categorySelect{
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  padding-right:2px !important;
+  background-image:none !important;
+}
+.box,.list{
+  border-radius:22px !important;
+  padding:13px !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+.card-main{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  display:flex !important;
+  align-items:center !important;
+}
+.lines-wrap{width:100% !important;}
+.question-card-top,.auto-card-top{flex:0 0 auto !important;margin-bottom:8px !important;}
+.status{flex:0 0 auto !important;margin-top:7px !important;}
+.question-nav{flex:0 0 auto !important;margin-top:8px !important;}
+
+@media(max-width:360px){
+  .app{padding:6px !important;gap:5px !important;}
+  .app-header{min-height:30px !important;}
+  .brand{gap:6px !important;}
+  .logo-mark{width:29px !important;height:29px !important;flex-basis:29px !important;border-radius:10px !important;}
+  .logo-wave{transform:scale(.72) !important;}
+  .brand-title{font-size:18px !important;}
+  .brand-subtitle{font-size:10px !important;}
+  .controls{gap:2px !important;padding:2px !important;}
+  .controls button,.controls select{height:29px !important;line-height:29px !important;font-size:11px !important;padding:0 1px !important;}
+  .box,.list{padding:10px !important;border-radius:19px !important;}
+  .question-card-top,.auto-card-top{margin-bottom:6px !important;}
+  .chip{font-size:10px !important;min-height:21px !important;padding:3px 7px !important;}
+  .counter{font-size:11px !important;}
+  .line{margin-bottom:6px !important;}
+  .zh{font-size:clamp(25px,8.8vw,32px) !important;line-height:1.22 !important;}
+  .pinyin{font-size:clamp(16px,4.8vw,20px) !important;line-height:1.22 !important;}
+  .jp{font-size:clamp(15px,4.7vw,19px) !important;line-height:1.25 !important;}
+  .question-nav{gap:4px !important;margin-top:7px !important;}
+  .question-nav button{height:29px !important;font-size:11px !important;padding:0 3px !important;}
+  .status{display:none !important;}
+}
+@media(max-height:600px){
+  .app{padding:6px !important;gap:5px !important;}
+  .app-header{min-height:29px !important;}
+  .logo-mark{width:29px !important;height:29px !important;flex-basis:29px !important;border-radius:10px !important;}
+  .brand-title{font-size:18px !important;}
+  .brand-subtitle{font-size:10px !important;}
+  .controls button,.controls select{height:29px !important;line-height:29px !important;font-size:11px !important;}
+  .box,.list{padding:10px !important;border-radius:19px !important;}
+  .zh{font-size:clamp(25px,8.5vw,32px) !important;line-height:1.22 !important;}
+  .pinyin{font-size:clamp(16px,4.6vw,20px) !important;line-height:1.22 !important;}
+  .jp{font-size:clamp(15px,4.5vw,19px) !important;line-height:1.25 !important;}
+  .question-nav button{height:29px !important;font-size:11px !important;}
+  .status{display:none !important;}
+}
+
+
+
+/* ===== Compact UI final fix v1 =====
+   - Main title row removed
+   - iPhone SE: no horizontal menu scroll
+   - List status: no decorative headphone/icon
+   - Auto modes kept simple and stable
+*/
+.app-header{display:none!important;}
+.app{
+  padding:6px !important;
+  gap:6px !important;
+  overflow:hidden !important;
 }
 .controls{
-  background:rgba(255,255,255,.88) !important;
-  border:1px solid rgba(255,255,255,.92) !important;
-  box-shadow:0 12px 34px rgba(15,49,98,.12) !important;
+  flex:0 0 auto !important;
+  display:grid !important;
+  grid-template-columns:1.08fr .78fr .78fr .94fr !important;
+  gap:3px !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+  padding:2px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.72) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:0 6px 18px rgba(15,49,98,.045), inset 0 1px 0 rgba(255,255,255,.85) !important;
 }
 .controls button,
 .controls select{
-  background:rgba(255,255,255,.78) !important;
-  color:var(--lf-ink) !important;
-  border:1px solid rgba(0,122,255,.10) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 4px 12px rgba(15,49,98,.07) !important;
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  height:32px !important;
+  line-height:32px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  color:#17345e !important;
+  font-size:12px !important;
   font-weight:900 !important;
+  letter-spacing:-.03em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  text-align:center !important;
+  text-align-last:center !important;
 }
 #viewBtn{
-  background:linear-gradient(135deg,#0a84ff,#006fe6) !important;
-  color:white !important;
-  border-color:rgba(0,122,255,.45) !important;
-  box-shadow:0 8px 20px rgba(0,122,255,.26) !important;
+  color:#fff !important;
+  background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important;
+  box-shadow:0 5px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.25) !important;
 }
-.box,
+select#categorySelect{
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  padding-right:2px !important;
+  background-image:none !important;
+}
+.box,.list{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  padding:10px !important;
+  border-radius:20px !important;
+  overflow:hidden !important;
+}
 .list{
-  background:var(--lf-card) !important;
-  border:1px solid rgba(255,255,255,.94) !important;
-  border-radius:28px !important;
-  box-shadow:0 18px 46px rgba(15,49,98,.12), inset 0 1px 0 rgba(255,255,255,.88) !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
 }
+.question-card-top,
+.auto-card-top{
+  margin:0 0 7px !important;
+  min-height:24px !important;
+}
+.chip{
+  min-height:22px !important;
+  padding:3px 8px !important;
+  font-size:11px !important;
+  line-height:1.1 !important;
+}
+.counter{font-size:11px !important;}
+.card-main{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  display:flex !important;
+  align-items:center !important;
+}
+.lines-wrap{width:100% !important;}
+.line{margin-bottom:7px !important;}
+.zh{font-size:clamp(25px,8.2vw,36px) !important;line-height:1.22 !important;}
+.pinyin{font-size:clamp(16px,4.8vw,21px) !important;line-height:1.24 !important;}
+.jp{font-size:clamp(15px,4.6vw,20px) !important;line-height:1.25 !important;}
 .question-nav{
-  padding:4px !important;
-  border-radius:999px !important;
-  background:rgba(241,247,255,.78) !important;
-  border:1px solid rgba(0,122,255,.08) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.8) !important;
+  flex:0 0 auto !important;
+  margin-top:7px !important;
+  gap:5px !important;
 }
 .question-nav button{
-  background:transparent !important;
-  border:0 !important;
-  color:#41516a !important;
-  box-shadow:none !important;
+  height:30px !important;
+  font-size:11px !important;
+  padding:0 4px !important;
 }
-.question-nav button[data-qnav="replay"]{
-  background:rgba(0,122,255,.10) !important;
-  color:var(--lf-blue-deep) !important;
-}
-.question-meta{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin:4px 0 18px;
-}
-.phrase-chip{
-  display:inline-flex;
-  align-items:center;
-  min-height:30px;
-  padding:5px 12px;
-  border-radius:999px;
-  color:white;
-  background:linear-gradient(135deg,#5eb2ff,#007aff);
-  font-weight:900;
-  font-size:15px;
-  box-shadow:0 8px 18px rgba(0,122,255,.22);
-}
-.phrase-count{
-  color:#475569;
-  font-size:15px;
-  font-weight:900;
-  letter-spacing:.04em;
-}
-.zh{
-  color:#0875f5 !important;
-  font-size:34px !important;
-  line-height:1.35 !important;
-  text-shadow:0 6px 22px rgba(0,122,255,.10);
-}
-.pinyin{
-  color:#1464c8 !important;
-  font-size:23px !important;
-  line-height:1.42 !important;
-}
-.jp{
-  color:#17233b !important;
-  font-size:23px !important;
-  line-height:1.48 !important;
-}
-.line{
-  margin:0 0 18px !important;
-}
-.status,
 .list-status{
-  background:rgba(234,244,255,.92) !important;
-  color:#0754c9 !important;
-  border:1px solid rgba(0,122,255,.10) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.78) !important;
+  display:block !important;
+  margin:0 0 9px !important;
+  padding:8px 9px !important;
+  border-radius:13px !important;
+  font-size:12px !important;
+  line-height:1.35 !important;
+  text-align:left !important;
 }
-.list-item{
-  margin:0 0 10px;
-  padding:15px 14px !important;
+.list-status svg,
+.list-status .control-icon,
+.auto-card-top svg,
+.question-card-top svg{display:none!important;}
+.status{
+  flex:0 0 auto !important;
+  margin-top:6px !important;
+  padding:7px 9px !important;
+  font-size:12px !important;
+  line-height:1.3 !important;
+}
+@media(max-width:360px){
+  .app{padding:5px !important;gap:5px !important;}
+  .controls{gap:2px !important;padding:2px !important;grid-template-columns:1.10fr .76fr .76fr .92fr !important;}
+  .controls button,.controls select{height:30px !important;line-height:30px !important;font-size:11px !important;padding:0 1px !important;}
+  .box,.list{padding:9px !important;border-radius:18px !important;}
+  .zh{font-size:clamp(24px,8.4vw,32px) !important;}
+  .pinyin{font-size:clamp(15px,4.7vw,19px) !important;}
+  .jp{font-size:clamp(14px,4.6vw,18px) !important;}
+}
+@media(max-height:600px){
+  .app{padding:5px !important;gap:5px !important;}
+  .controls button,.controls select{height:30px !important;line-height:30px !important;font-size:11px !important;}
+  .box,.list{padding:9px !important;border-radius:18px !important;}
+  .line{margin-bottom:5px !important;}
+  .status{display:none !important;}
+}
+
+
+
+/* ===== Final visibility fix v2 =====
+   Keep only the active panel visible. This must come after all .box/.list overrides. */
+.box.hidden-panel,
+.list.hidden-panel,
+.hidden-panel{
+  display:none !important;
+}
+
+
+
+/* ===== FINAL iPhone SE no-horizontal-scroll patch v3 =====
+   Purpose: the top menu must never require horizontal scroll at 320px width.
+   This overrides all earlier menu rules. */
+html,
+body{
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:hidden !important;
+}
+.app{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  overflow-x:hidden !important;
+}
+.controls{
+  box-sizing:border-box !important;
+  flex:0 0 auto !important;
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  gap:2px !important;
+  padding:2px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.72) !important;
   border:1px solid rgba(0,122,255,.08) !important;
-  background:rgba(255,255,255,.66);
-  box-shadow:0 8px 22px rgba(15,49,98,.06);
+  box-shadow:0 6px 18px rgba(15,49,98,.045), inset 0 1px 0 rgba(255,255,255,.85) !important;
 }
-.list-item.playing{
-  background:rgba(234,244,255,.90) !important;
-  outline:2px solid rgba(0,122,255,.20) !important;
+.controls button,
+.controls select{
+  box-sizing:border-box !important;
+  display:block !important;
+  min-width:0 !important;
+  width:0 !important;
+  max-width:none !important;
+  height:30px !important;
+  line-height:30px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  border-radius:999px !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  color:#17345e !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  letter-spacing:-.04em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  text-align:center !important;
+  text-align-last:center !important;
 }
-.category-title{
-  color:#0754c9 !important;
-  margin-top:22px !important;
+#viewBtn{flex:1.02 1 0 !important; color:#fff !important; background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important; box-shadow:0 5px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.25) !important;}
+#modeBtn{flex:.72 1 0 !important;}
+#levelBtn{flex:.72 1 0 !important;}
+#categorySelect{
+  flex:.78 1 0 !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  background-image:none !important;
+  padding:0 !important;
 }
-.level-title{
-  color:#6b7c96 !important;
-}
-#startOverlay{
-  background:
-    radial-gradient(circle at 88% 12%, rgba(0,122,255,.24), transparent 34%),
-    linear-gradient(135deg,#f8fbff,#e7f3ff 54%,#ffffff) !important;
-}
-.start-card{
-  background:rgba(255,255,255,.78) !important;
-  border:1px solid rgba(255,255,255,.96) !important;
-  box-shadow:0 28px 74px rgba(15,49,98,.18) !important;
-}
-.logo-mark{
-  position:relative;
-  overflow:hidden;
-  background:linear-gradient(135deg,#0a84ff,#006fe6) !important;
-  box-shadow:0 16px 36px rgba(0,122,255,.30) !important;
-}
-.logo-mark::before{
-  content:"";
-  position:absolute;
-  inset:-20% -45%;
-  background:linear-gradient(110deg, transparent 34%, rgba(255,255,255,.24) 48%, transparent 62%);
-  transform:rotate(-12deg);
-}
-.logo-wave{
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:5px;
-  width:44px;
-  height:40px;
-}
-.logo-wave i{
-  display:block;
-  width:6px;
-  border-radius:999px;
-  background:#fff;
-  box-shadow:0 0 12px rgba(255,255,255,.55);
-}
-.logo-wave i:nth-child(1){height:14px;opacity:.78}
-.logo-wave i:nth-child(2){height:26px;opacity:.92}
-.logo-wave i:nth-child(3){height:36px}
-.logo-wave i:nth-child(4){height:20px;opacity:.86}
-.logo-title{
-  color:var(--lf-ink) !important;
-  letter-spacing:.1px !important;
-}
-.logo-subtitle{
-  color:#37506f !important;
-}
-.start-button{
-  background:linear-gradient(135deg,#0a84ff,#006fe6) !important;
-  box-shadow:0 14px 28px rgba(0,122,255,.28) !important;
-}
-.char.done{
-  color:#007aff!important;
-  text-shadow:0 0 12px rgba(0,122,255,.30)!important;
-}
-@media(max-width:520px){
-  .zh{font-size:31px !important;}
-  .pinyin,.jp{font-size:21px !important;}
-  .box,.list{border-radius:24px !important;}
-  .phrase-chip{font-size:14px;min-height:28px;padding:4px 10px;}
-  .phrase-count{font-size:14px;}
+@media(max-width:340px){
+  .app{padding-left:5px !important; padding-right:5px !important;}
+  .controls{gap:1px !important; padding:2px !important;}
+  .controls button,.controls select{font-size:10.5px !important; letter-spacing:-.055em !important; height:29px !important; line-height:29px !important;}
 }
 
 </style>
@@ -536,20 +818,24 @@ body::before{
 
 <div id="startOverlay">
   <div class="start-card">
-    <div class="logo-mark" aria-label="LingoFlow icon"><span class="logo-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+    <div class="logo-mark" aria-label="LingoFlow icon"><span class="logo-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>
     <h1 class="logo-title">LingoFlow</h1>
-    <p class="logo-subtitle">耳から覚える、毎日つづく。<br>台湾華語を自然に学ぶ。</p>
+    <p class="logo-subtitle">台湾華語を、耳から自然に学ぶ。</p>
     <button id="startButton" class="start-button" type="button">タップして開始</button>
-    <div class="start-note">音声は開始後だけ再生されます。<br>電車・会社・カフェでも安心して開けます。</div>
+    <div class="start-note">音声は開始後だけ再生されます。<br>タブ復帰・スリープ復帰で勝手に鳴りません。</div>
   </div>
 </div>
 
 <div class="app">
-  <div class="controls">
+  
+  <!-- Compact UI: main title row removed to keep iPhone SE usable without vertical scroll. -->
+
+
+  <div class="controls" role="toolbar" aria-label="学習メニュー">
     <button id="viewBtn" type="button">問題</button>
     <button id="modeBtn" type="button">話す</button>
     <button id="levelBtn" type="button">初級</button>
-    <select id="categorySelect">
+    <select id="categorySelect" aria-label="カテゴリ">
       <option value="all">全部</option>
       <option value="greeting">挨拶</option>
       <option value="cafe">カフェ</option>
@@ -563,6 +849,7 @@ body::before{
       <option value="emergency">緊急</option>
     </select>
   </div>
+
   <div id="box" class="box"></div>
   <div id="listPanel" class="list hidden-panel"></div>
 </div>
@@ -579,7 +866,7 @@ const DATA = JSON.parse(document.getElementById("embeddedData").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-22-ui-refresh-no-ryu-icon-v1";
+const LINGOFLOW_APP_VERSION = "2026-05-22-compact-ui-no-scroll-v3";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -1070,12 +1357,50 @@ function pick(){
   const list = getList();
   return list[Math.floor(Math.random() * list.length)];
 }
+
+function iconMarkup(name){
+  const icons = {
+    question:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 17h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M9.2 9a3 3 0 1 1 4.9 2.3c-1.1.8-2.1 1.4-2.1 3" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    list:'<svg viewBox="0 0 24 24" fill="none"><path d="M8 6h11M8 12h11M8 18h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+    listen:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M7 12h2v7H7a3 3 0 0 1-3-3v-1a3 3 0 0 1 3-3ZM17 12h-2v7h2a3 3 0 0 0 3-3v-1a3 3 0 0 0-3-3Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>',
+    random:'<svg viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M4 7h3c3 0 4.6 10 8 10h6M21 17l-5 4M21 17l-5-4M4 17h3c1.3 0 2.4-.9 3.4-2.2M14 7c.8-.5 1.6-.8 2.6-.8H21" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    mic:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 14a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v4a4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="2.1"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>',
+    book:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H5V4ZM19 4h-5a3 3 0 0 0-3 3" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/></svg>',
+    level:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 20V10M12 20V5M19 20v-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    tag:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 7a3 3 0 0 1 3-3h4.5a3 3 0 0 1 2.1.9l6.5 6.5a2.5 2.5 0 0 1 0 3.5l-5.2 5.2a2.5 2.5 0 0 1-3.5 0L4.9 13.6A3 3 0 0 1 4 11.5V7Z" stroke="currentColor" stroke-width="2"/><path d="M8.5 8.5h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+    speaker:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9.5a4 4 0 0 1 0 5M18.5 7a7.5 7.5 0 0 1 0 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+  };
+  return icons[name] || '';
+}
+function controlMarkup(icon, label){
+  return esc(label);
+}
+function categoryLabel(cat){ return categoryNames[cat] || categoryNames.all || "全部"; }
+function currentListCount(){ return getList().length || 1; }
+function progressPercent(){
+  const count = currentListCount();
+  return Math.max(8, Math.min(100, Math.round(((Math.max(index,0) + 1) / count) * 100)));
+}
+function viewLabel(){
+  return view === "question" ? "問題" : view === "list" ? "一覧" : view === "continuous" ? "連続" : "ランダム";
+}
+function viewIcon(){
+  return view === "question" ? "question" : view === "list" ? "list" : view === "continuous" ? "listen" : "random";
+}
+function dotsHtml(active = 0){
+  return "";
+}
+function levelCardHtml(){
+  return "";
+}
+
 function updateButtons(){
   modeBtn.textContent = mode === "speaking" ? "話す" : "読む";
   levelBtn.textContent = levelNames[level];
-  viewBtn.textContent = view === "question" ? "問題" :
-                        view === "list" ? "一覧" :
-                        view === "continuous" ? "連続再生" : "ランダム再生";
+  viewBtn.textContent = viewLabel();
+  viewBtn.setAttribute("aria-label", `表示を${viewLabel()}に切替中。クリックで次の表示へ`);
+  modeBtn.setAttribute("aria-label", `学習順序: ${mode === "speaking" ? "話す" : "読む"}`);
+  levelBtn.setAttribute("aria-label", `レベル: ${levelNames[level]}`);
 }
 function setView(v){
   stopAudio();
@@ -1183,23 +1508,6 @@ function renderQuestion(options = {}){
     (mode === "speaking" && step === 2)
   );
 
-  const navHtml = `
-    <div class="question-nav" aria-label="問題操作">
-      <button type="button" data-qnav="prev">← 前</button>
-      <button type="button" data-qnav="replay">↻ もう一度</button>
-      <button type="button" data-qnav="next">次 →</button>
-    </div>
-  `;
-
-  const totalInFilter = Math.max(1, getList().length || history.length || 1);
-  const shownIndex = Math.max(1, Math.min(index + 1, totalInFilter));
-  const metaHtml = `
-    <div class="question-meta">
-      <span class="phrase-chip">${esc(categoryNames[p.category] || "台湾華語")}</span>
-      <span class="phrase-count">${shownIndex} / ${totalInFilter}</span>
-    </div>
-  `;
-
   const linesHtml = order.map((key,i) => {
     const isVisible = i < visible;
     const content = key === "zh" && isVisible && shouldSpeakZh
@@ -1213,13 +1521,29 @@ function renderQuestion(options = {}){
     `;
   }).join("");
 
-  const statusHtml = `
-    <div class="status">
-      ${step < 2 ? "画面をクリックすると次を表示します。" : "画面をクリックすると次の問題へ進みます。"}
+  const navHtml = `
+    <div class="question-nav" aria-label="問題操作">
+      <button type="button" data-qnav="prev">← 前</button>
+      <button type="button" data-qnav="replay">↻ もう一度</button>
+      <button type="button" data-qnav="next">次 →</button>
     </div>
   `;
 
-  box.innerHTML = navHtml + metaHtml + linesHtml + statusHtml;
+  const statusText = step < 2 ? "カードをタップすると次を表示します。" : "カードをタップすると次の問題へ進みます。";
+
+  box.innerHTML = `
+    <div class="question-card-top">
+      <div class="meta-left">
+        <span class="chip">${esc(categoryLabel(p.category))}</span>
+      </div>
+      <div class="counter">${Math.max(index,0) + 1} / ${currentListCount()}</div>
+    </div>
+    <div class="card-main">
+      <div class="lines-wrap">${linesHtml}</div>
+    </div>
+    <div class="status">${statusText}</div>
+    ${navHtml}
+  `;
 
   if(shouldSpeakZh){
     speakHighlight(p.zh);
@@ -1252,18 +1576,23 @@ function renderChars(text){
   }).join("");
 }
 function renderAuto(p){
-  const totalInFilter = Math.max(1, getList().length || history.length || 1);
-  const shownIndex = Math.max(1, Math.min(index + 1, totalInFilter));
-
+  const autoLabel = view === "random" ? "ランダム再生" : "聞き流し";
   box.innerHTML = `
-    <div class="question-meta auto-meta">
-      <span class="phrase-chip">${esc(categoryNames[p.category] || "聞き流し")}</span>
-      <span class="phrase-count">${shownIndex} / ${totalInFilter}</span>
+    <div class="auto-card-top">
+      <div class="meta-left">
+        <span class="chip">${autoLabel}</span>
+        <span class="chip">${esc(categoryLabel(p.category))}</span>
+      </div>
+      <div class="counter">${Math.max(index,0) + 1} / ${currentListCount()}</div>
     </div>
-    <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
-    <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
-    <div class="line"><div class="jp">${esc(p.jp)}</div></div>
-    <div class="status">自動再生中：中国語音声 → 日本語音声 → 次の文</div>
+    <div class="card-main">
+      <div class="lines-wrap">
+        <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
+        <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
+        <div class="line"><div class="jp">${esc(p.jp)}</div></div>
+      </div>
+    </div>
+    <div class="status">中国語 → 日本語 → 次の文</div>
   `;
 }
 function speak(text){
@@ -1513,7 +1842,7 @@ async function playListById(id){
 }
 function renderList(){
   currentListItems = [];
-  let out = '<div class="list-status">一覧クリック：音声に合わせて中国語が青色に進みます</div>';
+  let out = `<div class="list-status">一覧クリック：音声に合わせて中国語が青色に進みます</div>`;
 
   Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
     let html = `<div class="category-title">${categoryNames[cat]}</div>`;
