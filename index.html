@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-23-word-card-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-23-word-card-v1">
+<!-- LingoFlow app version: 2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups -->
+<meta name="lingoflow-app-version" content="2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -1002,6 +1002,972 @@ body{
   .player-buttons button{height:38px !important;font-size:12px !important;}
 }
 
+
+
+/* ===== Word card v5 permanent bottom/list fix =====
+   - Top menu only: 問題 / 一覧 / 単語 / 再生, larger text.
+   - Bottom fixed menu: 話す / 初級 / 全部.
+   - Playback bottom fixed menu: 再生 / 停止 / 連続 / ランダム.
+   - List default text is black; only playing Chinese chars turn blue.
+*/
+.app{
+  padding:6px 6px 54px !important;
+  gap:6px !important;
+  overflow:hidden !important;
+}
+.controls{
+  flex:0 0 auto !important;
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  padding:3px !important;
+  margin:0 !important;
+  overflow:visible !important;
+  border-radius:18px !important;
+  background:rgba(255,255,255,.76) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:0 6px 18px rgba(15,49,98,.045), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+.view-tabs{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:3px !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+}
+.view-tabs button{
+  min-width:0 !important;
+  width:100% !important;
+  height:34px !important;
+  line-height:34px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:#17345e !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.view-tab.active,
+#questionViewBtn.active,
+#listViewBtn.active,
+#wordViewBtn.active,
+#playViewBtn.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important;
+  box-shadow:0 5px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.25) !important;
+}
+.filter-tabs{
+  position:fixed !important;
+  z-index:5000 !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  transform:translateX(-50%) !important;
+  display:grid !important;
+  grid-template-columns:.92fr .92fr 1.16fr !important;
+  gap:4px !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  min-width:0 !important;
+  padding:4px !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.92) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.filter-tabs button,
+.filter-tabs select,
+#modeBtn,
+#levelBtn,
+#categorySelect{
+  min-width:0 !important;
+  width:100% !important;
+  height:36px !important;
+  line-height:36px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:rgba(238,246,255,.96) !important;
+  color:#17345e !important;
+  box-shadow:none !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+  text-align:center !important;
+  text-align-last:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+#categorySelect{
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  background-image:none !important;
+}
+.box,.list{
+  margin-bottom:0 !important;
+  overflow-x:hidden !important;
+}
+.list-item .zh,
+.list-item .pinyin,
+.list-item .jp,
+.list-item .char{
+  color:#111827 !important;
+  text-shadow:none !important;
+}
+.list-item .char.done{
+  color:#007aff !important;
+  text-shadow:0 0 8px rgba(0,122,255,.24) !important;
+}
+.list-item.playing{
+  background:rgba(0,122,255,.055) !important;
+  outline:2px solid rgba(0,122,255,.16) !important;
+}
+.word-card-main{
+  cursor:pointer !important;
+  border-radius:20px !important;
+  touch-action:manipulation !important;
+}
+.word-card-main:active{
+  background:rgba(0,122,255,.045) !important;
+}
+.player-control-bar{
+  position:fixed !important;
+  z-index:5001 !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 52px) !important;
+  transform:translateX(-50%) !important;
+  display:grid !important;
+  grid-template-columns:1fr 1fr 1fr 1fr !important;
+  gap:4px !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  min-width:0 !important;
+  padding:4px !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.15), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.player-control-bar button{
+  min-width:0 !important;
+  width:100% !important;
+  height:36px !important;
+  line-height:36px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  color:#005bbb !important;
+  background:#eef6ff !important;
+  font-size:12.5px !important;
+  font-weight:950 !important;
+  letter-spacing:-.03em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+.player-control-bar button.active,
+.player-control-bar button[data-player-control="play"]{
+  color:#fff !important;
+  background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important;
+  box-shadow:0 5px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.25) !important;
+}
+.player-buttons{display:none !important;}
+body.is-player-controls-visible .app{
+  padding-bottom:98px !important;
+}
+@media(max-width:340px){
+  .app{padding-left:5px !important; padding-right:5px !important;}
+  .view-tabs{gap:2px !important;}
+  .view-tabs button{height:33px !important;line-height:33px !important;font-size:12.5px !important;}
+  .filter-tabs{width:calc(100vw - 10px) !important;max-width:calc(100vw - 10px) !important;gap:3px !important;padding:3px !important;}
+  .filter-tabs button,.filter-tabs select,#modeBtn,#levelBtn,#categorySelect{height:35px !important;line-height:35px !important;font-size:12.5px !important;}
+  .player-control-bar{width:calc(100vw - 10px) !important;max-width:calc(100vw - 10px) !important;gap:3px !important;padding:3px !important;}
+  .player-control-bar button{height:35px !important;line-height:35px !important;font-size:12px !important;}
+}
+
+
+
+/* ===== Word card v4 final verification tune ===== */
+.view-tabs button{font-size:14px !important; letter-spacing:-.015em !important;}
+.filter-tabs button,
+.filter-tabs select,
+#modeBtn,
+#levelBtn,
+#categorySelect{font-size:14px !important; letter-spacing:-.015em !important;}
+.player-control-bar button{font-size:13.5px !important; letter-spacing:-.025em !important;}
+.list-status,
+.category-title,
+.level-title{color:#111827 !important;}
+@media(max-width:340px){
+  .view-tabs button{font-size:13.5px !important;}
+  .filter-tabs button,.filter-tabs select,#modeBtn,#levelBtn,#categorySelect{font-size:13.5px !important;}
+  .player-control-bar button{font-size:13px !important;}
+}
+
+
+
+/* ===== Word card v5 permanent verification patch =====
+   Permanent fixes:
+   1) List items use list-zh/list-pinyin/list-jp, not the global .zh/.pinyin/.jp classes.
+   2) Default list text is always black.
+   3) Only .list-item.playing .list-zh .char.done turns blue while audio is playing.
+   4) Playback controls use one static fixed bottom bar, not a dynamically injected bar.
+*/
+.list-item .list-zh,
+.list-item .list-pinyin,
+.list-item .list-jp,
+.list-item .list-zh .char,
+.list-item .list-pinyin .char,
+.list-item .list-jp .char{
+  color:#111827 !important;
+  text-shadow:none !important;
+}
+.list-item:not(.playing) .list-zh .char.done{
+  color:#111827 !important;
+  text-shadow:none !important;
+}
+.list-item.playing .list-zh .char.done{
+  color:#007aff !important;
+  text-shadow:0 0 8px rgba(0,122,255,.24) !important;
+}
+#playerBottomBar.hidden-panel{display:none !important;}
+#playerBottomBar.player-control-bar{
+  position:fixed !important;
+  z-index:7000 !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 52px) !important;
+  transform:translateX(-50%) !important;
+}
+body:not(.is-player-controls-visible) #playerBottomBar{display:none !important;}
+body.is-player-controls-visible #playerBottomBar{display:grid !important;}
+
+
+/* ===== Word card v7 list typography hierarchy fix =====
+   Purpose:
+   - Keep list default text black.
+   - Restore visual hierarchy from the previous list UI:
+     Chinese large/bold, pinyin medium/italic, Japanese readable/bold.
+   - Keep only playing Chinese completed characters blue.
+*/
+.list-item .list-zh{
+  margin:0 0 4px !important;
+  color:#111827 !important;
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif !important;
+  font-size:clamp(25px, 8.2vw, 36px) !important;
+  line-height:1.22 !important;
+  font-weight:950 !important;
+  letter-spacing:.25px !important;
+  text-shadow:none !important;
+}
+.list-item .list-pinyin{
+  margin:0 0 3px !important;
+  color:#111827 !important;
+  font-size:clamp(16px, 4.8vw, 21px) !important;
+  line-height:1.24 !important;
+  font-weight:900 !important;
+  font-style:italic !important;
+  letter-spacing:.05px !important;
+  text-shadow:none !important;
+}
+.list-item .list-jp{
+  margin:0 !important;
+  color:#111827 !important;
+  font-size:clamp(15px, 4.6vw, 20px) !important;
+  line-height:1.25 !important;
+  font-weight:820 !important;
+  letter-spacing:.05px !important;
+  text-shadow:none !important;
+}
+.list-item .list-zh .char,
+.list-item .list-pinyin .char,
+.list-item .list-jp .char{
+  color:#111827 !important;
+  text-shadow:none !important;
+}
+.list-item:not(.playing) .list-zh .char.done,
+.list-item:not(.playing) .list-pinyin .char.done,
+.list-item:not(.playing) .list-jp .char.done{
+  color:#111827 !important;
+  text-shadow:none !important;
+}
+.list-item.playing .list-zh .char.done{
+  color:#007aff !important;
+  text-shadow:0 0 8px rgba(0,122,255,.24) !important;
+}
+@media(max-width:340px){
+  .list-item .list-zh{font-size:clamp(24px, 8.4vw, 32px) !important;}
+  .list-item .list-pinyin{font-size:clamp(15px, 4.8vw, 19px) !important;}
+  .list-item .list-jp{font-size:clamp(14px, 4.6vw, 18px) !important;}
+}
+
+
+
+/* ===== Word card v8 content toggle / word question fix =====
+   - Chip order is menu -> genre/category.
+   - Bottom content toggle: 文章 / 単語 for 問題・一覧・再生.
+   - Word question modes: イラスト / 中ピン.
+   - List headers show genre and level as different concepts.
+*/
+body.is-content-toggle-visible .app{
+  padding-bottom:104px !important;
+}
+body.is-player-controls-visible .app,
+body.is-word-question-controls-visible .app{
+  padding-bottom:148px !important;
+}
+body.is-player-controls-visible.is-content-toggle-visible .app,
+body.is-word-question-controls-visible.is-content-toggle-visible .app{
+  padding-bottom:150px !important;
+}
+.content-toggle-bar,
+.word-question-mode-bar{
+  position:fixed !important;
+  z-index:5002 !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  display:grid !important;
+  gap:4px !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  min-width:0 !important;
+  padding:4px !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.content-toggle-bar{bottom:calc(env(safe-area-inset-bottom, 0px) + 52px) !important;grid-template-columns:1fr 1fr !important;}
+.word-question-mode-bar{bottom:calc(env(safe-area-inset-bottom, 0px) + 98px) !important;grid-template-columns:1fr 1fr !important;}
+.content-toggle-bar.hidden-panel,
+.word-question-mode-bar.hidden-panel{display:none !important;}
+.content-toggle-bar button,
+.word-question-mode-bar button,
+.player-control-bar button{
+  min-width:0 !important;
+  width:100% !important;
+  height:36px !important;
+  line-height:36px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:rgba(238,246,255,.96) !important;
+  color:#17345e !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  text-align:center !important;
+}
+.content-toggle-bar button.active,
+.word-question-mode-bar button.active,
+.player-control-bar button.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important;
+  box-shadow:0 5px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.25) !important;
+}
+body.is-player-controls-visible #playerBottomBar.player-control-bar{
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 98px) !important;
+  display:grid !important;
+}
+body.is-word-question-controls-visible #playerBottomBar{display:none !important;}
+.list-group-head{
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:space-between !important;
+  gap:8px !important;
+  margin:18px 0 8px !important;
+  padding:0 2px !important;
+}
+.list-genre-block,
+.list-level-block{
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:2px !important;
+}
+.list-level-block{align-items:flex-end !important;flex:0 0 auto !important;}
+.list-head-label{
+  display:block !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  color:#94a3b8 !important;
+  letter-spacing:.04em !important;
+}
+.list-head-genre{
+  display:block !important;
+  font-size:18px !important;
+  line-height:1.1 !important;
+  font-weight:950 !important;
+  color:#111827 !important;
+  letter-spacing:.02em !important;
+}
+.list-head-level{
+  display:inline-flex !important;
+  min-height:22px !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:3px 9px !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  color:#007aff !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+}
+.word-list-row{
+  display:grid !important;
+  grid-template-columns:44px minmax(0,1fr) !important;
+  gap:10px !important;
+  align-items:center !important;
+}
+.word-list-emoji{
+  width:42px !important;
+  height:42px !important;
+  display:grid !important;
+  place-items:center !important;
+  border-radius:16px !important;
+  background:#eef6ff !important;
+  font-size:24px !important;
+}
+.word-question-prompt{
+  width:100% !important;
+  min-height:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+.word-question-prompt .word-emoji{
+  width:92px !important;
+  height:92px !important;
+  border-radius:30px !important;
+  font-size:54px !important;
+}
+.word-question-answer{
+  margin-top:10px !important;
+  padding-top:10px !important;
+  border-top:1px solid rgba(15,49,98,.08) !important;
+}
+.word-question-hidden-note{
+  font-size:13px !important;
+  font-weight:850 !important;
+  color:#64748b !important;
+  line-height:1.35 !important;
+}
+.meta-left .chip:first-child{
+  background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important;
+  color:#fff !important;
+}
+.meta-left .chip:nth-child(2){
+  background:#eef6ff !important;
+  color:#0068d8 !important;
+}
+@media(max-width:340px){
+  .content-toggle-bar button,.word-question-mode-bar button,.player-control-bar button{height:34px !important;line-height:34px !important;font-size:12.5px !important;}
+  .list-head-genre{font-size:17px !important;}
+  .list-head-level{font-size:11.5px !important;}
+}
+
+
+
+/* ===== Word card v9 clean 2-row bottom menu / simple hierarchy =====
+   修正後のみ: screenshots generated from this version are labeled in filenames with v9_after_*. */
+.view-tab.active,
+#questionViewBtn.active,
+#listViewBtn.active,
+#wordViewBtn.active,
+#playViewBtn.active{
+  color:#0068d8 !important;
+  background:#eef6ff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92), 0 3px 9px rgba(15,49,98,.045) !important;
+}
+.meta-left .chip:first-child,
+.meta-left .chip:nth-child(2){
+  background:#eef6ff !important;
+  color:#0068d8 !important;
+  box-shadow:none !important;
+}
+.list-group-head{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  margin:16px 0 9px !important;
+  padding:0 2px !important;
+}
+.list-genre-block,
+.list-level-block{
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:0 !important;
+  flex:0 0 auto !important;
+}
+.list-level-block{align-items:center !important;}
+.list-head-label{display:none !important;}
+.list-head-genre{
+  display:inline-flex !important;
+  align-items:center !important;
+  color:#111827 !important;
+  font-size:18px !important;
+  line-height:1.05 !important;
+  font-weight:950 !important;
+  letter-spacing:.02em !important;
+}
+.list-head-level{
+  display:inline-flex !important;
+  min-height:21px !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:3px 8px !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  color:#0068d8 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+}
+.content-toggle-bar,
+.word-question-mode-bar,
+#playerBottomBar{
+  display:none !important;
+}
+.bottom-action-bar{
+  position:fixed !important;
+  z-index:5002 !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 52px) !important;
+  transform:translateX(-50%) !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  min-width:0 !important;
+  padding:4px !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+  gap:4px !important;
+}
+.bottom-action-bar.hidden-panel{display:none !important;}
+.bottom-action-bar:not(.hidden-panel){display:grid !important;}
+.bottom-action-bar.action-count-2{grid-template-columns:1fr 1fr !important;}
+.bottom-action-bar.action-count-4{grid-template-columns:1fr 1fr 1fr 1.25fr !important;}
+.bottom-action-bar.action-count-6{grid-template-columns:.9fr .98fr .94fr .94fr .94fr 1.18fr !important;}
+.bottom-action-bar button{
+  min-width:0 !important;
+  width:100% !important;
+  height:36px !important;
+  line-height:36px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  color:#17345e !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  text-align:center !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+.bottom-action-bar button.active{
+  color:#0068d8 !important;
+  background:#e5f1ff !important;
+  box-shadow:inset 0 0 0 1px rgba(0,122,255,.18), inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+body.is-bottom-action-visible .app,
+body.is-content-toggle-visible .app,
+body.is-player-controls-visible .app,
+body.is-word-question-controls-visible .app,
+body.is-player-controls-visible.is-content-toggle-visible .app,
+body.is-word-question-controls-visible.is-content-toggle-visible .app{
+  padding-bottom:104px !important;
+}
+.filter-tabs{
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+}
+@media(max-width:340px){
+  .list-head-genre{font-size:17px !important;}
+  .list-head-level{font-size:11.5px !important;padding:3px 7px !important;}
+  .bottom-action-bar{width:calc(100vw - 10px) !important;max-width:calc(100vw - 10px) !important;gap:3px !important;padding:3px !important;}
+  .bottom-action-bar button{height:35px !important;line-height:35px !important;font-size:12.5px !important;}
+  .bottom-action-bar.action-count-6 button{font-size:11.2px !important;letter-spacing:-.055em !important;}
+  .bottom-action-bar.action-count-4 button{font-size:12px !important;letter-spacing:-.04em !important;}
+}
+
+
+/* v9 hard-hide old separate bars even under previous body-state selectors */
+body.is-player-controls-visible #playerBottomBar.player-control-bar,
+body.is-word-question-controls-visible #wordQuestionModeBar.word-question-mode-bar,
+body.is-content-toggle-visible #contentBottomBar.content-toggle-bar,
+#contentBottomBar.content-toggle-bar,
+#wordQuestionModeBar.word-question-mode-bar,
+#playerBottomBar.player-control-bar{
+  display:none !important;
+}
+
+
+
+/* ===== Word card v10 simplified bottom groups =====
+   修正後:
+   - 上メニューから「単語」を削除し、問題 / 一覧 / 再生 に整理。
+   - 問題下メニューは 文章 / 単語 / イラスト の3項目。
+   - 単語問題の台湾華語・ピンインは黒。
+   - 話す/初級/全部 を 日→中・中→日 / レベル / ジャンル に変更。
+   - 再生下メニューは 文章/単語、再生/停止、連続/ランダム のグループ感を出す。
+*/
+#wordViewBtn{display:none !important;}
+.view-tabs{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+.view-tab.active,
+#questionViewBtn.active,
+#listViewBtn.active,
+#playViewBtn.active{
+  color:#0068d8 !important;
+  background:#eaf4ff !important;
+  border:1px solid rgba(0,122,255,.14) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+#modeBtn,#levelBtn,#categorySelect{ font-size:13px !important; letter-spacing:-.02em !important; }
+.bottom-action-bar.v10-action-bar{
+  display:grid !important;
+  width:calc(100% - 12px) !important;
+  max-width:748px !important;
+  left:50% !important;
+  right:auto !important;
+  transform:translateX(-50%) !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 46px) !important;
+  gap:5px !important;
+  padding:3px !important;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.76) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:0 8px 20px rgba(15,49,98,.07), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+.bottom-action-bar.v10-count-2{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+.bottom-action-bar.v10-count-3{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+.bottom-action-bar.v10-count-6{grid-template-columns:repeat(6,minmax(0,1fr)) !important;}
+.bottom-action-bar.v10-action-bar button{
+  height:35px !important;
+  line-height:35px !important;
+  min-width:0 !important;
+  padding:0 3px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  background:#eef6ff !important;
+  color:#0a3766 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.88) !important;
+  font-size:12.5px !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.bottom-action-bar.v10-action-bar button.active{
+  background:#dcefff !important;
+  color:#0068d8 !important;
+  border-color:rgba(0,122,255,.25) !important;
+}
+.bottom-action-bar.v10-action-bar button[data-group="content"]{background:#f5faff !important;}
+.bottom-action-bar.v10-action-bar button[data-group="run"]{background:#eef6ff !important;}
+.bottom-action-bar.v10-action-bar button[data-group="order"]{background:#f3f8ff !important;}
+.bottom-action-bar.v10-action-bar button[data-group="run"][data-player-control="play"]{ color:#0068d8 !important; font-weight:950 !important; }
+.bottom-action-bar.v10-count-6 button:nth-child(2),
+.bottom-action-bar.v10-count-6 button:nth-child(4){ margin-right:5px !important; }
+.bottom-action-bar.v10-count-6 button{ font-size:11.3px !important; letter-spacing:-.055em !important; padding:0 1px !important; }
+.word-question-prompt .word-zh,
+.word-question-prompt .word-pinyin,
+.word-question-answer .word-zh,
+.word-question-answer .word-pinyin{ color:#111827 !important; text-shadow:none !important; }
+.word-question-prompt .word-zh{ letter-spacing:.02em !important; }
+.word-question-prompt .word-pinyin{ font-style:italic !important; }
+.list-status{ color:#0a3766 !important; }
+@media(max-width:340px){
+  .bottom-action-bar.v10-action-bar{width:calc(100% - 10px) !important; gap:4px !important; padding:3px !important;}
+  .bottom-action-bar.v10-action-bar button{height:34px !important;line-height:34px !important;font-size:12px !important;}
+  .bottom-action-bar.v10-count-6 button{font-size:10.6px !important;letter-spacing:-.07em !important;}
+  .bottom-action-bar.v10-count-6 button:nth-child(2),
+  .bottom-action-bar.v10-count-6 button:nth-child(4){margin-right:3px !important;}
+  #modeBtn,#levelBtn,#categorySelect{font-size:12px !important;}
+}
+
+
+
+/* ===== Word card v11 top selectors + toggle groups =====
+   修正後:
+   - 上メニューを使用ハードル順: 再生 / 問題 / 一覧。
+   - レベル・ジャンルは上側のリスト選択へ移動。
+   - 下側のレベル/ジャンル固定メニューは廃止。
+   - 下側操作はトグル式: 文章/単語, 再生/停止, 連続/ランダム, 日→中/中→日。
+*/
+.app{
+  padding:6px 6px 58px !important;
+  gap:6px !important;
+  overflow:hidden !important;
+}
+.controls{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:5px !important;
+  padding:4px !important;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.78) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:0 6px 18px rgba(15,49,98,.045), inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+.view-tabs{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:4px !important;
+  width:100% !important;
+}
+#wordViewBtn{display:none !important;}
+#playViewBtn{order:1 !important;}
+#questionViewBtn{order:2 !important;}
+#listViewBtn{order:3 !important;}
+.view-tabs button{
+  height:34px !important;
+  line-height:34px !important;
+  padding:0 3px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:rgba(238,246,255,.55) !important;
+  color:#0a3766 !important;
+  box-shadow:none !important;
+  font-size:13.5px !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+}
+.view-tab.active,
+#questionViewBtn.active,
+#listViewBtn.active,
+#playViewBtn.active{
+  color:#0068d8 !important;
+  background:#e5f1ff !important;
+  border:1px solid rgba(0,122,255,.16) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+.filter-tabs{
+  position:static !important;
+  left:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  transform:none !important;
+  z-index:auto !important;
+  display:grid !important;
+  grid-template-columns:1fr 1.18fr !important;
+  gap:4px !important;
+  width:100% !important;
+  max-width:100% !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+}
+#modeBtn,#levelBtn{display:none !important;}
+#v11LevelSelect,
+#categorySelect{
+  display:block !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:32px !important;
+  line-height:32px !important;
+  padding:0 8px !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  border-radius:999px !important;
+  background:#f3f8ff !important;
+  color:#0a3766 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.88) !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  text-align:center !important;
+  text-align-last:center !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  background-image:none !important;
+}
+body.is-bottom-action-visible .app,
+body.is-content-toggle-visible .app,
+body.is-player-controls-visible .app,
+body.is-word-question-controls-visible .app,
+body.is-player-controls-visible.is-content-toggle-visible .app,
+body.is-word-question-controls-visible.is-content-toggle-visible .app{
+  padding-bottom:58px !important;
+}
+.bottom-action-bar.v11-action-bar{
+  position:fixed !important;
+  z-index:5002 !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  transform:translateX(-50%) !important;
+  display:grid !important;
+  width:calc(100% - 12px) !important;
+  max-width:748px !important;
+  min-width:0 !important;
+  gap:5px !important;
+  padding:4px !important;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.bottom-action-bar.v11-count-2{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+.bottom-action-bar.v11-count-4{grid-template-columns:repeat(4,minmax(0,1fr)) !important;}
+.bottom-action-bar.v11-action-bar button{
+  height:36px !important;
+  line-height:36px !important;
+  min-width:0 !important;
+  padding:0 3px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  background:#f3f8ff !important;
+  color:#0a3766 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.88) !important;
+  font-size:12.8px !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.bottom-action-bar.v11-action-bar button.active{
+  background:#e5f1ff !important;
+  color:#0068d8 !important;
+  border-color:rgba(0,122,255,.24) !important;
+}
+.bottom-action-bar.v11-action-bar button[data-group="content"]{background:#f7fbff !important;}
+.bottom-action-bar.v11-action-bar button[data-group="run"]{background:#eef6ff !important;}
+.bottom-action-bar.v11-action-bar button[data-group="order"]{background:#f5faff !important;}
+.bottom-action-bar.v11-action-bar button[data-group="direction"]{background:#f8fbff !important;}
+/* 旧バーは使わない */
+#contentBottomBar,#wordQuestionModeBar,#playerBottomBar{display:none !important;}
+@media(max-width:340px){
+  .controls{padding:3px !important;gap:4px !important;}
+  .view-tabs button{height:33px !important;line-height:33px !important;font-size:13px !important;}
+  #v11LevelSelect,#categorySelect{height:31px !important;line-height:31px !important;font-size:12.5px !important;}
+  .bottom-action-bar.v11-action-bar{width:calc(100% - 10px) !important;gap:3px !important;padding:3px !important;}
+  .bottom-action-bar.v11-action-bar button{height:34px !important;line-height:34px !important;font-size:11.6px !important;letter-spacing:-.045em !important;padding:0 1px !important;}
+}
+
+
+
+/* ===== Word card v12 meta selects + one-row toggle groups =====
+   修正後:
+   - 上メニュー: 再生 / 問題 / 一覧。
+   - レベル・ジャンルは本文上部のメタ領域に移動。
+   - 下側からレベル・ジャンルを削除。
+   - 下側操作は一行トグル: 内容 / 再生状態 / 順番 / 表示順。
+*/
+.controls{gap:4px !important;}
+.view-tabs{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+#playViewBtn{order:1 !important;}
+#questionViewBtn{order:2 !important;}
+#listViewBtn{order:3 !important;}
+#wordViewBtn{display:none !important;}
+.filter-tabs{display:none !important;}
+#v12MetaSelectBar{
+  flex:0 0 auto !important;
+  display:grid !important;
+  grid-template-columns:1fr 1.18fr !important;
+  gap:5px !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  padding:0 2px !important;
+  margin:-1px 0 1px !important;
+}
+#v12MetaSelectBar select{
+  display:block !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:31px !important;
+  line-height:31px !important;
+  padding:0 8px !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  border-radius:999px !important;
+  background:#f3f8ff !important;
+  color:#0a3766 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.88) !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  text-align:center !important;
+  text-align-last:center !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  background-image:none !important;
+}
+/* カテゴリ/レベルはメタセレクトに移したので、本文カード内の重複チップは軽くする */
+.auto-card-top .chip,
+.question-card-top .chip{background:#f3f8ff !important;color:#0a3766 !important;}
+.bottom-action-bar.v12-action-bar{
+  position:fixed !important;
+  z-index:5002 !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  transform:translateX(-50%) !important;
+  display:grid !important;
+  width:calc(100% - 12px) !important;
+  max-width:748px !important;
+  min-width:0 !important;
+  gap:5px !important;
+  padding:4px !important;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.bottom-action-bar.v12-count-2{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+.bottom-action-bar.v12-count-4{grid-template-columns:repeat(4,minmax(0,1fr)) !important;}
+.bottom-action-bar.v12-action-bar button{
+  height:36px !important;
+  line-height:36px !important;
+  min-width:0 !important;
+  padding:0 3px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  background:#f3f8ff !important;
+  color:#0a3766 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.88) !important;
+  font-size:12.8px !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.bottom-action-bar.v12-action-bar button.active{background:#e5f1ff !important;color:#0068d8 !important;border-color:rgba(0,122,255,.24) !important;}
+@media(max-width:340px){
+  #v12MetaSelectBar{gap:4px !important;padding:0 1px !important;}
+  #v12MetaSelectBar select{height:30px !important;line-height:30px !important;font-size:12.5px !important;}
+  .bottom-action-bar.v12-action-bar{width:calc(100% - 10px) !important;gap:3px !important;padding:3px !important;}
+  .bottom-action-bar.v12-action-bar button{height:34px !important;line-height:34px !important;font-size:11.6px !important;letter-spacing:-.045em !important;padding:0 1px !important;}
+}
+
 </style>
 </head>
 <body>
@@ -1049,6 +2015,21 @@ body{
 
   <div id="box" class="box"></div>
   <div id="listPanel" class="list hidden-panel"></div>
+  <div id="contentBottomBar" class="content-toggle-bar hidden-panel" aria-label="表示内容">
+    <button id="sentenceContentBtn" type="button" data-content-mode="sentence">文章</button>
+    <button id="wordContentBtn" type="button" data-content-mode="word">単語</button>
+  </div>
+  <div id="wordQuestionModeBar" class="word-question-mode-bar hidden-panel" aria-label="単語問題モード">
+    <button id="wordQuestionEmojiBtn" type="button" data-word-question-mode="emoji">イラスト</button>
+    <button id="wordQuestionZhpinyinBtn" type="button" data-word-question-mode="zhpinyin">台湾華語</button>
+  </div>
+  <div id="playerBottomBar" class="player-control-bar hidden-panel" aria-label="再生操作">
+    <button type="button" data-player-control="play">▶ 再生</button>
+    <button type="button" data-player-control="stop">■ 停止</button>
+    <button type="button" data-player-control="continuous">連続</button>
+    <button type="button" data-player-control="random">ランダム</button>
+  </div>
+  <div id="bottomActionBar" class="bottom-action-bar hidden-panel" aria-label="下側操作"></div>
 </div>
 
 <script id="embeddedData" type="application/json">
@@ -1068,7 +2049,7 @@ const WORDS = JSON.parse(document.getElementById("embeddedWords").textContent);
 let analyticsReady = false;
 const ANALYTICS_STORAGE_KEY = "lingoflow_analytics_events_v1";
 const ANALYTICS_MAX_EVENTS = 300;
-const LINGOFLOW_APP_VERSION = "2026-05-23-word-card-v1";
+const LINGOFLOW_APP_VERSION = "2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups";
 window.LINGOFLOW_APP_VERSION = LINGOFLOW_APP_VERSION;
 function createAnalyticsSessionId(){
   return String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8);
@@ -1409,6 +2390,7 @@ const questionViewBtn = document.getElementById("questionViewBtn");
 const listViewBtn = document.getElementById("listViewBtn");
 const wordViewBtn = document.getElementById("wordViewBtn");
 const playViewBtn = document.getElementById("playViewBtn");
+const playerBottomBar = document.getElementById("playerBottomBar");
 const modeBtn = document.getElementById("modeBtn");
 const levelBtn = document.getElementById("levelBtn");
 const categorySelect = document.getElementById("categorySelect");
@@ -1611,6 +2593,19 @@ function setActiveButton(btn, active){
   btn.classList.toggle("active", !!active);
   btn.setAttribute("aria-pressed", active ? "true" : "false");
 }
+function syncPlayerBottomBar(){
+  const show = view === "player" || view === "continuous" || view === "random";
+  if(playerBottomBar){
+    playerBottomBar.classList.toggle("hidden-panel", !show);
+    playerBottomBar.querySelectorAll("[data-player-control]").forEach(btn => {
+      const action = btn.getAttribute("data-player-control");
+      const active = (action === "continuous" && autoMode === "continuous") || (action === "random" && autoMode === "random");
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+  document.body.classList.toggle("is-player-controls-visible", show);
+}
 function updateButtons(){
   modeBtn.textContent = mode === "speaking" ? "話す" : "読む";
   levelBtn.textContent = levelNames[level];
@@ -1620,6 +2615,7 @@ function updateButtons(){
   setActiveButton(playViewBtn, view === "player" || view === "continuous" || view === "random");
   modeBtn.setAttribute("aria-label", `学習順序: ${mode === "speaking" ? "話す" : "読む"}`);
   levelBtn.setAttribute("aria-label", `レベル: ${levelNames[level]}`);
+  syncPlayerBottomBar();
 }
 function showBoxOnly(){
   listPanel.classList.add("hidden-panel");
@@ -1941,6 +2937,47 @@ function playCurrentWord(){
   if(!w) return;
   speakWordAudio(w.zh);
 }
+
+function playerControlBarHtml(){
+  // v5 permanent fix: the playback controls live in a single static fixed bar.
+  // Do not inject another bar into #box; duplicated dynamic bars caused reflection checks to be unreliable.
+  return "";
+}
+function startOrResumePlayback(){
+  if(!audioEnabled) return;
+  try{
+    if(speechSynthesis.paused && speechSynthesis.speaking){
+      speechSynthesis.resume();
+      track("play_resume_manual", { playMode: autoMode });
+      return;
+    }
+  }catch(e){}
+  const nextMode = autoMode === "random" ? "random" : "continuous";
+  track("play_start_manual", { playMode: nextMode });
+  setView(nextMode);
+}
+function stopPlaybackManual(){
+  track("play_stop_manual", { playMode: autoMode });
+  stopAudio();
+  view = "player";
+  updateButtons();
+  renderPlaybackPanel();
+}
+function handlePlayerControl(action){
+  if(action === "play"){
+    startOrResumePlayback();
+    return;
+  }
+  if(action === "stop"){
+    stopPlaybackManual();
+    return;
+  }
+  if(action === "continuous" || action === "random"){
+    autoMode = action;
+    setAutoPlayback(action);
+  }
+}
+
 function renderPlaybackPanel(){
   box.innerHTML = `
     <div class="auto-card-top">
@@ -1952,14 +2989,11 @@ function renderPlaybackPanel(){
     <div class="player-main">
       <div class="player-wrap">
         <div class="player-title">再生モード</div>
-        <p class="player-desc">連続またはランダムを選ぶと、中国語 → 日本語 → 次の文 の順に再生します。</p>
-        <div class="player-buttons" aria-label="再生モード選択">
-          <button type="button" data-player="continuous">連続</button>
-          <button type="button" data-player="random">ランダム</button>
-        </div>
+        <p class="player-desc">下側メニューで、再生・停止・連続・ランダムを選べます。</p>
       </div>
     </div>
     <div class="status">自動再生はこの画面で選んだ時だけ開始します。</div>
+    ${playerControlBarHtml()}
   `;
 }
 function setAutoPlayback(nextMode){
@@ -1980,14 +3014,15 @@ function renderAuto(p){
     <div class="card-main">
       <div class="lines-wrap">
         <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
-        <div class="line"><div class="pinyin">${esc(p.pinyin)}</div></div>
-        <div class="line"><div class="jp">${esc(p.jp)}</div></div>
+        <div class="line"><div class="list-pinyin">${esc(p.pinyin)}</div></div>
+        <div class="line"><div class="list-jp">${esc(p.jp)}</div></div>
       </div>
     </div>
     <div class="status">中国語 → 日本語 → 次の文</div>
+    ${playerControlBarHtml()}
   `;
 }
-function speak(text){
+async function speak(text){
   if(!audioEnabled) return Promise.resolve();
   safeCancelSpeech("before_normal_speak");
   return new Promise(resolve => {
@@ -2215,22 +3250,42 @@ async function startAuto(){
     index = history.length - 1;
   }
 }
+function resetListItemVisual(el){
+  if(!el) return;
+  const id = Number(el.getAttribute("data-id"));
+  const original = currentListItems[id];
+  const zhEl = el.querySelector(".list-zh");
+  if(zhEl && original){
+    zhEl.textContent = original.zh;
+  }
+  el.classList.remove("playing");
+}
+function resetAllListVisuals(){
+  document.querySelectorAll(".list-item").forEach(resetListItemVisual);
+}
 async function playListById(id){
   stopAudio();
 
   const item = currentListItems[Number(id)];
   const el = listPanel.querySelector(`.list-item[data-id="${id}"]`);
-  const zhEl = el ? el.querySelector(".zh") : null;
+  const zhEl = el ? el.querySelector(".list-zh") : null;
 
   if(!item || !zhEl){
     alert("一覧再生エラー: item not found");
     return;
   }
 
-  document.querySelectorAll(".list-item").forEach(x => x.classList.remove("playing"));
+  // v5 permanent fix: reset all previous karaoke spans to plain black text before each new playback.
+  // This prevents completed .char.done spans from staying blue in the default list state.
+  resetAllListVisuals();
   el.classList.add("playing");
 
   await highlightElement(item.zh, zhEl);
+
+  // After playback finishes, return to the default black list state.
+  if(el.classList.contains("playing")){
+    resetListItemVisual(el);
+  }
 }
 function renderList(){
   currentListItems = [];
@@ -2253,9 +3308,9 @@ function renderList(){
 
         html += `
           <div class="list-item" data-id="${id}">
-            <div class="zh">${esc(p.zh)}</div>
-            <div class="pinyin">${esc(p.pinyin)}</div>
-            <div class="jp">${esc(p.jp)}</div>
+            <div class="list-zh">${esc(p.zh)}</div>
+            <div class="list-pinyin">${esc(p.pinyin)}</div>
+            <div class="list-jp">${esc(p.jp)}</div>
           </div>`;
       });
     });
@@ -2306,6 +3361,34 @@ box.addEventListener("click", function(e){
 }, true);
 
 box.addEventListener("click", function(e){
+  if(view !== "word") return;
+  if(e.target.closest("[data-word-nav]")) return;
+  const card = e.target.closest(".word-card-main");
+  if(!card || !box.contains(card)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  playCurrentWord();
+}, true);
+
+if(playerBottomBar){
+  playerBottomBar.addEventListener("click", function(e){
+    const btn = e.target.closest("[data-player-control]");
+    if(!btn || !playerBottomBar.contains(btn)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    handlePlayerControl(btn.getAttribute("data-player-control"));
+  }, true);
+}
+
+box.addEventListener("click", function(e){
+  const btn = e.target.closest("[data-player-control]");
+  if(!btn || !box.contains(btn)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  handlePlayerControl(btn.getAttribute("data-player-control"));
+}, true);
+
+box.addEventListener("click", function(e){
   const btn = e.target.closest("[data-player]");
   if(!btn || !box.contains(btn)) return;
 
@@ -2344,6 +3427,1285 @@ updateButtons();
 nextQuestion(true);
 analyticsReady = true;
 
+
+
+
+// ===== Word card v8 behavior patch =====
+// This patch is intentionally appended after the original boot code.
+// It overrides only UI routing/rendering while preserving the audio safety controls.
+let contentMode = "sentence";       // sentence | word
+let wordQuestionMode = "emoji";     // emoji | zhpinyin
+let wordQuestionRevealed = false;
+
+const contentBottomBar = document.getElementById("contentBottomBar");
+const wordQuestionModeBar = document.getElementById("wordQuestionModeBar");
+const sentenceContentBtn = document.getElementById("sentenceContentBtn");
+const wordContentBtn = document.getElementById("wordContentBtn");
+const wordQuestionEmojiBtn = document.getElementById("wordQuestionEmojiBtn");
+const wordQuestionZhpinyinBtn = document.getElementById("wordQuestionZhpinyinBtn");
+
+function setBtnActive(btn, active){
+  if(!btn) return;
+  btn.classList.toggle("active", !!active);
+  btn.setAttribute("aria-pressed", active ? "true" : "false");
+}
+function isSentenceWordToggleView(){
+  return view === "question" || view === "list" || view === "player" || view === "continuous" || view === "random";
+}
+function syncContentBottomBars(){
+  const showContent = isSentenceWordToggleView();
+  if(contentBottomBar){
+    contentBottomBar.classList.toggle("hidden-panel", !showContent);
+    setBtnActive(sentenceContentBtn, contentMode === "sentence");
+    setBtnActive(wordContentBtn, contentMode === "word");
+  }
+  const showWordQuestion = view === "question" && contentMode === "word";
+  if(wordQuestionModeBar){
+    wordQuestionModeBar.classList.toggle("hidden-panel", !showWordQuestion);
+    setBtnActive(wordQuestionEmojiBtn, wordQuestionMode === "emoji");
+    setBtnActive(wordQuestionZhpinyinBtn, wordQuestionMode === "zhpinyin");
+  }
+  document.body.classList.toggle("is-content-toggle-visible", showContent);
+  document.body.classList.toggle("is-word-question-controls-visible", showWordQuestion);
+}
+
+syncPlayerBottomBar = function(){
+  const show = view === "player" || view === "continuous" || view === "random";
+  if(playerBottomBar){
+    playerBottomBar.classList.toggle("hidden-panel", !show);
+    playerBottomBar.querySelectorAll("[data-player-control]").forEach(btn => {
+      const action = btn.getAttribute("data-player-control");
+      const active = (action === "continuous" && autoMode === "continuous") || (action === "random" && autoMode === "random");
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+  document.body.classList.toggle("is-player-controls-visible", show);
+  syncContentBottomBars();
+};
+
+updateButtons = function(){
+  modeBtn.textContent = mode === "speaking" ? "話す" : "読む";
+  levelBtn.textContent = levelNames[level];
+  setActiveButton(questionViewBtn, view === "question");
+  setActiveButton(listViewBtn, view === "list");
+  setActiveButton(wordViewBtn, view === "word");
+  setActiveButton(playViewBtn, view === "player" || view === "continuous" || view === "random");
+  modeBtn.setAttribute("aria-label", `学習順序: ${mode === "speaking" ? "話す" : "読む"}`);
+  levelBtn.setAttribute("aria-label", `レベル: ${levelNames[level]}`);
+  syncPlayerBottomBar();
+};
+
+function switchContentMode(next){
+  if(next !== "sentence" && next !== "word") return;
+  if(contentMode === next) return;
+  stopAudio();
+  contentMode = next;
+  wordQuestionRevealed = false;
+  step = 0;
+  history = [];
+  index = -1;
+  track("content_mode_change", { contentMode });
+  updateButtons();
+  if(view === "list") renderList();
+  else if(view === "player") renderPlaybackPanel();
+  else if(view === "continuous" || view === "random") startAuto();
+  else if(view === "question") renderQuestion();
+}
+function switchWordQuestionMode(next){
+  if(next !== "emoji" && next !== "zhpinyin") return;
+  stopAudio();
+  wordQuestionMode = next;
+  wordQuestionRevealed = false;
+  track("word_question_mode_change", { wordQuestionMode });
+  updateButtons();
+  if(view === "question" && contentMode === "word") renderQuestion();
+}
+
+function pickWord(){
+  const list = getWordList();
+  return list[Math.floor(Math.random() * list.length)] || null;
+}
+function currentWordQuestion(){
+  return currentWord();
+}
+function nextWordQuestion(){
+  stopAudio();
+  wordIndex = normalizeWordIndex(wordIndex + 1);
+  wordQuestionRevealed = false;
+  renderQuestion();
+  const w = currentWordQuestion();
+  track("word_question_next", { wordCategory: w?.category || null, wordId: w?.id || null, wordQuestionMode });
+}
+function prevWordQuestion(){
+  stopAudio();
+  wordIndex = normalizeWordIndex(wordIndex - 1);
+  wordQuestionRevealed = false;
+  renderQuestion();
+  const w = currentWordQuestion();
+  track("word_question_prev", { wordCategory: w?.category || null, wordId: w?.id || null, wordQuestionMode });
+}
+function revealWordQuestion(){
+  wordQuestionRevealed = true;
+  renderQuestion();
+}
+function renderWordQuestion(){
+  const w = currentWordQuestion();
+  if(!w){
+    box.innerHTML = '<div class="error">表示できる単語データがありません。</div>';
+    return;
+  }
+  const prompt = wordQuestionMode === "emoji"
+    ? `<div class="word-emoji" aria-label="イラスト">${esc(w.emoji || "🔤")}</div>`
+    : `<div><div class="word-zh">${esc(w.zh)}</div><div class="word-pinyin">${esc(w.pinyin)}</div></div>`;
+  const answer = wordQuestionRevealed ? `
+    <div class="word-question-answer">
+      <div class="word-wrap">
+        <div class="word-emoji" aria-hidden="true">${esc(w.emoji || "🔤")}</div>
+        <div class="word-zh">${esc(w.zh)}</div>
+        <div class="word-pinyin">${esc(w.pinyin)}</div>
+        <div class="word-jp">${esc(w.jp)}</div>
+      </div>
+    </div>` : `<div class="word-question-hidden-note">カードをタップすると答えを表示します。</div>`;
+  box.innerHTML = `
+    <div class="question-card-top">
+      <div class="meta-left">
+        <span class="chip">問題</span>
+        <span class="chip">${esc(categoryLabel(w.category))}</span>
+      </div>
+      <div class="counter">${wordIndex + 1} / ${currentWordCount()}</div>
+    </div>
+    <div class="word-question-prompt">
+      <div class="word-wrap">${prompt}${answer}</div>
+    </div>
+    <div class="status">単語問題：${wordQuestionMode === "emoji" ? "イラストのみ" : "中国語＋ピンイン"}</div>
+    <div class="question-nav" aria-label="単語問題操作">
+      <button type="button" data-qnav="prev">← 前</button>
+      <button type="button" data-qnav="replay">▶ 聞く</button>
+      <button type="button" data-qnav="next">次 →</button>
+    </div>
+  `;
+}
+
+setView = function(v){
+  stopAudio();
+  view = v;
+  updateButtons();
+
+  if(view === "list"){
+    box.classList.add("hidden-panel");
+    listPanel.classList.remove("hidden-panel");
+    renderList();
+    return;
+  }
+
+  showBoxOnly();
+
+  if(view === "word"){
+    if(level !== "beginner") level = "beginner";
+    wordIndex = normalizeWordIndex(wordIndex);
+    updateButtons();
+    renderWord();
+    track("word_view", { wordCategory: currentWord()?.category || null, wordId: currentWord()?.id || null });
+    return;
+  }
+
+  if(view === "player"){
+    renderPlaybackPanel();
+    return;
+  }
+
+  if(view === "continuous" || view === "random"){
+    autoMode = view;
+    if(contentMode === "word"){
+      wordIndex = normalizeWordIndex(wordIndex);
+      startAuto();
+    }else{
+      nextQuestion(true);
+      startAuto();
+    }
+  }else{
+    if(contentMode === "word"){
+      wordQuestionRevealed = false;
+      renderQuestion();
+    }else{
+      if(!history[index]) nextQuestion(true);
+      else renderQuestion();
+    }
+  }
+};
+
+cycleMode = function(){
+  stopAudio();
+  mode = mode === "speaking" ? "reading" : "speaking";
+  step = 0;
+  wordQuestionRevealed = false;
+  track("mode_change", { mode });
+  updateButtons();
+
+  if(view === "list") renderList();
+  else if(view === "word") renderWord();
+  else if(view === "player") renderPlaybackPanel();
+  else if(view === "continuous" || view === "random") startAuto();
+  else renderQuestion();
+};
+
+cycleLevel = function(){
+  stopAudio();
+  level = levels[(levels.indexOf(level)+1) % levels.length];
+  step = 0; history = []; index = -1;
+  if(view === "word" || contentMode === "word") level = "beginner";
+  wordQuestionRevealed = false;
+  track("level_change", { level });
+  updateButtons();
+  if(view === "list") renderList();
+  else if(view === "word"){ wordIndex = 0; renderWord(); }
+  else if(view === "player") renderPlaybackPanel();
+  else if(view === "continuous" || view === "random") startAuto();
+  else renderQuestion();
+};
+
+setCategory = function(c){
+  stopAudio();
+  category = c;
+  step = 0; history = []; index = -1; wordIndex = 0; wordQuestionRevealed = false;
+  track("category_change", { category });
+  updateButtons();
+  if(view === "list") renderList();
+  else if(view === "word") renderWord();
+  else if(view === "player") renderPlaybackPanel();
+  else if(view === "continuous" || view === "random") startAuto();
+  else renderQuestion();
+};
+
+nextStep = function(){
+  if(view === "word" || view === "player") return;
+
+  if(view === "continuous" || view === "random"){
+    startAuto();
+    return;
+  }
+
+  if(contentMode === "word" && view === "question"){
+    if(!wordQuestionRevealed){ revealWordQuestion(); return; }
+    nextWordQuestion();
+    return;
+  }
+
+  if(!history[index]) return;
+
+  if(step < 2){
+    step++;
+    renderQuestion();
+    return;
+  }
+  nextQuestion(true);
+};
+
+renderQuestion = function(options = {}){
+  if(contentMode === "word"){
+    renderWordQuestion();
+    return;
+  }
+
+  const p = history[index];
+  if(!p) return;
+
+  const order = mode === "speaking" ? ["jp","zh","pinyin"] : ["zh","pinyin","jp"];
+  const visible = step + 1;
+  const shouldSpeakZh = !options.suppressAutoSpeak && ((mode === "reading" && step === 1) || (mode === "speaking" && step === 2));
+
+  const linesHtml = order.map((key,i) => {
+    const isVisible = i < visible;
+    const content = key === "zh" && isVisible && shouldSpeakZh ? renderChars(p.zh) : esc(p[key]);
+    return `<div class="line ${isVisible ? "" : "hidden-line"}"><div class="${key}">${content}</div></div>`;
+  }).join("");
+
+  const statusText = step < 2 ? "カードをタップすると次を表示します。" : "カードをタップすると次の問題へ進みます。";
+
+  box.innerHTML = `
+    <div class="question-card-top">
+      <div class="meta-left">
+        <span class="chip">問題</span>
+        <span class="chip">${esc(categoryLabel(p.category))}</span>
+      </div>
+      <div class="counter">${Math.max(index,0) + 1} / ${currentListCount()}</div>
+    </div>
+    <div class="card-main"><div class="lines-wrap">${linesHtml}</div></div>
+    <div class="status">${statusText}</div>
+    <div class="question-nav" aria-label="問題操作">
+      <button type="button" data-qnav="prev">← 前</button>
+      <button type="button" data-qnav="replay">↻ もう一度</button>
+      <button type="button" data-qnav="next">次 →</button>
+    </div>
+  `;
+  if(shouldSpeakZh) speakHighlight(p.zh);
+};
+
+replayCurrentQuestion = function(){
+  if(contentMode === "word" && view === "question"){
+    const w = currentWordQuestion();
+    if(!w) return;
+    track("word_question_replay_audio", { wordCategory: w.category || null, wordId: w.id || null, wordQuestionMode });
+    speakWordAudio(w.zh);
+    return;
+  }
+  const p = history[index];
+  if(!p) return;
+  step = 2;
+  renderQuestion({ suppressAutoSpeak: true });
+  track("question_replay", { phraseCategory: p.category || null });
+  speakHighlight(p.zh);
+};
+
+goPrevQuestion = function(){
+  if(contentMode === "word" && view === "question"){
+    prevWordQuestion();
+    return;
+  }
+  const before = index;
+  prevQuestion();
+  if(index !== before) track("question_prev", { index });
+};
+
+goNextQuestion = function(){
+  if(contentMode === "word" && view === "question"){
+    nextWordQuestion();
+    return;
+  }
+  nextQuestion(false);
+  track("question_next_manual", { index });
+};
+
+renderWord = function(){
+  const w = currentWord();
+  if(!w){ box.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+  box.innerHTML = `
+    <div class="question-card-top">
+      <div class="meta-left">
+        <span class="chip">単語</span>
+        <span class="chip">${esc(categoryLabel(w.category))}</span>
+      </div>
+      <div class="counter">${wordIndex + 1} / ${currentWordCount()}</div>
+    </div>
+    <div class="word-card-main">
+      <div class="word-wrap">
+        <div class="word-emoji" aria-hidden="true">${esc(w.emoji || "🔤")}</div>
+        <div class="word-zh">${esc(w.zh)}</div>
+        <div class="word-pinyin">${esc(w.pinyin)}</div>
+        <div class="word-jp">${esc(w.jp)}</div>
+      </div>
+    </div>
+    <div class="status">カードをタップすると台湾華語音声を再生します。</div>
+    <div class="word-nav" aria-label="単語操作">
+      <button type="button" data-word-nav="prev">← 前</button>
+      <button type="button" data-word-nav="listen" class="word-listen">▶ 聞く</button>
+      <button type="button" data-word-nav="next">次 →</button>
+    </div>
+  `;
+};
+
+function listHeaderHtml(cat, lv, labelSuffix = ""){
+  return `<div class="list-group-head">
+    <div class="list-genre-block"><span class="list-head-label">ジャンル</span><span class="list-head-genre">${esc(categoryLabel(cat))}</span></div>
+    <div class="list-level-block"><span class="list-head-label">レベル</span><span class="list-head-level">${esc(levelNames[lv] || lv)}${labelSuffix}</span></div>
+  </div>`;
+}
+
+function renderSentenceList(){
+  currentListItems = [];
+  let out = `<div class="list-status">文章一覧：タップすると音声に合わせて中国語だけ青色に進みます</div>`;
+  Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
+    levels.forEach(lv => {
+      const list = (DATA[lv] || []).filter(p => p.category === cat);
+      if(!list.length) return;
+      out += listHeaderHtml(cat, lv);
+      list.forEach(p => {
+        const id = currentListItems.length;
+        currentListItems.push({type:"sentence", ...p});
+        out += `<div class="list-item" data-id="${id}">
+          <div class="list-zh">${esc(p.zh)}</div>
+          <div class="list-pinyin">${esc(p.pinyin)}</div>
+          <div class="list-jp">${esc(p.jp)}</div>
+        </div>`;
+      });
+    });
+  });
+  listPanel.innerHTML = out;
+}
+
+function renderWordList(){
+  currentListItems = [];
+  let out = `<div class="list-status">単語一覧：タップすると台湾華語音声を再生します</div>`;
+  Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
+    const list = WORDS.filter(w => w.category === cat);
+    if(!list.length) return;
+    out += listHeaderHtml(cat, "beginner", "単語");
+    list.forEach(w => {
+      const id = currentListItems.length;
+      currentListItems.push({type:"word", ...w});
+      out += `<div class="list-item" data-id="${id}">
+        <div class="word-list-row">
+          <div class="word-list-emoji" aria-hidden="true">${esc(w.emoji || "🔤")}</div>
+          <div>
+            <div class="list-zh">${esc(w.zh)}</div>
+            <div class="list-pinyin">${esc(w.pinyin)}</div>
+            <div class="list-jp">${esc(w.jp)}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  listPanel.innerHTML = out;
+}
+
+renderList = function(){
+  if(contentMode === "word") renderWordList();
+  else renderSentenceList();
+};
+
+playListById = async function(id){
+  stopAudio();
+  const item = currentListItems[Number(id)];
+  const el = listPanel.querySelector(`.list-item[data-id="${id}"]`);
+  const zhEl = el ? el.querySelector(".list-zh") : null;
+  if(!item || !zhEl){ alert("一覧再生エラー: item not found"); return; }
+  resetAllListVisuals();
+  el.classList.add("playing");
+  if(item.type === "word"){
+    await speakWordAudio(item.zh);
+    if(el.classList.contains("playing")) resetListItemVisual(el);
+    return;
+  }
+  await highlightElement(item.zh, zhEl);
+  if(el.classList.contains("playing")) resetListItemVisual(el);
+};
+
+renderPlaybackPanel = function(){
+  const contentLabel = contentMode === "word" ? "単語" : "文章";
+  box.innerHTML = `
+    <div class="auto-card-top">
+      <div class="meta-left">
+        <span class="chip">再生</span>
+        <span class="chip">${esc(categoryLabel(category))}</span>
+      </div>
+    </div>
+    <div class="player-main">
+      <div class="player-wrap">
+        <div class="player-title">${contentLabel}再生モード</div>
+        <p class="player-desc">下側メニューで、再生・停止・連続・ランダムを選べます。</p>
+      </div>
+    </div>
+    <div class="status">${contentLabel}の自動再生はこの画面で選んだ時だけ開始します。</div>
+  `;
+};
+
+renderAuto = function(p){
+  const autoLabel = view === "random" ? "ランダム" : "連続";
+  box.innerHTML = `
+    <div class="auto-card-top">
+      <div class="meta-left"><span class="chip">${autoLabel}</span><span class="chip">${esc(categoryLabel(p.category))}</span></div>
+      <div class="counter">${Math.max(index,0) + 1} / ${currentListCount()}</div>
+    </div>
+    <div class="card-main"><div class="lines-wrap">
+      <div class="line"><div class="zh">${renderChars(p.zh)}</div></div>
+      <div class="line"><div class="list-pinyin">${esc(p.pinyin)}</div></div>
+      <div class="line"><div class="list-jp">${esc(p.jp)}</div></div>
+    </div></div>
+    <div class="status">中国語 → 日本語 → 次の文</div>
+  `;
+};
+
+function renderWordAuto(w){
+  const autoLabel = view === "random" ? "ランダム" : "連続";
+  box.innerHTML = `
+    <div class="auto-card-top">
+      <div class="meta-left"><span class="chip">${autoLabel}</span><span class="chip">${esc(categoryLabel(w.category))}</span></div>
+      <div class="counter">${wordIndex + 1} / ${currentWordCount()}</div>
+    </div>
+    <div class="word-card-main">
+      <div class="word-wrap">
+        <div class="word-emoji" aria-hidden="true">${esc(w.emoji || "🔤")}</div>
+        <div class="word-zh">${esc(w.zh)}</div>
+        <div class="word-pinyin">${esc(w.pinyin)}</div>
+        <div class="word-jp">${esc(w.jp)}</div>
+      </div>
+    </div>
+    <div class="status">単語音声のみ：台湾華語 → 次の単語</div>
+  `;
+}
+
+canContinueAuto = function(id){
+  return id === autoId && audioEnabled && (view === "continuous" || view === "random");
+};
+
+startAuto = async function(){
+  if(!audioEnabled) return;
+  const id = ++autoId;
+
+  while(canContinueAuto(id)){
+    if(contentMode === "word"){
+      const w = autoMode === "random" ? pickWord() : currentWord();
+      if(!w) break;
+      if(autoMode === "random"){
+        const list = getWordList();
+        const pos = list.findIndex(x => x.id === w.id);
+        if(pos >= 0) wordIndex = pos;
+      }
+      renderWordAuto(w);
+      await speakWordAudio(w.zh);
+      if(!canContinueAuto(id)) break;
+      await wait(700);
+      if(!canContinueAuto(id)) break;
+      if(autoMode === "continuous") wordIndex = normalizeWordIndex(wordIndex + 1);
+      continue;
+    }
+
+    const p = history[index] || pick();
+    if(!p) break;
+    step = 2;
+    renderAuto(p);
+    await speakHighlight(p.zh);
+    if(!canContinueAuto(id)) break;
+    await wait(550);
+    if(!canContinueAuto(id)) break;
+    await speakJapanese(p.jp);
+    if(!canContinueAuto(id)) break;
+    await wait(900);
+    if(!canContinueAuto(id)) break;
+    const next = pick();
+    if(!next) break;
+    history.push(next);
+    index = history.length - 1;
+  }
+};
+
+// Bottom content/word-question event delegation.
+if(contentBottomBar){
+  contentBottomBar.addEventListener("click", function(e){
+    const btn = e.target.closest("[data-content-mode]");
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    switchContentMode(btn.getAttribute("data-content-mode"));
+  }, true);
+}
+if(wordQuestionModeBar){
+  wordQuestionModeBar.addEventListener("click", function(e){
+    const btn = e.target.closest("[data-word-question-mode]");
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    switchWordQuestionMode(btn.getAttribute("data-word-question-mode"));
+  }, true);
+}
+
+
+/* ===== Word card v9 JS patch: unified 2-row bottom menu ===== */
+const bottomActionBar = document.getElementById("bottomActionBar");
+
+function actionButtonHtml(label, attrs, active){
+  return `<button type="button" ${attrs} class="${active ? 'active' : ''}" aria-pressed="${active ? 'true' : 'false'}">${esc(label)}</button>`;
+}
+function renderUnifiedBottomActionBar(){
+  if(!bottomActionBar) return;
+  // Old separate bars stay hidden. v9 uses one row above 話す/初級/全部.
+  if(contentBottomBar) contentBottomBar.classList.add("hidden-panel");
+  if(wordQuestionModeBar) wordQuestionModeBar.classList.add("hidden-panel");
+  if(playerBottomBar) playerBottomBar.classList.add("hidden-panel");
+
+  const buttons = [];
+  const inPlayer = view === "player" || view === "continuous" || view === "random";
+  if(view === "question"){
+    buttons.push(actionButtonHtml("文章", 'data-content-mode="sentence"', contentMode === "sentence"));
+    buttons.push(actionButtonHtml("単語", 'data-content-mode="word"', contentMode === "word"));
+    if(contentMode === "word"){
+      buttons.push(actionButtonHtml("イラスト", 'data-word-question-mode="emoji"', wordQuestionMode === "emoji"));
+      buttons.push(actionButtonHtml("台湾華語", 'data-word-question-mode="zhpinyin"', wordQuestionMode === "zhpinyin"));
+    }
+  }else if(view === "list"){
+    buttons.push(actionButtonHtml("文章", 'data-content-mode="sentence"', contentMode === "sentence"));
+    buttons.push(actionButtonHtml("単語", 'data-content-mode="word"', contentMode === "word"));
+  }else if(inPlayer){
+    buttons.push(actionButtonHtml("文章", 'data-content-mode="sentence"', contentMode === "sentence"));
+    buttons.push(actionButtonHtml("単語", 'data-content-mode="word"', contentMode === "word"));
+    buttons.push(actionButtonHtml("再生", 'data-player-control="play"', false));
+    buttons.push(actionButtonHtml("停止", 'data-player-control="stop"', false));
+    buttons.push(actionButtonHtml("連続", 'data-player-control="continuous"', autoMode === "continuous"));
+    buttons.push(actionButtonHtml("ランダム", 'data-player-control="random"', autoMode === "random"));
+  }
+
+  bottomActionBar.className = "bottom-action-bar hidden-panel";
+  if(buttons.length){
+    bottomActionBar.className = `bottom-action-bar action-count-${buttons.length}`;
+    bottomActionBar.innerHTML = buttons.join("");
+  }else{
+    bottomActionBar.innerHTML = "";
+  }
+  document.body.classList.toggle("is-bottom-action-visible", buttons.length > 0);
+  document.body.classList.toggle("is-content-toggle-visible", false);
+  document.body.classList.toggle("is-word-question-controls-visible", false);
+  document.body.classList.toggle("is-player-controls-visible", inPlayer);
+}
+
+if(bottomActionBar){
+  bottomActionBar.addEventListener("click", function(e){
+    const contentBtn = e.target.closest("[data-content-mode]");
+    if(contentBtn && bottomActionBar.contains(contentBtn)){
+      e.preventDefault();
+      e.stopPropagation();
+      switchContentMode(contentBtn.getAttribute("data-content-mode"));
+      return;
+    }
+    const wordQBtn = e.target.closest("[data-word-question-mode]");
+    if(wordQBtn && bottomActionBar.contains(wordQBtn)){
+      e.preventDefault();
+      e.stopPropagation();
+      switchWordQuestionMode(wordQBtn.getAttribute("data-word-question-mode"));
+      return;
+    }
+    const playerBtn = e.target.closest("[data-player-control]");
+    if(playerBtn && bottomActionBar.contains(playerBtn)){
+      e.preventDefault();
+      e.stopPropagation();
+      handlePlayerControl(playerBtn.getAttribute("data-player-control"));
+      return;
+    }
+  }, true);
+}
+
+syncContentBottomBars = function(){
+  renderUnifiedBottomActionBar();
+};
+syncPlayerBottomBar = function(){
+  renderUnifiedBottomActionBar();
+};
+
+updateButtons = function(){
+  modeBtn.textContent = mode === "speaking" ? "話す" : "読む";
+  levelBtn.textContent = levelNames[level];
+  setActiveButton(questionViewBtn, view === "question");
+  setActiveButton(listViewBtn, view === "list");
+  setActiveButton(wordViewBtn, view === "word");
+  setActiveButton(playViewBtn, view === "player" || view === "continuous" || view === "random");
+  modeBtn.setAttribute("aria-label", `学習順序: ${mode === "speaking" ? "話す" : "読む"}`);
+  levelBtn.setAttribute("aria-label", `レベル: ${levelNames[level]}`);
+  renderUnifiedBottomActionBar();
+};
+
+function listHeaderHtml(cat, lv, labelSuffix = ""){
+  return `<div class="list-group-head">
+    <span class="list-head-genre">${esc(categoryLabel(cat))}</span>
+    <span class="list-head-level">${esc(levelNames[lv] || lv)}${labelSuffix}</span>
+  </div>`;
+}
+
+renderWordQuestion = function(){
+  const w = currentWordQuestion();
+  if(!w){
+    box.innerHTML = '<div class="error">表示できる単語データがありません。</div>';
+    return;
+  }
+  const prompt = wordQuestionMode === "emoji"
+    ? `<div class="word-emoji" aria-label="イラスト">${esc(w.emoji || "🔤")}</div>`
+    : `<div><div class="word-zh">${esc(w.zh)}</div><div class="word-pinyin">${esc(w.pinyin)}</div></div>`;
+  const answer = wordQuestionRevealed ? `
+    <div class="word-question-answer">
+      <div class="word-wrap">
+        <div class="word-emoji" aria-hidden="true">${esc(w.emoji || "🔤")}</div>
+        <div class="word-zh">${esc(w.zh)}</div>
+        <div class="word-pinyin">${esc(w.pinyin)}</div>
+        <div class="word-jp">${esc(w.jp)}</div>
+      </div>
+    </div>` : `<div class="word-question-hidden-note">カードをタップすると答えを表示します。</div>`;
+  box.innerHTML = `
+    <div class="question-card-top">
+      <div class="meta-left">
+        <span class="chip">問題</span>
+        <span class="chip">${esc(categoryLabel(w.category))}</span>
+      </div>
+      <div class="counter">${wordIndex + 1} / ${currentWordCount()}</div>
+    </div>
+    <div class="word-question-prompt">
+      <div class="word-wrap">${prompt}${answer}</div>
+    </div>
+    <div class="status">単語問題：${wordQuestionMode === "emoji" ? "イラストのみ" : "台湾華語"}</div>
+    <div class="question-nav" aria-label="単語問題操作">
+      <button type="button" data-qnav="prev">← 前</button>
+      <button type="button" data-qnav="replay">▶ 聞く</button>
+      <button type="button" data-qnav="next">次 →</button>
+    </div>
+  `;
+};
+
+// Re-render with v9 patched routing.
+updateButtons();
+setView(view);
+
+
+
+/* ===== Word card v10 JS patch: simplified top and grouped bottom menu ===== */
+(function(){
+  const V10_VERSION = "2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups";
+  try{ document.body.setAttribute("data-lingoflow-v10", V10_VERSION); }catch(e){}
+  try{
+    if(wordViewBtn){
+      wordViewBtn.hidden = true;
+      wordViewBtn.setAttribute("aria-hidden", "true");
+      wordViewBtn.tabIndex = -1;
+    }
+    const allOpt = categorySelect ? categorySelect.querySelector('option[value="all"]') : null;
+    if(allOpt) allOpt.textContent = "ジャンル";
+  }catch(e){}
+
+  function v10ModeLabel(){ return mode === "speaking" ? "日→中" : "中→日"; }
+  function v10CategoryLabel(){ return category === "all" ? "ジャンル" : categoryLabel(category); }
+
+  function v10SetActionMode(next){
+    if(next === "sentence"){
+      switchContentMode("sentence");
+      return;
+    }
+    if(next === "word" || next === "emoji"){
+      stopAudio();
+      contentMode = "word";
+      wordQuestionMode = next === "emoji" ? "emoji" : "zhpinyin";
+      wordQuestionRevealed = false;
+      step = 0;
+      track("word_question_mode_change", { wordQuestionMode, source: "v10_three_item_menu" });
+      updateButtons();
+      if(view === "question") renderQuestion();
+      else if(view === "list") renderList();
+      else if(view === "player") renderPlaybackPanel();
+      else if(view === "continuous" || view === "random") startAuto();
+    }
+  }
+
+  function v10ActionButton(label, attrs, active, group){
+    const groupAttr = group ? ` data-group="${group}"` : "";
+    return `<button type="button" ${attrs}${groupAttr} class="${active ? 'active' : ''}" aria-pressed="${active ? 'true' : 'false'}">${esc(label)}</button>`;
+  }
+
+  window.renderUnifiedBottomActionBar = function(){
+    if(!bottomActionBar) return;
+    if(contentBottomBar) contentBottomBar.classList.add("hidden-panel");
+    if(wordQuestionModeBar) wordQuestionModeBar.classList.add("hidden-panel");
+    if(playerBottomBar) playerBottomBar.classList.add("hidden-panel");
+
+    const buttons = [];
+    const inPlayer = view === "player" || view === "continuous" || view === "random";
+    if(view === "question"){
+      buttons.push(v10ActionButton("文章", 'data-v10-mode="sentence"', contentMode === "sentence", "content"));
+      buttons.push(v10ActionButton("単語", 'data-v10-mode="word"', contentMode === "word" && wordQuestionMode === "zhpinyin", "content"));
+      buttons.push(v10ActionButton("イラスト", 'data-v10-mode="emoji"', contentMode === "word" && wordQuestionMode === "emoji", "content"));
+    }else if(view === "list"){
+      buttons.push(v10ActionButton("文章", 'data-content-mode="sentence"', contentMode === "sentence", "content"));
+      buttons.push(v10ActionButton("単語", 'data-content-mode="word"', contentMode === "word", "content"));
+    }else if(inPlayer){
+      buttons.push(v10ActionButton("文章", 'data-content-mode="sentence"', contentMode === "sentence", "content"));
+      buttons.push(v10ActionButton("単語", 'data-content-mode="word"', contentMode === "word", "content"));
+      buttons.push(v10ActionButton("再生", 'data-player-control="play"', false, "run"));
+      buttons.push(v10ActionButton("停止", 'data-player-control="stop"', false, "run"));
+      buttons.push(v10ActionButton("連続", 'data-player-control="continuous"', autoMode === "continuous", "order"));
+      buttons.push(v10ActionButton("ランダム", 'data-player-control="random"', autoMode === "random", "order"));
+    }
+
+    bottomActionBar.className = "bottom-action-bar hidden-panel";
+    if(buttons.length){
+      bottomActionBar.className = `bottom-action-bar v10-action-bar v10-count-${buttons.length}`;
+      bottomActionBar.innerHTML = buttons.join("");
+    }else{
+      bottomActionBar.innerHTML = "";
+    }
+    document.body.classList.toggle("is-bottom-action-visible", buttons.length > 0);
+    document.body.classList.toggle("is-content-toggle-visible", false);
+    document.body.classList.toggle("is-word-question-controls-visible", false);
+    document.body.classList.toggle("is-player-controls-visible", inPlayer);
+  };
+
+  if(bottomActionBar){
+    bottomActionBar.addEventListener("click", function(e){
+      const v10 = e.target.closest("[data-v10-mode]");
+      if(v10 && bottomActionBar.contains(v10)){
+        e.preventDefault(); e.stopPropagation();
+        v10SetActionMode(v10.getAttribute("data-v10-mode"));
+      }
+    }, true);
+  }
+
+  window.cycleView = function(){
+    const now = Date.now();
+    if(now - lastViewCycleAt < VIEW_CYCLE_GUARD_MS) return;
+    lastViewCycleAt = now;
+    const simpleViews = ["question", "list", "player"];
+    const normalized = (view === "continuous" || view === "random" || view === "word") ? "player" : view;
+    const currentIndex = Math.max(0, simpleViews.indexOf(normalized));
+    const nextView = simpleViews[(currentIndex + 1) % simpleViews.length];
+    track("view_change", { from: view, to: nextView, source: "v10_three_top_tabs" });
+    setView(nextView);
+  };
+
+  const originalSetViewV10 = setView;
+  window.setView = function(v){
+    if(v === "word") v = "question";
+    return originalSetViewV10(v);
+  };
+
+  window.updateButtons = function(){
+    modeBtn.textContent = v10ModeLabel();
+    levelBtn.textContent = "レベル";
+    if(categorySelect){
+      const allOpt = categorySelect.querySelector('option[value="all"]');
+      if(allOpt) allOpt.textContent = "ジャンル";
+      categorySelect.setAttribute("aria-label", `ジャンル: ${v10CategoryLabel()}`);
+    }
+    setActiveButton(questionViewBtn, view === "question");
+    setActiveButton(listViewBtn, view === "list");
+    setActiveButton(wordViewBtn, false);
+    setActiveButton(playViewBtn, view === "player" || view === "continuous" || view === "random");
+    modeBtn.setAttribute("aria-label", `表示順: ${mode === "speaking" ? "日本語から台湾華語" : "台湾華語から日本語"}`);
+    levelBtn.setAttribute("aria-label", `レベル: ${levelNames[level]}`);
+    renderUnifiedBottomActionBar();
+  };
+
+  window.renderWordQuestion = function(){
+    const w = currentWordQuestion();
+    if(!w){ box.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+    const isEmoji = wordQuestionMode === "emoji";
+    const prompt = isEmoji
+      ? `<div class="word-emoji" aria-label="イラスト">${esc(w.emoji || "🔤")}</div>`
+      : `<div><div class="word-zh">${esc(w.zh)}</div><div class="word-pinyin">${esc(w.pinyin)}</div></div>`;
+    const answer = wordQuestionRevealed ? `
+      <div class="word-question-answer"><div class="word-wrap">
+        <div class="word-emoji" aria-hidden="true">${esc(w.emoji || "🔤")}</div>
+        <div class="word-zh">${esc(w.zh)}</div>
+        <div class="word-pinyin">${esc(w.pinyin)}</div>
+        <div class="word-jp">${esc(w.jp)}</div>
+      </div></div>` : `<div class="word-question-hidden-note">カードをタップすると答えを表示します。</div>`;
+    box.innerHTML = `
+      <div class="question-card-top"><div class="meta-left"><span class="chip">${esc(categoryLabel(w.category))}</span></div><div class="counter">${wordIndex + 1} / ${currentWordCount()}</div></div>
+      <div class="word-question-prompt"><div class="word-wrap">${prompt}${answer}</div></div>
+      <div class="status">単語問題：${isEmoji ? "イラスト" : "台湾華語"}</div>
+      <div class="question-nav" aria-label="単語問題操作"><button type="button" data-qnav="prev">← 前</button><button type="button" data-qnav="replay">▶ 聞く</button><button type="button" data-qnav="next">次 →</button></div>
+    `;
+  };
+
+  window.renderPlaybackPanel = function(){
+    const contentLabel = contentMode === "word" ? "単語" : "文章";
+    box.innerHTML = `
+      <div class="auto-card-top"><div class="meta-left"><span class="chip">再生</span><span class="chip">${esc(categoryLabel(category))}</span></div></div>
+      <div class="player-main"><div class="player-wrap"><div class="player-title">${contentLabel}再生モード</div><p class="player-desc">下側メニューは、文章/単語・再生/停止・連続/ランダムの組合せです。</p></div></div>
+      <div class="status">自動再生はこの画面で選んだ時だけ開始します。</div>
+    `;
+  };
+
+  updateButtons();
+  if(view === "word") view = "question";
+  setView(view);
+})();
+
+
+
+/* ===== Word card v11 JS patch: top level/category selectors + grouped toggle buttons ===== */
+(function(){
+  const V11_VERSION = "2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups";
+  try{ document.body.setAttribute("data-lingoflow-v11", V11_VERSION); }catch(e){}
+
+  function ensureV11Selectors(){
+    try{
+      if(wordViewBtn){
+        wordViewBtn.hidden = true;
+        wordViewBtn.setAttribute("aria-hidden", "true");
+        wordViewBtn.tabIndex = -1;
+      }
+      if(playViewBtn && questionViewBtn && listViewBtn){
+        playViewBtn.textContent = "再生";
+        questionViewBtn.textContent = "問題";
+        listViewBtn.textContent = "一覧";
+      }
+      const filter = document.querySelector(".filter-tabs");
+      if(filter && !document.getElementById("v11LevelSelect")){
+        const sel = document.createElement("select");
+        sel.id = "v11LevelSelect";
+        sel.setAttribute("aria-label", "レベル");
+        sel.innerHTML = '<option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
+        filter.insertBefore(sel, categorySelect || null);
+        sel.addEventListener("change", function(e){
+          stopAudio();
+          level = e.target.value;
+          step = 0; history = []; index = -1;
+          track("level_change", { level, source:"v11_select" });
+          updateButtons();
+          if(view === "list") renderList();
+          else if(view === "player") renderPlaybackPanel();
+          else if(view === "continuous" || view === "random") startAuto();
+          else renderQuestion();
+        });
+      }
+      if(categorySelect){
+        const allOpt = categorySelect.querySelector('option[value="all"]');
+        if(allOpt) allOpt.textContent = "ジャンル";
+      }
+    }catch(e){}
+  }
+
+  function v11DirectionLabel(){ return mode === "speaking" ? "日→中" : "中→日"; }
+  function v11ContentLabel(){
+    if(view === "question" && contentMode === "word" && wordQuestionMode === "emoji") return "イラスト";
+    return contentMode === "word" ? "単語" : "文章";
+  }
+  function v11RunLabel(){ return (view === "continuous" || view === "random") ? "停止" : "再生"; }
+  function v11OrderLabel(){ return autoMode === "random" ? "ランダム" : "連続"; }
+
+  function v11Button(label, attrs, active, group){
+    return `<button type="button" ${attrs} data-group="${group || ''}" class="${active ? 'active' : ''}" aria-pressed="${active ? 'true' : 'false'}">${esc(label)}</button>`;
+  }
+
+  function v11CycleContent(){
+    stopAudio();
+    if(view === "question"){
+      if(contentMode === "sentence"){
+        contentMode = "word";
+        wordQuestionMode = "zhpinyin";
+      }else if(wordQuestionMode === "zhpinyin"){
+        contentMode = "word";
+        wordQuestionMode = "emoji";
+      }else{
+        contentMode = "sentence";
+        wordQuestionMode = "zhpinyin";
+      }
+      wordQuestionRevealed = false;
+      step = 0; history = []; index = -1;
+      track("content_mode_change", { contentMode, wordQuestionMode, source:"v11_cycle_content" });
+      updateButtons();
+      renderQuestion();
+      return;
+    }
+    switchContentMode(contentMode === "word" ? "sentence" : "word");
+  }
+
+  function v11ToggleRun(){
+    if(view === "continuous" || view === "random"){
+      stopPlaybackManual();
+    }else{
+      startOrResumePlayback();
+    }
+  }
+
+  function v11ToggleOrder(){
+    const next = autoMode === "random" ? "continuous" : "random";
+    autoMode = next;
+    track("play_mode_select", { playMode: next, source:"v11_toggle" });
+    if(view === "continuous" || view === "random") setAutoPlayback(next);
+    else{
+      updateButtons();
+      if(view === "player") renderPlaybackPanel();
+    }
+  }
+
+  function v11ToggleDirection(){
+    cycleMode();
+  }
+
+  window.renderUnifiedBottomActionBar = function(){
+    ensureV11Selectors();
+    if(!bottomActionBar) return;
+    if(contentBottomBar) contentBottomBar.classList.add("hidden-panel");
+    if(wordQuestionModeBar) wordQuestionModeBar.classList.add("hidden-panel");
+    if(playerBottomBar) playerBottomBar.classList.add("hidden-panel");
+
+    const buttons = [];
+    const inPlayer = view === "player" || view === "continuous" || view === "random";
+    if(view === "question" || view === "list"){
+      buttons.push(v11Button(v11ContentLabel(), 'data-v11-toggle="content"', true, "content"));
+      buttons.push(v11Button(v11DirectionLabel(), 'data-v11-toggle="direction"', true, "direction"));
+    }else if(inPlayer){
+      buttons.push(v11Button(v11ContentLabel() === "イラスト" ? "単語" : v11ContentLabel(), 'data-v11-toggle="content"', true, "content"));
+      buttons.push(v11Button(v11RunLabel(), 'data-v11-toggle="run"', view === "continuous" || view === "random", "run"));
+      buttons.push(v11Button(v11OrderLabel(), 'data-v11-toggle="order"', true, "order"));
+      buttons.push(v11Button(v11DirectionLabel(), 'data-v11-toggle="direction"', true, "direction"));
+    }
+
+    bottomActionBar.className = "bottom-action-bar hidden-panel";
+    if(buttons.length){
+      bottomActionBar.className = `bottom-action-bar v11-action-bar v11-count-${buttons.length}`;
+      bottomActionBar.innerHTML = buttons.join("");
+    }else{
+      bottomActionBar.innerHTML = "";
+    }
+    document.body.classList.toggle("is-bottom-action-visible", buttons.length > 0);
+    document.body.classList.toggle("is-content-toggle-visible", false);
+    document.body.classList.toggle("is-word-question-controls-visible", false);
+    document.body.classList.toggle("is-player-controls-visible", inPlayer);
+  };
+
+  if(bottomActionBar && !bottomActionBar.dataset.v11Bound){
+    bottomActionBar.dataset.v11Bound = "1";
+    bottomActionBar.addEventListener("click", function(e){
+      const btn = e.target.closest("[data-v11-toggle]");
+      if(!btn || !bottomActionBar.contains(btn)) return;
+      e.preventDefault(); e.stopPropagation();
+      const act = btn.getAttribute("data-v11-toggle");
+      if(act === "content") v11CycleContent();
+      else if(act === "run") v11ToggleRun();
+      else if(act === "order") v11ToggleOrder();
+      else if(act === "direction") v11ToggleDirection();
+    }, true);
+  }
+
+  window.cycleView = function(){
+    const now = Date.now();
+    if(now - lastViewCycleAt < VIEW_CYCLE_GUARD_MS) return;
+    lastViewCycleAt = now;
+    const simpleViews = ["player", "question", "list"];
+    const normalized = (view === "continuous" || view === "random" || view === "word") ? "player" : view;
+    const currentIndex = Math.max(0, simpleViews.indexOf(normalized));
+    const nextView = simpleViews[(currentIndex + 1) % simpleViews.length];
+    track("view_change", { from: view, to: nextView, source: "v11_top_order" });
+    setView(nextView);
+  };
+
+  window.updateButtons = function(){
+    ensureV11Selectors();
+    const levelSelect = document.getElementById("v11LevelSelect");
+    if(levelSelect) levelSelect.value = level;
+    if(categorySelect){
+      categorySelect.value = category;
+      const allOpt = categorySelect.querySelector('option[value="all"]');
+      if(allOpt) allOpt.textContent = "ジャンル";
+      categorySelect.setAttribute("aria-label", `ジャンル: ${category === "all" ? "ジャンル" : categoryLabel(category)}`);
+    }
+    if(modeBtn) modeBtn.textContent = v11DirectionLabel();
+    if(levelBtn) levelBtn.textContent = levelNames[level];
+    setActiveButton(playViewBtn, view === "player" || view === "continuous" || view === "random");
+    setActiveButton(questionViewBtn, view === "question");
+    setActiveButton(listViewBtn, view === "list");
+    setActiveButton(wordViewBtn, false);
+    renderUnifiedBottomActionBar();
+  };
+
+  window.renderPlaybackPanel = function(){
+    const contentLabel = contentMode === "word" ? "単語" : "文章";
+    box.innerHTML = `
+      <div class="auto-card-top"><div class="meta-left"><span class="chip">再生</span><span class="chip">${esc(categoryLabel(category))}</span></div></div>
+      <div class="player-main"><div class="player-wrap"><div class="player-title">${contentLabel}再生モード</div><p class="player-desc">下側の4つの切替で、内容・再生状態・順番・表示順を選びます。</p></div></div>
+      <div class="status">自動再生はこの画面で選んだ時だけ開始します。</div>
+    `;
+  };
+
+  ensureV11Selectors();
+  updateButtons();
+  if(view === "word") view = "question";
+  setView(view);
+})();
+
+
+
+/* ===== Word card v12 JS patch: move level/category to meta area ===== */
+(function(){
+  const V12_VERSION = "2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups";
+  try{ document.body.setAttribute("data-lingoflow-v12", V12_VERSION); }catch(e){}
+
+  function ensureV12MetaSelectors(){
+    try{
+      if(wordViewBtn){ wordViewBtn.hidden = true; wordViewBtn.setAttribute("aria-hidden","true"); wordViewBtn.tabIndex = -1; }
+      if(playViewBtn) playViewBtn.textContent = "再生";
+      if(questionViewBtn) questionViewBtn.textContent = "問題";
+      if(listViewBtn) listViewBtn.textContent = "一覧";
+      const app = document.querySelector('.app');
+      const controls = document.querySelector('.controls');
+      let bar = document.getElementById('v12MetaSelectBar');
+      if(app && controls && !bar){
+        bar = document.createElement('div');
+        bar.id = 'v12MetaSelectBar';
+        bar.setAttribute('aria-label','レベルとジャンル');
+        controls.insertAdjacentElement('afterend', bar);
+      }
+      let levelSelect = document.getElementById('v11LevelSelect') || document.getElementById('v12LevelSelect');
+      if(!levelSelect){
+        levelSelect = document.createElement('select');
+        levelSelect.id = 'v12LevelSelect';
+        levelSelect.setAttribute('aria-label','レベル');
+        levelSelect.innerHTML = '<option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
+        levelSelect.addEventListener('change', function(e){
+          stopAudio();
+          level = e.target.value;
+          step = 0; history = []; index = -1;
+          track('level_change', { level, source:'v12_meta_select' });
+          updateButtons();
+          if(view === 'list') renderList();
+          else if(view === 'player') renderPlaybackPanel();
+          else if(view === 'continuous' || view === 'random') startAuto();
+          else renderQuestion();
+        });
+      }
+      levelSelect.id = 'v12LevelSelect';
+      if(bar && levelSelect.parentElement !== bar) bar.appendChild(levelSelect);
+      if(categorySelect){
+        const allOpt = categorySelect.querySelector('option[value="all"]');
+        if(allOpt) allOpt.textContent = 'ジャンル';
+        if(bar && categorySelect.parentElement !== bar) bar.appendChild(categorySelect);
+      }
+    }catch(e){}
+  }
+
+  function directionLabel(){ return mode === 'speaking' ? '日→中' : '中→日'; }
+  function contentLabel(){
+    if(view === 'question' && contentMode === 'word' && wordQuestionMode === 'emoji') return 'イラスト';
+    return contentMode === 'word' ? '単語' : '文章';
+  }
+  function runLabel(){ return (view === 'continuous' || view === 'random') ? '停止' : '再生'; }
+  function orderLabel(){ return autoMode === 'random' ? 'ランダム' : '連続'; }
+  function btn(label, attrs, active, group){ return `<button type="button" ${attrs} data-group="${group||''}" class="${active?'active':''}" aria-pressed="${active?'true':'false'}">${esc(label)}</button>`; }
+  function cycleContent(){
+    stopAudio();
+    if(view === 'question'){
+      if(contentMode === 'sentence'){ contentMode='word'; wordQuestionMode='zhpinyin'; }
+      else if(wordQuestionMode === 'zhpinyin'){ contentMode='word'; wordQuestionMode='emoji'; }
+      else { contentMode='sentence'; wordQuestionMode='zhpinyin'; }
+      wordQuestionRevealed=false; step=0; history=[]; index=-1;
+      track('content_mode_change', {contentMode, wordQuestionMode, source:'v12_cycle_content'});
+      updateButtons(); renderQuestion(); return;
+    }
+    switchContentMode(contentMode === 'word' ? 'sentence' : 'word');
+  }
+  function toggleRun(){ if(view === 'continuous' || view === 'random') stopPlaybackManual(); else startOrResumePlayback(); }
+  function toggleOrder(){
+    const next = autoMode === 'random' ? 'continuous' : 'random';
+    autoMode = next;
+    track('play_mode_select', { playMode: next, source:'v12_toggle' });
+    if(view === 'continuous' || view === 'random') setAutoPlayback(next);
+    else{ updateButtons(); if(view === 'player') renderPlaybackPanel(); }
+  }
+  function toggleDirection(){ cycleMode(); }
+
+  window.renderUnifiedBottomActionBar = function(){
+    ensureV12MetaSelectors();
+    if(!bottomActionBar) return;
+    if(contentBottomBar) contentBottomBar.classList.add('hidden-panel');
+    if(wordQuestionModeBar) wordQuestionModeBar.classList.add('hidden-panel');
+    if(playerBottomBar) playerBottomBar.classList.add('hidden-panel');
+    const buttons=[];
+    const inPlayer = view === 'player' || view === 'continuous' || view === 'random';
+    if(view === 'question' || view === 'list'){
+      buttons.push(btn(contentLabel(), 'data-v12-toggle="content"', true, 'content'));
+      buttons.push(btn(directionLabel(), 'data-v12-toggle="direction"', true, 'direction'));
+    }else if(inPlayer){
+      buttons.push(btn(contentLabel() === 'イラスト' ? '単語' : contentLabel(), 'data-v12-toggle="content"', true, 'content'));
+      buttons.push(btn(runLabel(), 'data-v12-toggle="run"', view === 'continuous' || view === 'random', 'run'));
+      buttons.push(btn(orderLabel(), 'data-v12-toggle="order"', true, 'order'));
+      buttons.push(btn(directionLabel(), 'data-v12-toggle="direction"', true, 'direction'));
+    }
+    bottomActionBar.className='bottom-action-bar hidden-panel';
+    if(buttons.length){ bottomActionBar.className=`bottom-action-bar v12-action-bar v12-count-${buttons.length}`; bottomActionBar.innerHTML=buttons.join(''); }
+    else bottomActionBar.innerHTML='';
+    document.body.classList.toggle('is-bottom-action-visible', buttons.length>0);
+    document.body.classList.toggle('is-content-toggle-visible', false);
+    document.body.classList.toggle('is-word-question-controls-visible', false);
+    document.body.classList.toggle('is-player-controls-visible', inPlayer);
+  };
+  if(bottomActionBar && !bottomActionBar.dataset.v12Bound){
+    bottomActionBar.dataset.v12Bound='1';
+    bottomActionBar.addEventListener('click', function(e){
+      const b=e.target.closest('[data-v12-toggle]');
+      if(!b || !bottomActionBar.contains(b)) return;
+      e.preventDefault(); e.stopPropagation();
+      const a=b.getAttribute('data-v12-toggle');
+      if(a==='content') cycleContent();
+      else if(a==='run') toggleRun();
+      else if(a==='order') toggleOrder();
+      else if(a==='direction') toggleDirection();
+    }, true);
+  }
+  window.cycleView = function(){
+    const now=Date.now(); if(now-lastViewCycleAt<VIEW_CYCLE_GUARD_MS) return; lastViewCycleAt=now;
+    const simpleViews=['player','question','list'];
+    const normalized=(view==='continuous'||view==='random'||view==='word')?'player':view;
+    const nextView=simpleViews[(Math.max(0,simpleViews.indexOf(normalized))+1)%simpleViews.length];
+    track('view_change',{from:view,to:nextView,source:'v12_top_order'}); setView(nextView);
+  };
+  window.updateButtons = function(){
+    ensureV12MetaSelectors();
+    const lv=document.getElementById('v12LevelSelect'); if(lv) lv.value=level;
+    if(categorySelect){ categorySelect.value=category; const allOpt=categorySelect.querySelector('option[value="all"]'); if(allOpt) allOpt.textContent='ジャンル'; }
+    setActiveButton(playViewBtn, view==='player'||view==='continuous'||view==='random');
+    setActiveButton(questionViewBtn, view==='question');
+    setActiveButton(listViewBtn, view==='list');
+    setActiveButton(wordViewBtn, false);
+    renderUnifiedBottomActionBar();
+  };
+  window.renderPlaybackPanel = function(){
+    const contentLabel = contentMode === 'word' ? '単語' : '文章';
+    box.innerHTML = `<div class="player-main"><div class="player-wrap"><div class="player-title">${contentLabel}再生モード</div><p class="player-desc">下側の4つの切替で、内容・再生状態・順番・表示順を選びます。</p></div></div><div class="status">自動再生はこの画面で選んだ時だけ開始します。</div>`;
+  };
+  ensureV12MetaSelectors(); updateButtons(); if(view==='word') view='question'; setView(view);
+})();
+
+
+
+/* ===== Word card v13 JS patch: level/category selectors actually filter list ===== */
+(function(){
+  const V13_VERSION = "2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups";
+  try{ document.body.setAttribute("data-lingoflow-v13", V13_VERSION); }catch(e){}
+
+  function selectedCategories(){
+    return category === 'all' ? Object.keys(categoryNames).filter(c => c !== 'all') : [category];
+  }
+
+  window.renderSentenceList = function(){
+    currentListItems = [];
+    let out = `<div class="list-status">文章一覧：タップすると音声に合わせて中国語だけ青色に進みます</div>`;
+    selectedCategories().forEach(cat => {
+      const lv = level || 'beginner';
+      const list = (DATA[lv] || []).filter(p => p.category === cat);
+      if(!list.length) return;
+      out += listHeaderHtml(cat, lv);
+      list.forEach(p => {
+        const id = currentListItems.length;
+        currentListItems.push({type:'sentence', ...p});
+        out += `<div class="list-item" data-id="${id}">
+          <div class="list-zh">${esc(p.zh)}</div>
+          <div class="list-pinyin">${esc(p.pinyin)}</div>
+          <div class="list-jp">${esc(p.jp)}</div>
+        </div>`;
+      });
+    });
+    listPanel.innerHTML = out || '<div class="error">表示できる文章データがありません。</div>';
+  };
+
+  window.renderWordList = function(){
+    currentListItems = [];
+    let out = `<div class="list-status">単語一覧：タップすると台湾華語音声を再生します</div>`;
+    selectedCategories().forEach(cat => {
+      const list = WORDS.filter(w => w.category === cat);
+      if(!list.length) return;
+      out += listHeaderHtml(cat, 'beginner', '単語');
+      list.forEach(w => {
+        const id = currentListItems.length;
+        currentListItems.push({type:'word', ...w});
+        out += `<div class="list-item" data-id="${id}">
+          <div class="word-list-row">
+            <div class="word-list-emoji" aria-hidden="true">${esc(w.emoji || '🔤')}</div>
+            <div>
+              <div class="list-zh">${esc(w.zh)}</div>
+              <div class="list-pinyin">${esc(w.pinyin)}</div>
+              <div class="list-jp">${esc(w.jp)}</div>
+            </div>
+          </div>
+        </div>`;
+      });
+    });
+    listPanel.innerHTML = out || '<div class="error">表示できる単語データがありません。</div>';
+  };
+
+  window.renderList = function(){
+    if(contentMode === 'word') renderWordList();
+    else renderSentenceList();
+  };
+
+  updateButtons();
+  if(view === 'list') renderList();
+})();
 
 </script>
 </body>
