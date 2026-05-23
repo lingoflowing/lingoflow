@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-23-v21-two-row-large-controls -->
-<meta name="lingoflow-app-version" content="2026-05-23-v21-two-row-large-controls">
+<!-- LingoFlow app version: 2026-05-23-v22-compact-two-row-icon-left-direction -->
+<meta name="lingoflow-app-version" content="2026-05-23-v22-compact-two-row-icon-left-direction">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -5007,7 +5007,7 @@ setView(view);
 
 /* ===== v15 reflected JS patch: labels/order + paired toggles ===== */
 (function(){
-  const V15_VERSION = "2026-05-23-v21-two-row-large-controls";
+  const V15_VERSION = "2026-05-23-v22-compact-two-row-icon-left-direction";
   try{
     document.body.setAttribute('data-lingoflow-v15', V15_VERSION);
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
@@ -5160,7 +5160,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-23-v21-two-row-large-controls';
+  const VERSION = '2026-05-23-v22-compact-two-row-icon-left-direction';
 
   const icons = {
     hear:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1v-5Z"/><path d="M20 13h-3v6h2a1 1 0 0 0 1-1v-5Z"/></svg>',
@@ -5378,7 +5378,7 @@ body.is-player-controls-visible .app{
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-23-v21-two-row-large-controls';
+  const VERSION = '2026-05-23-v22-compact-two-row-icon-left-direction';
   function setVersion(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -5541,7 +5541,7 @@ body.is-player-controls-visible .app{
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-23-v21-two-row-large-controls';
+  const VERSION = '2026-05-23-v22-compact-two-row-icon-left-direction';
   function setVersionV18(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -5785,7 +5785,7 @@ body.is-word-question-controls-visible .app{
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-23-v21-two-row-large-controls';
+  const VERSION='2026-05-23-v22-compact-two-row-icon-left-direction';
   function setV19(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -6004,7 +6004,7 @@ body.is-word-question-controls-visible .app{
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-23-v21-two-row-large-controls';
+  const VERSION='2026-05-23-v22-compact-two-row-icon-left-direction';
   function applyV21(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -6036,6 +6036,261 @@ body.is-word-question-controls-visible .app{
   setTimeout(applyV21,0);
   setTimeout(applyV21,250);
   setInterval(applyV21,1000);
+})();
+</script>
+
+
+
+<style>
+/* ===== v22 patch: compact two-row icon-left controls =====
+   - Bottom controls stay 2 rows / 2 groups per row.
+   - Icon moves to the left of text.
+   - Height is reduced while keeping 55yo-readable text.
+   - Direction buttons use book/speaking icons and full labels.
+*/
+.bottom-action-bar.v15-action-bar.v18-action-bar.v22-compact-two-row,
+.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar.v22-compact-two-row{
+  position:fixed !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  transform:translateX(-50%) !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  grid-template-rows:repeat(2,auto) !important;
+  gap:7px !important;
+  padding:8px !important;
+  border-radius:20px !important;
+  background:#fff !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 12px 30px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  overflow:hidden !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:6px !important;
+  min-width:0 !important;
+  width:100% !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group button{
+  width:100% !important;
+  min-width:0 !important;
+  height:44px !important;
+  min-height:44px !important;
+  padding:0 6px !important;
+  border-radius:14px !important;
+  border:1px solid rgba(15,49,98,.09) !important;
+  background:#fff !important;
+  color:#071a3a !important;
+  box-shadow:0 4px 11px rgba(15,49,98,.07), inset 0 1px 0 rgba(255,255,255,.98) !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group button + button{
+  border-left:1px solid rgba(15,49,98,.09) !important;
+}
+.bottom-action-bar.v22-compact-two-row .v18-mini-icon{
+  flex:0 0 auto !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:18px !important;
+  height:18px !important;
+  line-height:18px !important;
+  font-size:18px !important;
+  margin:0 !important;
+  color:currentColor !important;
+}
+.bottom-action-bar.v22-compact-two-row .v18-mini-icon svg{
+  width:18px !important;
+  height:18px !important;
+  display:block !important;
+  stroke:currentColor !important;
+  fill:none !important;
+  stroke-width:2.4 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+}
+.bottom-action-bar.v22-compact-two-row .v18-label{
+  display:block !important;
+  min-width:0 !important;
+  font-size:13.5px !important;
+  line-height:1.05 !important;
+  font-weight:950 !important;
+  letter-spacing:-.045em !important;
+  color:currentColor !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="direction"] .v18-label{
+  font-size:12px !important;
+  letter-spacing:-.065em !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group button.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
+  border-color:rgba(0,122,255,.44) !important;
+  box-shadow:0 7px 16px rgba(0,122,255,.22), inset 0 1px 1px rgba(255,255,255,.26) !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
+  color:#087a35 !important;
+  background:linear-gradient(145deg,#dcfce7 0%,#bbf7d0 100%) !important;
+  border-color:rgba(34,197,94,.28) !important;
+  box-shadow:0 7px 16px rgba(34,197,94,.13), inset 0 1px 1px rgba(255,255,255,.45) !important;
+}
+body .app,
+body.is-bottom-action-visible .app,
+body.is-content-toggle-visible .app,
+body.is-player-controls-visible .app,
+body.is-word-question-controls-visible .app{
+  padding-bottom:142px !important;
+}
+@media(max-width:340px){
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v22-compact-two-row,
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar.v22-compact-two-row{
+    width:calc(100vw - 10px) !important;
+    max-width:calc(100vw - 10px) !important;
+    gap:6px !important;
+    padding:7px !important;
+    border-radius:18px !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v15-toggle-group{gap:5px !important;}
+  .bottom-action-bar.v22-compact-two-row .v15-toggle-group button{
+    height:42px !important;
+    min-height:42px !important;
+    padding:0 4px !important;
+    border-radius:13px !important;
+    gap:4px !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v18-mini-icon,
+  .bottom-action-bar.v22-compact-two-row .v18-mini-icon svg{
+    width:16px !important;
+    height:16px !important;
+    font-size:16px !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v18-label{
+    font-size:12.3px !important;
+    letter-spacing:-.07em !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="direction"] .v18-label{
+    font-size:10.8px !important;
+    letter-spacing:-.09em !important;
+  }
+  body .app,
+  body.is-bottom-action-visible .app,
+  body.is-content-toggle-visible .app,
+  body.is-player-controls-visible .app,
+  body.is-word-question-controls-visible .app{
+    padding-bottom:132px !important;
+  }
+}
+</style>
+<script>
+(function(){
+  'use strict';
+  const VERSION='2026-05-23-v22-compact-two-row-icon-left-direction';
+  function escV22(s){
+    return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});
+  }
+  const icons = {
+    sentence:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8l4 4V20.5H6z"/><path d="M14 3.5v4h4"/><path d="M9 12h6"/><path d="M9 15.5h6"/></svg>',
+    word:'<span aria-hidden="true">Aa</span>',
+    play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/></svg>',
+    stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z" fill="currentColor" stroke="none"/></svg>',
+    continuous:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h11"/><path d="M8 12h11"/><path d="M8 17h11"/><path d="M4 7h.01"/><path d="M4 12h.01"/><path d="M4 17h.01"/></svg>',
+    random:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>',
+    book:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 4H11v15H7.5A3.5 3.5 0 0 0 4 20.5z"/><path d="M20 5.5A3.5 3.5 0 0 0 16.5 4H13v15h3.5A3.5 3.5 0 0 1 20 20.5z"/></svg>',
+    speak:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18a6 6 0 0 1-1-11.9A6 6 0 0 1 15 12v6z"/><path d="M17 8.5c1 .9 1.5 2.1 1.5 3.5S18 14.6 17 15.5"/><path d="M19.5 6c1.7 1.5 2.5 3.5 2.5 6s-.8 4.5-2.5 6"/></svg>'
+  };
+  function iconV22(group,value){
+    if(group==='content') return value==='sentence'?icons.sentence:icons.word;
+    if(group==='run') return value==='play'?icons.play:icons.stop;
+    if(group==='order') return value==='continuous'?icons.continuous:icons.random;
+    if(group==='direction') return value==='zhjp'?icons.book:icons.speak;
+    return '';
+  }
+  function activeContent(){ return contentMode==='word'?'word':'sentence'; }
+  function isAutoPlaying(){ return view==='continuous'||view==='random'; }
+  function activeRun(){ return isAutoPlaying()?'play':'stop'; }
+  function activeOrder(){ return autoMode==='random'?'random':'continuous'; }
+  function activeDirection(){ return mode==='speaking'?'jpzh':'zhjp'; }
+  function btn(label,group,value,active){
+    return '<button type="button" data-v15-toggle="'+group+'" data-v15-value="'+value+'" class="'+(active?'active':'')+'" aria-pressed="'+(active?'true':'false')+'">'
+      + '<span class="v18-mini-icon">'+iconV22(group,value)+'</span>'
+      + '<span class="v18-label">'+escV22(label)+'</span>'
+      + '</button>';
+  }
+  function group(name, buttons){
+    return '<div class="v15-toggle-group" data-v15-group="'+name+'">'+buttons.join('')+'</div>';
+  }
+  function setTopLabels(){
+    try{
+      if(playViewBtn) playViewBtn.innerHTML='<span class="v16-tab-icon" aria-hidden="true">🎧</span><span class="v16-tab-label">聞く</span>';
+      if(listViewBtn) listViewBtn.innerHTML='<span class="v16-tab-icon" aria-hidden="true">📖</span><span class="v16-tab-label">読む</span>';
+      if(questionViewBtn) questionViewBtn.innerHTML='<span class="v16-tab-icon" aria-hidden="true">?</span><span class="v16-tab-label">クイズ</span>';
+      if(wordViewBtn){ wordViewBtn.hidden=true; wordViewBtn.setAttribute('aria-hidden','true'); wordViewBtn.tabIndex=-1; }
+    }catch(e){}
+  }
+  function setVersion(){
+    const meta=document.querySelector('meta[name="lingoflow-app-version"]');
+    if(meta) meta.setAttribute('content', VERSION);
+    window.LINGOFLOW_APP_VERSION=VERSION;
+    if(document.body) document.body.setAttribute('data-lingoflow-v22', VERSION);
+  }
+  function fixGenreAll(){
+    const categorySelect=document.getElementById('categorySelect');
+    if(categorySelect){
+      const allOpt=categorySelect.querySelector('option[value="all"]');
+      if(allOpt) allOpt.textContent='全部';
+      if(!categorySelect.value) categorySelect.value='all';
+    }
+    const categoryText=document.querySelector('.v16-meta-item[data-kind="category"] .v16-meta-text');
+    if(categoryText && /ジャンル：ジャンル/.test(categoryText.textContent)) categoryText.textContent='ジャンル：全部';
+  }
+  window.renderUnifiedBottomActionBar=function(){
+    setTopLabels();
+    if(!bottomActionBar) return;
+    if(contentBottomBar) contentBottomBar.classList.add('hidden-panel');
+    if(wordQuestionModeBar) wordQuestionModeBar.classList.add('hidden-panel');
+    if(playerBottomBar) playerBottomBar.classList.add('hidden-panel');
+    const c=activeContent(), r=activeRun(), o=activeOrder(), d=activeDirection();
+    bottomActionBar.className='bottom-action-bar v15-action-bar v18-action-bar v22-compact-two-row';
+    bottomActionBar.innerHTML=[
+      group('content',[btn('文章','content','sentence',c==='sentence'),btn('単語','content','word',c==='word')]),
+      group('run',[btn('再生中','run','play',r==='play'),btn('停止','run','stop',r==='stop')]),
+      group('order',[btn('連続','order','continuous',o==='continuous'),btn('ランダム','order','random',o==='random')]),
+      group('direction',[btn('中文→日本語','direction','zhjp',d==='zhjp'),btn('日本語→中文','direction','jpzh',d==='jpzh')])
+    ].join('');
+    document.body.classList.add('is-bottom-action-visible');
+    document.body.classList.remove('is-content-toggle-visible','is-word-question-controls-visible');
+    document.body.classList.toggle('is-player-controls-visible', isAutoPlaying());
+    setVersion();
+    fixGenreAll();
+  };
+  const prevUpdate=window.updateButtons;
+  window.updateButtons=function(){
+    if(typeof prevUpdate==='function') prevUpdate.apply(this,arguments);
+    setTopLabels();
+    if(window.renderUnifiedBottomActionBar && !window.__v22RenderingBottom){
+      window.__v22RenderingBottom=true;
+      try{ window.renderUnifiedBottomActionBar(); }finally{ window.__v22RenderingBottom=false; }
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function(){ setVersion(); fixGenreAll(); setTopLabels(); setTimeout(function(){ if(window.renderUnifiedBottomActionBar) window.renderUnifiedBottomActionBar(); },0); });
+  setTimeout(function(){ setVersion(); fixGenreAll(); setTopLabels(); if(window.renderUnifiedBottomActionBar) window.renderUnifiedBottomActionBar(); },0);
+  setTimeout(function(){ if(window.renderUnifiedBottomActionBar) window.renderUnifiedBottomActionBar(); },300);
 })();
 </script>
 
