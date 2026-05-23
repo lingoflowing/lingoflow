@@ -7,8 +7,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups -->
-<meta name="lingoflow-app-version" content="2026-05-23-word-card-v13-filtered-meta-selects-toggle-groups">
+<!-- LingoFlow app version: 2026-05-23-v15-hear-read-quiz-clean-toggle-reflected -->
+<meta name="lingoflow-app-version" content="2026-05-23-v15-hear-read-quiz-clean-toggle-reflected">
 
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
@@ -1966,6 +1966,81 @@ body.is-word-question-controls-visible.is-content-toggle-visible .app{
   #v12MetaSelectBar select{height:30px !important;line-height:30px !important;font-size:12.5px !important;}
   .bottom-action-bar.v12-action-bar{width:calc(100% - 10px) !important;gap:3px !important;padding:3px !important;}
   .bottom-action-bar.v12-action-bar button{height:34px !important;line-height:34px !important;font-size:11.6px !important;letter-spacing:-.045em !important;padding:0 1px !important;}
+}
+
+
+
+/* ===== v15 reflected UI patch: hear / read / quiz + clean 1-row paired toggles ===== */
+.app-header{display:none!important;}
+.view-tabs{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+#playViewBtn{order:1 !important;}
+#listViewBtn{order:2 !important;}
+#questionViewBtn{order:3 !important;}
+#wordViewBtn{display:none !important;}
+.bottom-action-bar.v15-action-bar{
+  position:fixed !important;
+  z-index:8000 !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  transform:translateX(-50%) !important;
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:5px !important;
+  width:calc(100% - 12px) !important;
+  max-width:748px !important;
+  min-width:0 !important;
+  padding:4px !important;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.v15-toggle-group{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:0 !important;
+  min-width:0 !important;
+  border:1px solid rgba(0,122,255,.14) !important;
+  border-radius:15px !important;
+  overflow:hidden !important;
+  background:#fff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group button{
+  min-width:0 !important;
+  width:100% !important;
+  height:36px !important;
+  line-height:36px !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:#fff !important;
+  color:#0a1f3d !important;
+  box-shadow:none !important;
+  font-size:12.2px !important;
+  font-weight:950 !important;
+  letter-spacing:-.04em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  text-align:center !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group button + button{
+  border-left:1px solid rgba(0,122,255,.12) !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group button.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#148cff 0%,#006fe6 78%) !important;
+  box-shadow:0 4px 10px rgba(0,122,255,.16), inset 0 1px 1px rgba(255,255,255,.24) !important;
+}
+body.is-bottom-action-visible .app{padding-bottom:62px !important;}
+body.is-player-controls-visible .app{padding-bottom:62px !important;}
+@media(max-width:340px){
+  .bottom-action-bar.v15-action-bar{width:calc(100% - 10px) !important;gap:3px !important;padding:3px !important;border-radius:18px !important;}
+  .v15-toggle-group{border-radius:13px !important;}
+  .bottom-action-bar.v15-action-bar .v15-toggle-group button{height:34px !important;line-height:34px !important;font-size:10.8px !important;letter-spacing:-.075em !important;padding:0 1px !important;}
 }
 
 </style>
@@ -4705,6 +4780,158 @@ setView(view);
 
   updateButtons();
   if(view === 'list') renderList();
+})();
+
+
+
+/* ===== v15 reflected JS patch: labels/order + paired toggles ===== */
+(function(){
+  const V15_VERSION = "2026-05-23-v15-hear-read-quiz-clean-toggle-reflected";
+  try{
+    document.body.setAttribute('data-lingoflow-v15', V15_VERSION);
+    const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+    if(meta) meta.setAttribute('content', V15_VERSION);
+  }catch(e){}
+
+  function setTopLabelsV15(){
+    try{
+      if(playViewBtn) playViewBtn.textContent = '聞く';
+      if(listViewBtn) listViewBtn.textContent = '読む';
+      if(questionViewBtn) questionViewBtn.textContent = 'クイズ';
+      if(wordViewBtn){ wordViewBtn.hidden = true; wordViewBtn.setAttribute('aria-hidden','true'); wordViewBtn.tabIndex = -1; }
+    }catch(e){}
+  }
+
+  function isAutoPlayingV15(){ return view === 'continuous' || view === 'random'; }
+  function activeDirectionV15(){ return mode === 'speaking' ? 'jpzh' : 'zhjp'; }
+  function activeContentV15(){ return contentMode === 'word' ? 'word' : 'sentence'; }
+  function activeOrderV15(){ return autoMode === 'random' ? 'random' : 'continuous'; }
+  function groupV15(name, buttons){
+    return `<div class="v15-toggle-group" data-v15-group="${name}">${buttons.join('')}</div>`;
+  }
+  function buttonV15(label, group, value, active){
+    return `<button type="button" data-v15-toggle="${group}" data-v15-value="${value}" class="${active ? 'active' : ''}" aria-pressed="${active ? 'true' : 'false'}">${esc(label)}</button>`;
+  }
+  function rerenderV15(){
+    updateButtons();
+    if(view === 'list') renderList();
+    else if(view === 'player') renderPlaybackPanel();
+    else if(view === 'question') renderQuestion();
+  }
+  function setContentV15(next){
+    stopAudio();
+    contentMode = next === 'word' ? 'word' : 'sentence';
+    if(contentMode === 'word' && view === 'question' && !wordQuestionMode) wordQuestionMode = 'zhpinyin';
+    wordQuestionRevealed = false;
+    step = 0; history = []; index = -1;
+    track('content_mode_change', {contentMode, source:'v15_pair_toggle'});
+    rerenderV15();
+  }
+  function setRunV15(next){
+    if(next === 'stop'){
+      stopPlaybackManual();
+      updateButtons();
+      return;
+    }
+    if(view !== 'continuous' && view !== 'random'){
+      setView(autoMode === 'random' ? 'random' : 'continuous');
+    }else{
+      startOrResumePlayback();
+    }
+  }
+  function setOrderV15(next){
+    autoMode = next === 'random' ? 'random' : 'continuous';
+    track('play_mode_select', {playMode:autoMode, source:'v15_pair_toggle'});
+    if(isAutoPlayingV15()) setAutoPlayback(autoMode);
+    else updateButtons();
+  }
+  function setDirectionV15(next){
+    stopAudio();
+    mode = next === 'jpzh' ? 'speaking' : 'reading';
+    step = 0;
+    track('mode_change', {mode, source:'v15_pair_toggle'});
+    rerenderV15();
+  }
+
+  window.renderUnifiedBottomActionBar = function(){
+    setTopLabelsV15();
+    if(!bottomActionBar) return;
+    if(contentBottomBar) contentBottomBar.classList.add('hidden-panel');
+    if(wordQuestionModeBar) wordQuestionModeBar.classList.add('hidden-panel');
+    if(playerBottomBar) playerBottomBar.classList.add('hidden-panel');
+
+    const c = activeContentV15();
+    const r = isAutoPlayingV15() ? 'play' : 'stop';
+    const o = activeOrderV15();
+    const d = activeDirectionV15();
+    const html = [
+      groupV15('content', [
+        buttonV15('文章','content','sentence', c === 'sentence'),
+        buttonV15('単語','content','word', c === 'word')
+      ]),
+      groupV15('run', [
+        buttonV15('再生中','run','play', r === 'play'),
+        buttonV15('停止','run','stop', r === 'stop')
+      ]),
+      groupV15('order', [
+        buttonV15('連続','order','continuous', o === 'continuous'),
+        buttonV15('ランダム','order','random', o === 'random')
+      ]),
+      groupV15('direction', [
+        buttonV15('中→日','direction','zhjp', d === 'zhjp'),
+        buttonV15('日→中','direction','jpzh', d === 'jpzh')
+      ])
+    ].join('');
+    bottomActionBar.className = 'bottom-action-bar v15-action-bar';
+    bottomActionBar.innerHTML = html;
+    document.body.classList.add('is-bottom-action-visible');
+    document.body.classList.remove('is-content-toggle-visible','is-word-question-controls-visible');
+    document.body.classList.toggle('is-player-controls-visible', isAutoPlayingV15());
+  };
+
+  if(bottomActionBar && !bottomActionBar.dataset.v15Bound){
+    bottomActionBar.dataset.v15Bound = '1';
+    bottomActionBar.addEventListener('click', function(e){
+      const b = e.target.closest('[data-v15-toggle]');
+      if(!b || !bottomActionBar.contains(b)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const group = b.getAttribute('data-v15-toggle');
+      const value = b.getAttribute('data-v15-value');
+      if(group === 'content') setContentV15(value);
+      else if(group === 'run') setRunV15(value);
+      else if(group === 'order') setOrderV15(value);
+      else if(group === 'direction') setDirectionV15(value);
+    }, true);
+  }
+
+  const prevUpdateButtonsV15 = window.updateButtons;
+  window.updateButtons = function(){
+    if(typeof prevUpdateButtonsV15 === 'function') prevUpdateButtonsV15();
+    setTopLabelsV15();
+    setActiveButton(playViewBtn, view === 'player' || view === 'continuous' || view === 'random');
+    setActiveButton(listViewBtn, view === 'list');
+    setActiveButton(questionViewBtn, view === 'question');
+    setActiveButton(wordViewBtn, false);
+    if(window.renderUnifiedBottomActionBar && !window.__v15RenderingBottom){
+      window.__v15RenderingBottom = true;
+      try{ window.renderUnifiedBottomActionBar(); }finally{ window.__v15RenderingBottom = false; }
+    }
+  };
+
+  window.cycleView = function(){
+    const now = Date.now();
+    if(now - lastViewCycleAt < VIEW_CYCLE_GUARD_MS) return;
+    lastViewCycleAt = now;
+    const simpleViews = ['player','list','question'];
+    const normalized = (view === 'continuous' || view === 'random' || view === 'word') ? 'player' : view;
+    const nextView = simpleViews[(Math.max(0, simpleViews.indexOf(normalized)) + 1) % simpleViews.length];
+    track('view_change', {from:view, to:nextView, source:'v15_top_order'});
+    setView(nextView);
+  };
+
+  setTopLabelsV15();
+  updateButtons();
 })();
 
 </script>
