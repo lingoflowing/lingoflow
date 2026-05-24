@@ -9,8 +9,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-24-v51-word-quiz-audio-on-reveal-only-v1">
+<!-- LingoFlow app version: 2026-05-24-v52-word-quiz-nav-reset-question-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-24-v52-word-quiz-nav-reset-question-v1">
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -10537,7 +10537,7 @@ setView(view);
 
 
 <style>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 ===== */
 .fixed-card-nav{
   z-index:9000 !important;
 }
@@ -10569,7 +10569,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 </style>
 
 <script>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 =====
    Minimal patch on v42:
    - keep fixed 前/もう一度/次 visible during 聞く→単語 playback
    - keep sentence meta visible during 聞く→文章 playback
@@ -10579,7 +10579,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
   let lastSentence = null;
   let lastSentenceIndex = 0;
   let readWordToken = 0;
@@ -10814,7 +10814,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
 
 <style>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 ===== */
 .v45-reading-blue,
 .word-list-row.v45-reading-blue .list-zh,
 .word-list-row.v45-reading-blue .list-pinyin,
@@ -10828,7 +10828,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 </style>
 
 <script>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 =====
    Fixes:
    - 聞く→文章 meta uses the same pill format/location as 聞く→単語, no leading dot, no all display.
    - Start overlay unlock is silent; audio starts only after pressing 再生.
@@ -10837,7 +10837,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
   let v45LastSentence = null;
   let v45LastIndex = 0;
   let v45StartClosedAt = 0;
@@ -11046,7 +11046,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
 
 <style>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 ===== */
 .quiz-card-top .quiz-meta-pills,
 .auto-card-top .quiz-meta-pills,
 .question-card-top .quiz-meta-pills{
@@ -11075,7 +11075,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 </style>
 
 <script>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 =====
    Root cause:
    - 聞く→文章の fixed nav が prevQuestion/nextQuestion を呼び、クイズ用 render 経路へ落ちていた。
    - 停止時も「現在の聞くカード」ではなく renderPlaybackPanel / 初期描画に戻る経路が残っていた。
@@ -11086,7 +11086,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
   let v46Sentence = null;
   let v46SentencePos = 0;
   let v46LastMode = 'continuous';
@@ -11375,7 +11375,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
 
 <style>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 ===== */
 .quiz-word-card-v47,
 .listen-sentence-card-v47{
   width:100% !important;
@@ -11451,7 +11451,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 </style>
 
 <script>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 =====
    正確な原因:
    1) v46 の fixed nav が contentMode === 'word' を先に判定していたため、
       クイズ→単語でも wordPrev/wordNext/renderWord 経路に落ち、クイズ用 renderQuestion が壊れた。
@@ -11467,7 +11467,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
   let sentenceStore = null;
   let sentencePos = 0;
   let stopGuardUntil = 0;
@@ -11847,7 +11847,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 })();
 
 
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 =====
    クイズ→単語の構成修正:
    - 中→日: イラスト + 中国語 → ピンイン / 日本語を答える
    - 日→中: イラスト + 日本語 → 中国語 / ピンインを答える
@@ -11855,7 +11855,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
   function esc(s){
     return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
   }
@@ -11948,7 +11948,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
 
 <style>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1: quiz word pill + elegant typography final override ===== */
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1: quiz word pill + elegant typography final override ===== */
 .quiz-card-top .quiz-meta-pills,
 .question-card-top .quiz-meta-pills{
   display:inline-flex !important;
@@ -12061,7 +12061,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 </style>
 
 <script>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1: final word quiz display correction =====
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1: final word quiz display correction =====
    - Do not show internal category IDs such as greeting.
    - Do not show 「単語」 as the level pill.
    - Use the same refined pill pattern as 聞く: 「挨拶」「初級」.
@@ -12069,7 +12069,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
   const CATEGORY_LABELS = {
     all:'全部', greeting:'挨拶', cafe:'カフェ', restaurant:'食事', shopping:'買物',
     transport:'交通', hotel:'ホテル', tourism:'観光', daily:'日常', work:'仕事', emergency:'緊急'
@@ -12181,7 +12181,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
 
 <style>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1: remove tap hints + lock quiz text geometry ===== */
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1: remove tap hints + lock quiz text geometry ===== */
 .quiz-word-card-v50{
   display:grid !important;
   grid-template-columns:92px minmax(0,1fr) !important;
@@ -12247,14 +12247,14 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 </style>
 
 <script>
-/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 =====
    - Remove 「タップして中国語」 / 「タップしてピンイン・日本語」.
    - Keep answer area height reserved while hidden, so text does not jump vertically on reveal.
    - Preserve v49 pill/elegant typography and v48 direction logic.
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
   const CATEGORY_LABELS = {
     all:'全部', greeting:'挨拶', cafe:'カフェ', restaurant:'食事', shopping:'買物',
     transport:'交通', hotel:'ホテル', tourism:'観光', daily:'日常', work:'仕事', emergency:'緊急'
@@ -12360,6 +12360,226 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
   }catch(e){}
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule, {once:true});
   else schedule();
+})();
+</script>
+
+
+
+<script>
+/* ===== 2026-05-24-v52-word-quiz-nav-reset-question-v1 =====
+   クイズ→単語 nav 修正:
+   - 前 / 次 を押した時は、必ず未回答の「問題」だけを表示する。
+   - 直前が答え表示中でも、答え状態を引き継がない。
+   - 画面クリック時の 1回目=答え表示、2回目=次問題 の流れは維持。
+   - v50/v51 の pill・文字品位・上下ズレ防止を維持。
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v52-word-quiz-nav-reset-question-v1';
+  const CATEGORY_LABELS = {
+    all:'全部', greeting:'挨拶', cafe:'カフェ', restaurant:'食事', shopping:'買物',
+    transport:'交通', hotel:'ホテル', tourism:'観光', daily:'日常', work:'仕事', emergency:'緊急'
+  };
+  const LEVEL_LABELS = {beginner:'初級', intermediate:'中級', advanced:'上級', all:'全部'};
+  let lastTapAt = 0;
+  let speakToken = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>\"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function chars(s){
+    return String(s == null ? '' : s).split('').map(function(ch){ return '<span class="char">' + esc(ch) + '</span>'; }).join('');
+  }
+  function isWordQuiz(){
+    try{ return view === 'question' && contentMode === 'word'; }catch(e){ return false; }
+  }
+  function getWords(){
+    try{ if(typeof getWordList === 'function') return getWordList() || []; }catch(e){}
+    try{ return WORDS || []; }catch(e){ return []; }
+  }
+  function normalize(i){
+    try{ if(typeof normalizeWordIndex === 'function') return normalizeWordIndex(i); }catch(e){}
+    const list = getWords();
+    const n = list.length || 1;
+    return ((Number(i)||0) % n + n) % n;
+  }
+  function getWord(){
+    try{ if(typeof currentWordQuestion === 'function') return currentWordQuestion(); }catch(e){}
+    const list = getWords();
+    return list.length ? list[normalize(wordIndex || 0)] : null;
+  }
+  function totalWords(){
+    try{ if(typeof currentWordCount === 'function') return currentWordCount(); }catch(e){}
+    return getWords().length;
+  }
+  function categoryText(w){
+    const c = (w && w.category) || 'greeting';
+    return CATEGORY_LABELS[c] || c || '挨拶';
+  }
+  function levelText(w){
+    const lv = (w && w.level) || 'beginner';
+    return LEVEL_LABELS[lv] || '初級';
+  }
+  function direction(){
+    try{ return mode === 'speaking' ? 'jpzh' : 'zhjp'; }catch(e){ return 'zhjp'; }
+  }
+  function stopSpeech(){
+    speakToken++;
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+  }
+  function answerBlock(html, revealed){
+    return '<div class="quiz-answer-slot-v50"><div class="quiz-answer-block-v49 quiz-answer-block-v50' + (revealed ? '' : ' is-hidden') + '">' + html + '</div></div>';
+  }
+  function renderWordQuizV52(){
+    const boxEl = (typeof box !== 'undefined' && box) ? box : document.getElementById('box');
+    if(!boxEl || !isWordQuiz()) return;
+    const w = getWord();
+    if(!w){ boxEl.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+    const revealed = !!wordQuestionRevealed;
+    let right = '';
+    if(direction() === 'jpzh'){
+      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-jp-v49 quiz-prompt-line-v49">' + esc(w.jp) + '</div></div>';
+      right += answerBlock('<div class="quiz-word-zh-v49">' + chars(w.zh) + '</div><div class="quiz-word-pinyin-v49">' + esc(w.pinyin) + '</div>', revealed);
+    }else{
+      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-zh-v49 quiz-prompt-line-v49">' + chars(w.zh) + '</div></div>';
+      right += answerBlock('<div class="quiz-word-pinyin-v49">' + esc(w.pinyin) + '</div><div class="quiz-word-jp-v49">' + esc(w.jp) + '</div>', revealed);
+    }
+    boxEl.innerHTML =
+      '<div class="question-card-top quiz-card-top">' +
+        '<div class="quiz-meta-pills" aria-label="' + esc(categoryText(w)) + ' ' + esc(levelText(w)) + '">' +
+          '<span class="quiz-meta-genre">' + esc(categoryText(w)) + '</span>' +
+          '<span class="quiz-meta-level">' + esc(levelText(w)) + '</span>' +
+        '</div>' +
+        '<div class="counter">' + esc((Number(wordIndex || 0) + 1) + ' / ' + totalWords()) + '</div>' +
+      '</div>' +
+      '<div class="quiz-word-card-v47 quiz-word-card-v48 quiz-word-card-v49 quiz-word-card-v50 quiz-word-card-v52" role="button" tabindex="0" aria-label="単語クイズ">' +
+        '<div class="quiz-word-emoji-v47 quiz-word-emoji-v48 quiz-word-emoji-v49 quiz-word-emoji-v50" aria-hidden="true">' + esc(w.emoji || '🔤') + '</div>' +
+        '<div class="quiz-word-lines-v47 quiz-word-lines-v48 quiz-word-lines-v49 quiz-word-lines-v50">' + right + '</div>' +
+      '</div>';
+    try{ if(typeof cleanBadStatus === 'function') cleanBadStatus(); }catch(e){}
+    try{ if(typeof showFixedNavSoon === 'function') showFixedNavSoon(); }catch(e){}
+  }
+  function renderQuestionOnly(){
+    try{ wordQuestionRevealed = false; }catch(e){}
+    renderWordQuizV52();
+  }
+  function moveWord(delta){
+    if(!isWordQuiz()) return;
+    stopSpeech();
+    try{ wordIndex = normalize(Number(wordIndex || 0) + delta); }catch(e){}
+    renderQuestionOnly();
+    setTimeout(renderQuestionOnly, 0);
+    setTimeout(renderQuestionOnly, 140);
+  }
+  async function revealAndSpeak(){
+    if(!isWordQuiz()) return;
+    const w = getWord();
+    if(!w) return;
+    try{ wordQuestionRevealed = true; }catch(e){}
+    renderWordQuizV52();
+    const token = ++speakToken;
+    try{
+      if(typeof speakHighlight === 'function') await speakHighlight(w.zh);
+      else if(typeof speakWordAudio === 'function') await speakWordAudio(w.zh);
+      else if(typeof speakChinese === 'function') await speakChinese(w.zh);
+    }catch(e){}
+    if(token === speakToken && isWordQuiz()) renderWordQuizV52();
+  }
+  function bindFixedNav(){
+    const nav = document.getElementById('fixedCardNav');
+    if(!nav || nav.dataset.v52Bound === '1') return;
+    const clone = nav.cloneNode(false);
+    clone.id = 'fixedCardNav';
+    clone.className = (nav.className || '') + ' fixed-card-nav';
+    clone.setAttribute('aria-label','カード操作');
+    clone.innerHTML = '<button type="button" data-fixed-nav="prev">前</button><button type="button" data-fixed-nav="replay">もう一度</button><button type="button" data-fixed-nav="next">次</button>';
+    clone.dataset.v52Bound = '1';
+    nav.parentNode.replaceChild(clone, nav);
+    clone.addEventListener('click', function(e){
+      const btn = e.target.closest('[data-fixed-nav]');
+      if(!btn) return;
+      if(!isWordQuiz()) return;
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      const a = btn.getAttribute('data-fixed-nav');
+      if(a === 'prev') moveWord(-1);
+      else if(a === 'next') moveWord(1);
+      else revealAndSpeak();
+    }, true);
+  }
+  function patchGlobals(){
+    try{ window.renderWordQuestion = renderWordQuizV52; renderWordQuestion = renderWordQuizV52; }catch(e){}
+    const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
+    window.renderQuestion = function(){
+      if(isWordQuiz()) return renderWordQuizV52();
+      if(typeof prevRenderQuestion === 'function') return prevRenderQuestion.apply(this, arguments);
+    };
+    try{ renderQuestion = window.renderQuestion; }catch(e){}
+
+    const oldNext = window.nextQuestion || (typeof nextQuestion !== 'undefined' ? nextQuestion : null);
+    window.nextQuestion = function(){
+      if(isWordQuiz()){ moveWord(1); return; }
+      if(typeof oldNext === 'function') return oldNext.apply(this, arguments);
+    };
+    try{ nextQuestion = window.nextQuestion; }catch(e){}
+
+    const oldPrev = window.prevQuestion || (typeof prevQuestion !== 'undefined' ? prevQuestion : null);
+    window.prevQuestion = function(){
+      if(isWordQuiz()){ moveWord(-1); return; }
+      if(typeof oldPrev === 'function') return oldPrev.apply(this, arguments);
+    };
+    try{ prevQuestion = window.prevQuestion; }catch(e){}
+  }
+  document.addEventListener('click', function(e){
+    if(!isWordQuiz()) return;
+    const qnav = e.target.closest('[data-qnav]');
+    if(qnav){
+      const a = qnav.getAttribute('data-qnav');
+      if(a === 'prev' || a === 'next'){
+        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+        moveWord(a === 'prev' ? -1 : 1);
+        return;
+      }
+    }
+    if(e.target.closest('[data-fixed-nav], [data-v15-toggle], .view-tabs, #v12MetaSelectBar, select, button')) return;
+    const card = e.target.closest('.quiz-word-card-v52, .quiz-word-card-v50, .box, #box');
+    if(!card) return;
+    const now = Date.now();
+    if(now - lastTapAt < 250) return;
+    lastTapAt = now;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    if(wordQuestionRevealed) moveWord(1);
+    else revealAndSpeak();
+  }, true);
+  document.addEventListener('touchend', function(){
+    if(isWordQuiz()) setTimeout(bindFixedNav, 0);
+  }, true);
+  function apply(){
+    setVersion(); patchGlobals(); bindFixedNav();
+    if(isWordQuiz()) renderWordQuizV52();
+  }
+  try{
+    const mo = new MutationObserver(function(){
+      if(!isWordQuiz()) return;
+      bindFixedNav();
+      const boxEl = (typeof box !== 'undefined' && box) ? box : document.getElementById('box');
+      const txt = (boxEl && boxEl.textContent) || '';
+      if(/タップして中国語|タップしてピンイン・日本語|greeting|cafe|restaurant|shopping|transport|hotel|tourism|daily|work|emergency|単語/.test(txt) || (boxEl && !boxEl.querySelector('.quiz-word-card-v52'))){
+        setTimeout(renderWordQuizV52, 0);
+      }
+    });
+    if(document.body) mo.observe(document.body, {childList:true, subtree:true, characterData:true});
+  }catch(e){}
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,0); setTimeout(apply,300); }, {once:true});
+  else { apply(); setTimeout(apply,0); setTimeout(apply,300); }
 })();
 </script>
 
