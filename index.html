@@ -9,8 +9,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-24-v26-se-bottom-label-fit-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-24-v26-se-bottom-label-fit-v1">
+<!-- LingoFlow app version: 2026-05-24-v28-read-list-black-meta-swap-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-24-v28-read-list-black-meta-swap-v1">
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -1707,7 +1707,7 @@ body.is-word-question-controls-visible .app{
 
 
 
-/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: iPhone SE bottom label fit ===== */
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: iPhone SE bottom label fit ===== */
 .bottom-action-bar{
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:6px;
@@ -1756,6 +1756,247 @@ body.is-word-question-controls-visible .app{
     font-size:11.4px;
     letter-spacing:-.07em;
   }
+}
+
+
+
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: selectable level + SE random fit ===== */
+.bottom-action-bar,
+.bottom-action-bar.v15-action-bar,
+.bottom-action-bar.v18-action-bar,
+.bottom-action-bar.v22-compact-two-row{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:5px !important;
+  padding:5px !important;
+}
+.bottom-action-bar .toggle-group,
+.bottom-action-bar .v15-toggle-group{
+  min-width:0 !important;
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:2px !important;
+}
+.bottom-action-bar button,
+.bottom-action-bar .toggle-group button,
+.bottom-action-bar .v15-toggle-group button,
+.bottom-action-bar.v15-action-bar .v15-toggle-group button{
+  min-width:0 !important;
+  width:100% !important;
+  height:34px !important;
+  line-height:1 !important;
+  padding-left:2px !important;
+  padding-right:2px !important;
+  font-size:12px !important;
+  letter-spacing:-.06em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+@media(max-width:340px){
+  .bottom-action-bar button,
+  .bottom-action-bar .toggle-group button,
+  .bottom-action-bar .v15-toggle-group button,
+  .bottom-action-bar.v15-action-bar .v15-toggle-group button{
+    font-size:11.2px !important;
+    letter-spacing:-.08em !important;
+    padding-left:1px !important;
+    padding-right:1px !important;
+  }
+}
+
+
+
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: SE random text final fit ===== */
+.bottom-action-bar.v15-action-bar,
+.bottom-action-bar.v18-action-bar,
+.bottom-action-bar.v22-compact-two-row,
+.bottom-action-bar{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:5px !important;
+  padding:5px !important;
+}
+.bottom-action-bar .v15-toggle-group,
+.bottom-action-bar .toggle-group{
+  min-width:0 !important;
+  gap:2px !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group button,
+.bottom-action-bar button{
+  font-size:11.6px !important;
+  letter-spacing:-.075em !important;
+  padding-left:1px !important;
+  padding-right:1px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+
+
+
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: read mode typography aligned with listen mode ===== */
+.list-item{
+  padding:14px 14px !important;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.76) !important;
+}
+.list-zh{
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif !important;
+  font-size:clamp(24px, 6.4vw, 34px) !important;
+  line-height:1.28 !important;
+  font-weight:950 !important;
+  letter-spacing:.25px !important;
+  color:#087cff !important;
+  margin:0 0 6px !important;
+  word-break:break-word !important;
+  overflow-wrap:anywhere !important;
+}
+.list-pinyin{
+  font-size:clamp(17px, 4.7vw, 23px) !important;
+  line-height:1.28 !important;
+  font-weight:900 !important;
+  font-style:italic !important;
+  color:#1174df !important;
+  margin:0 0 6px !important;
+  word-break:break-word !important;
+  overflow-wrap:anywhere !important;
+}
+.list-jp{
+  font-size:clamp(16px, 4.5vw, 22px) !important;
+  line-height:1.34 !important;
+  font-weight:850 !important;
+  color:#12223f !important;
+  margin:0 !important;
+  word-break:break-word !important;
+  overflow-wrap:anywhere !important;
+}
+@media(max-width:380px){
+  .list-item{
+    padding:12px 12px !important;
+    margin-bottom:8px !important;
+  }
+  .list-zh{
+    font-size:clamp(22px, 6.1vw, 30px) !important;
+    margin-bottom:5px !important;
+  }
+  .list-pinyin{
+    font-size:clamp(16px, 4.5vw, 21px) !important;
+    margin-bottom:5px !important;
+  }
+  .list-jp{
+    font-size:clamp(15px, 4.3vw, 20px) !important;
+  }
+}
+
+
+
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: polished read category headers ===== */
+.list-group-head{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  max-width:100% !important;
+  margin:18px 0 8px !important;
+  padding:6px 9px !important;
+  border-radius:999px !important;
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(238,246,255,.92)) !important;
+  border:1px solid rgba(0,122,255,.12) !important;
+  box-shadow:0 5px 14px rgba(15,49,98,.055), inset 0 1px 0 rgba(255,255,255,.9) !important;
+  color:#0a3766 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+}
+.list-head-genre,
+.list-head-level{
+  display:inline-flex !important;
+  align-items:center !important;
+  min-width:0 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  letter-spacing:.01em !important;
+  color:#0068d8 !important;
+}
+.list-head-level{
+  color:#38516f !important;
+}
+.list-head-label{
+  display:none !important;
+}
+.list-head-genre::before{
+  content:"";
+  width:7px;
+  height:7px;
+  flex:0 0 7px;
+  margin-right:5px;
+  border-radius:999px;
+  background:#007aff;
+  box-shadow:0 0 0 4px rgba(0,122,255,.10);
+}
+.list-head-level::before{
+  content:"";
+  width:1px;
+  height:13px;
+  margin:0 2px 0 0;
+  background:rgba(0,122,255,.18);
+}
+.category-title,
+.level-title{
+  display:inline-flex !important;
+  margin:16px 0 8px !important;
+  padding:6px 9px !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  color:#0068d8 !important;
+  font-size:12px !important;
+  font-weight:950 !important;
+}
+@media(max-width:380px){
+  .list-group-head{
+    margin:15px 0 7px !important;
+    padding:5px 8px !important;
+    gap:5px !important;
+  }
+  .list-head-genre,
+  .list-head-level{
+    font-size:11.5px !important;
+  }
+}
+
+
+
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: read list black text + meta row swap ===== */
+#v12MetaSelectBar.v16-meta-bar,
+.meta-bar{
+  grid-template-columns:1.15fr 1fr !important;
+}
+#v12MetaSelectBar.v16-meta-bar .v16-meta-item[data-kind="category"]{
+  order:1 !important;
+}
+#v12MetaSelectBar.v16-meta-bar .v16-meta-item[data-kind="level"]{
+  order:2 !important;
+}
+.list-item .list-zh,
+.list-item .list-pinyin,
+.list-item .list-jp{
+  color:#111827 !important;
+  text-shadow:none !important;
+}
+.list-item.playing .list-zh,
+.list-item.playing .list-pinyin,
+.list-item.playing .list-jp{
+  color:#111827 !important;
+}
+.list-item .char{
+  color:#111827 !important;
+  text-shadow:none !important;
+}
+.list-item .char.done{
+  color:#007aff !important;
+  text-shadow:0 0 8px rgba(0,122,255,.24) !important;
+}
+.list-head-level::after{
+  content:"" !important;
 }
 
 </style>
@@ -1817,7 +2058,7 @@ body.is-word-question-controls-visible .app{
     <button type="button" data-player-control="play">▶ 再生</button>
     <button type="button" data-player-control="stop">■ 停止</button>
     <button type="button" data-player-control="continuous">連続</button>
-    <button type="button" data-player-control="random">ランダム</button>
+    <button type="button" data-player-control="random">順不同</button>
   </div>
   <div id="bottomActionBar" class="bottom-action-bar hidden-panel" aria-label="下側操作"></div>
 </div>
@@ -3630,7 +3871,7 @@ function renderWordList(){
   Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
     const list = WORDS.filter(w => w.category === cat);
     if(!list.length) return;
-    out += listHeaderHtml(cat, "beginner", "単語");
+    out += listHeaderHtml(cat, "beginner");
     list.forEach(w => {
       const id = currentListItems.length;
       currentListItems.push({type:"word", ...w});
@@ -4469,7 +4710,7 @@ setView(view);
     selectedCategories().forEach(cat => {
       const list = WORDS.filter(w => w.category === cat);
       if(!list.length) return;
-      out += listHeaderHtml(cat, 'beginner', '単語');
+      out += listHeaderHtml(cat, 'beginner');
       list.forEach(w => {
         const id = currentListItems.length;
         currentListItems.push({type:'word', ...w});
@@ -4501,7 +4742,7 @@ setView(view);
 
 /* ===== v15 reflected JS patch: labels/order + paired toggles ===== */
 (function(){
-  const V15_VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  const V15_VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
   try{
     document.body.setAttribute('data-lingoflow-v15', V15_VERSION);
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
@@ -4654,7 +4895,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v26-se-bottom-label-fit-v1';
+  const VERSION = '2026-05-24-v28-read-list-black-meta-swap-v1';
 
   const icons = {
     hear:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1v-5Z"/><path d="M20 13h-3v6h2a1 1 0 0 0 1-1v-5Z"/></svg>',
@@ -4771,7 +5012,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v26-se-bottom-label-fit-v1';
+  const VERSION = '2026-05-24-v28-read-list-black-meta-swap-v1';
   function setVersion(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -4810,7 +5051,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v26-se-bottom-label-fit-v1';
+  const VERSION = '2026-05-24-v28-read-list-black-meta-swap-v1';
   function setVersionV18(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -4948,7 +5189,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v26-se-bottom-label-fit-v1';
+  const VERSION='2026-05-24-v28-read-list-black-meta-swap-v1';
   function setV19(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -4975,7 +5216,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v26-se-bottom-label-fit-v1';
+  const VERSION='2026-05-24-v28-read-list-black-meta-swap-v1';
   function applyV21(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -5016,7 +5257,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v26-se-bottom-label-fit-v1';
+  const VERSION='2026-05-24-v28-read-list-black-meta-swap-v1';
   function escV22(s){
     return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});
   }
@@ -5086,7 +5327,7 @@ setView(view);
     bottomActionBar.innerHTML=[
       group('content',[btn('文章','content','sentence',c==='sentence'),btn('単語','content','word',c==='word')]),
       group('run',[btn('再生中','run','play',r==='play'),btn('停止','run','stop',r==='stop')]),
-      group('order',[btn('連続','order','continuous',o==='continuous'),btn('ランダム','order','random',o==='random')]),
+      group('order',[btn('連続','order','continuous',o==='continuous'),btn('順不同','order','random',o==='random')]),
       group('direction',[btn('中→日','direction','zhjp',d==='zhjp'),btn('日→中','direction','jpzh',d==='jpzh')])
     ].join('');
     document.body.classList.add('is-bottom-action-visible');
@@ -5184,7 +5425,7 @@ setView(view);
   };
 
   const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-  if(meta) meta.setAttribute('content', '2026-05-24-v26-se-bottom-label-fit-v1');
+  if(meta) meta.setAttribute('content', '2026-05-24-v28-read-list-black-meta-swap-v1');
 })();
 </script>
 
@@ -5340,7 +5581,7 @@ setView(view);
   };
 
   const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-  if(meta) meta.setAttribute('content', '2026-05-24-v26-se-bottom-label-fit-v1');
+  if(meta) meta.setAttribute('content', '2026-05-24-v28-read-list-black-meta-swap-v1');
 })();
 </script>
 
@@ -5349,7 +5590,7 @@ setView(view);
 /* ===== v25 final hotfix: default Listen + All levels + review visible ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
 
   function setVersion(){
     try{
@@ -5507,10 +5748,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: level all default hard fix ===== */
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: level all default hard fix ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
 
   function setVersion(){
     try{
@@ -5668,10 +5909,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: verified level-all default ===== */
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: verified level-all default ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
   const REAL_LEVELS = ["beginner","intermediate","advanced"];
 
   function setVersion(){
@@ -5815,10 +6056,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: final visible level-all display guard ===== */
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final visible level-all display guard ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
 
   function applyLevelAllDisplay(){
     try{
@@ -5875,10 +6116,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: final short bottom labels guard ===== */
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final short bottom labels guard ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
   function setVersion(){
     try{
       const meta = document.querySelector('meta[name="lingoflow-app-version"]');
@@ -5925,6 +6166,756 @@ setView(view);
     shortenBottomLabels();
     setTimeout(shortenBottomLabels, 0);
     setTimeout(shortenBottomLabels, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: level selectable + SE bottom labels final guard ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const LEVEL_LABELS = { all:'全部', beginner:'初級', intermediate:'中級', advanced:'上級' };
+  const LEVEL_OPTION_HTML = '<option value="all">全部</option><option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
+
+  // undefined means first load. After user changes level, this preserves their choice.
+  window.__lfDesiredLevel = window.__lfDesiredLevel || 'all';
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function realLevelLabel(value){
+    return LEVEL_LABELS[value] || LEVEL_LABELS.all;
+  }
+
+  function ensureLevelSelect(sel){
+    if(!sel) return;
+    if(!sel.querySelector('option[value="all"]')) sel.innerHTML = LEVEL_OPTION_HTML;
+    sel.value = window.__lfDesiredLevel || 'all';
+    sel.setAttribute('aria-label', 'レベル：' + realLevelLabel(sel.value));
+
+    if(sel.dataset.v26SelectableBound !== '1'){
+      sel.dataset.v26SelectableBound = '1';
+      sel.addEventListener('change', function(e){
+        const next = e.target.value || 'all';
+        window.__lfDesiredLevel = next;
+        try{
+          level = next;
+          step = 0;
+          history = [];
+          index = -1;
+          if(typeof track === 'function') track('level_change', { level: level, source:'v26_selectable_level' });
+          if(typeof installV26DataFns === 'function') installV26DataFns();
+          syncLevelUI();
+          if(typeof updateButtons === 'function') updateButtons();
+          syncLevelUI();
+          if(view === 'list') renderList();
+          else if(view === 'word'){ wordIndex = 0; renderWord(); }
+          else if(view === 'player') renderPlaybackPanel();
+          else if(view === 'continuous' || view === 'random') renderPlaybackPanel();
+          else nextQuestion(true);
+        }catch(err){
+          syncLevelUI();
+        }
+      }, true);
+    }
+  }
+
+  function syncLevelUI(){
+    try{
+      const desired = window.__lfDesiredLevel || level || 'all';
+      level = desired;
+      if(typeof levelNames !== 'undefined') levelNames.all = '全部';
+
+      ['v11LevelSelect','v12LevelSelect'].forEach(function(id){
+        ensureLevelSelect(document.getElementById(id));
+      });
+
+      const label = realLevelLabel(desired);
+      const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
+      if(levelText) levelText.textContent = 'レベル：' + label;
+
+      const levelBtn = document.getElementById('levelBtn');
+      if(levelBtn){
+        levelBtn.textContent = label;
+        levelBtn.setAttribute('aria-label','レベル：' + label);
+      }
+    }catch(e){}
+  }
+
+  window.installV26DataFns = function(){
+    try{
+      const realLevels = ['beginner','intermediate','advanced'];
+      getList = function(){
+        let rows = [];
+        if(level === 'all'){
+          realLevels.forEach(function(lv){ (DATA[lv] || []).forEach(function(r){ rows.push(r); }); });
+        }else{
+          rows = DATA[level] || [];
+        }
+        if(category && category !== 'all'){
+          const filtered = rows.filter(function(r){ return r.category === category; });
+          return filtered.length ? filtered : rows;
+        }
+        return rows;
+      };
+      currentListCount = function(){ return getList().length || 1; };
+      pick = function(){
+        const rows = getList();
+        return rows[Math.floor(Math.random() * rows.length)];
+      };
+    }catch(e){}
+  };
+
+  function shortenBottomLabels(){
+    try{
+      document.querySelectorAll('#bottomActionBar button, .bottom-action-bar button').forEach(function(btn){
+        const t = (btn.textContent || '').trim();
+        if(t === 'ランダム') btn.textContent = '順不同';
+        if(t === '中文→日本語' || t === '中文→日文') btn.textContent = '中→日';
+        if(t === '日本語→中文' || t === '日文→中文') btn.textContent = '日→中';
+      });
+    }catch(e){}
+  }
+
+  const prevUpdate = window.updateButtons;
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const desired = window.__lfDesiredLevel || level || 'all';
+      let result;
+      try{ result = prevUpdate.apply(this, arguments); }catch(e){}
+      window.__lfDesiredLevel = desired;
+      try{ level = desired; }catch(e){}
+      window.installV26DataFns();
+      syncLevelUI();
+      shortenBottomLabels();
+      setVersion();
+      return result;
+    };
+  }
+
+  const prevRender = window.renderUnifiedBottomActionBar;
+  if(typeof prevRender === 'function'){
+    window.renderUnifiedBottomActionBar = function(){
+      const r = prevRender.apply(this, arguments);
+      shortenBottomLabels();
+      syncLevelUI();
+      setVersion();
+      return r;
+    };
+  }
+
+  function apply(){
+    setVersion();
+    if(!window.__lfDesiredLevel) window.__lfDesiredLevel = 'all';
+    try{ level = window.__lfDesiredLevel; }catch(e){}
+    window.installV26DataFns();
+    syncLevelUI();
+    shortenBottomLabels();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 120);
+      setTimeout(apply, 500);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 120);
+    setTimeout(apply, 500);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: reset level select events, preserve selected level ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const LABELS = { all:'全部', beginner:'初級', intermediate:'中級', advanced:'上級' };
+  const REAL_LEVELS = ['beginner','intermediate','advanced'];
+  const OPTIONS = '<option value="all">全部</option><option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
+
+  window.__lfDesiredLevel = window.__lfDesiredLevel || 'all';
+
+  function label(v){ return LABELS[v] || '全部'; }
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      document.body && document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function setDataFns(){
+    try{
+      if(typeof levelNames !== 'undefined') levelNames.all = '全部';
+      if(typeof levels !== 'undefined' && Array.isArray(levels)){
+        levels.length = 0;
+        levels.push('all','beginner','intermediate','advanced');
+      }
+      getList = function(){
+        let rows = [];
+        if(level === 'all'){
+          REAL_LEVELS.forEach(function(lv){ (DATA[lv] || []).forEach(function(r){ rows.push(r); }); });
+        }else{
+          rows = DATA[level] || [];
+        }
+        if(category && category !== 'all'){
+          const filtered = rows.filter(function(r){ return r.category === category; });
+          return filtered.length ? filtered : rows;
+        }
+        return rows;
+      };
+      currentListCount = function(){ return getList().length || 1; };
+      pick = function(){
+        const rows = getList();
+        return rows[Math.floor(Math.random() * rows.length)];
+      };
+    }catch(e){}
+  }
+
+  function renderForCurrentView(){
+    try{
+      if(view === 'list') renderList();
+      else if(view === 'word'){ wordIndex = 0; renderWord(); }
+      else if(view === 'player') renderPlaybackPanel();
+      else if(view === 'continuous' || view === 'random') renderPlaybackPanel();
+      else nextQuestion(true);
+    }catch(e){}
+  }
+
+  function syncTextOnly(){
+    const desired = window.__lfDesiredLevel || 'all';
+    try{ level = desired; }catch(e){}
+
+    ['v11LevelSelect','v12LevelSelect'].forEach(function(id){
+      const sel = document.getElementById(id);
+      if(!sel) return;
+      if(!sel.querySelector('option[value="all"]')) sel.innerHTML = OPTIONS;
+      sel.value = desired;
+      sel.setAttribute('aria-label','レベル：' + label(desired));
+    });
+
+    const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
+    if(levelText) levelText.textContent = 'レベル：' + label(desired);
+
+    const levelBtn = document.getElementById('levelBtn');
+    if(levelBtn){
+      levelBtn.textContent = label(desired);
+      levelBtn.setAttribute('aria-label','レベル：' + label(desired));
+    }
+  }
+
+  function replaceLevelSelect(id){
+    const old = document.getElementById(id);
+    if(!old) return null;
+
+    // 重要: cloneで過去のchangeリスナーを全削除する。
+    const fresh = old.cloneNode(false);
+    fresh.id = id;
+    fresh.className = old.className;
+    fresh.setAttribute('aria-label', 'レベル：' + label(window.__lfDesiredLevel || 'all'));
+    fresh.innerHTML = OPTIONS;
+    fresh.value = window.__lfDesiredLevel || 'all';
+    fresh.dataset.v27CleanLevelSelect = '1';
+
+    old.replaceWith(fresh);
+
+    fresh.addEventListener('change', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      const next = e.target.value || 'all';
+      window.__lfDesiredLevel = next;
+      try{
+        stopAudio();
+        level = next;
+        step = 0;
+        history = [];
+        index = -1;
+        if(typeof track === 'function') track('level_change', { level: level, source:'v27_clean_select' });
+      }catch(err){}
+
+      setDataFns();
+      syncTextOnly();
+      renderForCurrentView();
+
+      // 古いupdateButtonsが後から走って戻すケースを再補正。
+      setTimeout(function(){ setDataFns(); syncTextOnly(); }, 0);
+      setTimeout(function(){ setDataFns(); syncTextOnly(); }, 120);
+    }, true);
+
+    return fresh;
+  }
+
+  function resetLevelSelects(){
+    replaceLevelSelect('v11LevelSelect');
+    replaceLevelSelect('v12LevelSelect');
+    syncTextOnly();
+  }
+
+  function shortenBottomLabels(){
+    try{
+      document.querySelectorAll('#bottomActionBar button, .bottom-action-bar button').forEach(function(btn){
+        const t = (btn.textContent || '').trim();
+        if(t === 'ランダム') btn.textContent = '順不同';
+        if(t === '中文→日本語' || t === '中文→日文') btn.textContent = '中→日';
+        if(t === '日本語→中文' || t === '日文→中文') btn.textContent = '日→中';
+      });
+    }catch(e){}
+  }
+
+  const previousUpdateButtons = window.updateButtons;
+  window.updateButtons = function(){
+    const keep = window.__lfDesiredLevel || level || 'all';
+    let r;
+    try{ r = previousUpdateButtons && previousUpdateButtons.apply(this, arguments); }catch(e){}
+    window.__lfDesiredLevel = keep;
+    try{ level = keep; }catch(e){}
+    setDataFns();
+    syncTextOnly();
+    shortenBottomLabels();
+    setVersion();
+    return r;
+  };
+
+  const previousRenderBottom = window.renderUnifiedBottomActionBar;
+  if(typeof previousRenderBottom === 'function'){
+    window.renderUnifiedBottomActionBar = function(){
+      const r = previousRenderBottom.apply(this, arguments);
+      shortenBottomLabels();
+      syncTextOnly();
+      setVersion();
+      return r;
+    };
+  }
+
+  function applyInitial(){
+    setVersion();
+    setDataFns();
+    // 初回だけ全部。以降はユーザー選択を保持。
+    window.__lfDesiredLevel = window.__lfDesiredLevel || 'all';
+    try{ level = window.__lfDesiredLevel; }catch(e){}
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    resetLevelSelects();
+    shortenBottomLabels();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      applyInitial();
+      setTimeout(applyInitial, 0);
+      setTimeout(resetLevelSelects, 300);
+    }, { once:true });
+  }else{
+    applyInitial();
+    setTimeout(applyInitial, 0);
+    setTimeout(resetLevelSelects, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final 順不同 label guard ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  function apply(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+      document.querySelectorAll('#bottomActionBar button, .bottom-action-bar button').forEach(function(btn){
+        const t = (btn.textContent || '').trim();
+        if(t === 'ランダム' || t === '乱順') btn.textContent = '順不同';
+      });
+    }catch(e){}
+  }
+  const prevRender = window.renderUnifiedBottomActionBar;
+  if(typeof prevRender === 'function'){
+    window.renderUnifiedBottomActionBar = function(){
+      const r = prevRender.apply(this, arguments);
+      apply();
+      return r;
+    };
+  }
+  const prevUpdate = window.updateButtons;
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      apply();
+      return r;
+    };
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 300);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: fix read sentence list when level=all ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const REAL_LEVELS = ['beginner','intermediate','advanced'];
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function safeCategories(){
+    try{
+      if(typeof selectedCategories === 'function') return selectedCategories();
+    }catch(e){}
+    try{
+      if(typeof category !== 'undefined' && category !== 'all') return [category];
+      return Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; });
+    }catch(e){
+      return [];
+    }
+  }
+
+  function safeLevelLabel(lv){
+    try{
+      if(typeof levelNames !== 'undefined' && levelNames[lv]) return levelNames[lv];
+    }catch(e){}
+    return lv === 'beginner' ? '初級' : lv === 'intermediate' ? '中級' : lv === 'advanced' ? '上級' : '全部';
+  }
+
+  function renderSentenceListFixed(){
+    try{
+      currentListItems = [];
+      let out = '<div class="list-status">文章一覧：タップすると音声に合わせて中国語だけ青色に進みます</div>';
+      const levelOrder = (typeof level !== 'undefined' && level === 'all') ? REAL_LEVELS : [level || 'beginner'];
+
+      safeCategories().forEach(function(cat){
+        levelOrder.forEach(function(lv){
+          const rows = ((DATA && DATA[lv]) ? DATA[lv] : []).filter(function(p){
+            return !cat || cat === 'all' || p.category === cat;
+          });
+          if(!rows.length) return;
+
+          if(typeof listHeaderHtml === 'function'){
+            out += listHeaderHtml(cat, lv);
+          }else{
+            out += '<div class="category-title">' + esc(cat) + '</div><div class="level-title">' + esc(safeLevelLabel(lv)) + '</div>';
+          }
+
+          rows.forEach(function(p){
+            const id = currentListItems.length;
+            currentListItems.push(Object.assign({ type:'sentence' }, p));
+            out += '<div class="list-item" data-id="' + id + '">' +
+              '<div class="list-zh">' + esc(p.zh) + '</div>' +
+              '<div class="list-pinyin">' + esc(p.pinyin) + '</div>' +
+              '<div class="list-jp">' + esc(p.jp) + '</div>' +
+            '</div>';
+          });
+        });
+      });
+
+      listPanel.innerHTML = currentListItems.length ? out : '<div class="error">表示できる文章データがありません。</div>';
+    }catch(e){
+      try{ listPanel.innerHTML = '<div class="error">文章一覧の表示でエラーが発生しました。</div>'; }catch(_e){}
+      try{ console.error('renderSentenceListFixed error', e); }catch(_e){}
+    }
+  }
+
+  const originalRenderWordList = window.renderWordList || renderWordList;
+
+  window.renderSentenceList = renderSentenceListFixed;
+  renderSentenceList = renderSentenceListFixed;
+
+  window.renderList = function(){
+    try{
+      if(contentMode === 'word') originalRenderWordList();
+      else renderSentenceListFixed();
+    }catch(e){
+      renderSentenceListFixed();
+    }
+  };
+  renderList = window.renderList;
+
+  function apply(){
+    setVersion();
+    try{
+      if(view === 'list' && contentMode !== 'word') renderSentenceListFixed();
+    }catch(e){}
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 300);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: read header polish + listen starts from beginner/greeting ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  let shouldStartListenFromDefault = true;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function labelCategory(cat){
+    try{
+      if(typeof categoryLabel === 'function') return categoryLabel(cat);
+      if(typeof categoryNames !== 'undefined' && categoryNames[cat]) return categoryNames[cat];
+    }catch(e){}
+    return cat || '';
+  }
+
+  function labelLevel(lv){
+    try{
+      if(typeof levelNames !== 'undefined' && levelNames[lv]) return levelNames[lv];
+    }catch(e){}
+    return lv === 'beginner' ? '初級' : lv === 'intermediate' ? '中級' : lv === 'advanced' ? '上級' : '全部';
+  }
+
+  window.listHeaderHtml = function(cat, lv, labelSuffix){
+    return '<div class="list-group-head" aria-label="' + esc(labelCategory(cat)) + ' ' + esc(labelLevel(lv)) + '">' +
+      '<span class="list-head-genre">' + esc(labelCategory(cat)) + '</span>' +
+      '<span class="list-head-label">レベル</span>' +
+      '<span class="list-head-level">' + esc(labelLevel(lv)) + '</span>' +
+    '</div>';
+  };
+
+  function findBeginnerGreetingFirst(){
+    try{
+      const rows = (DATA && DATA.beginner) ? DATA.beginner : [];
+      return rows.find(function(p){ return p.category === 'greeting'; }) || rows[0] || null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function prepareDefaultListenStart(){
+    try{
+      const first = findBeginnerGreetingFirst();
+      if(!first) return false;
+
+      level = 'beginner';
+      category = 'greeting';
+      step = 0;
+      history = [first];
+      index = 0;
+
+      const levelSelect = document.getElementById('v12LevelSelect') || document.getElementById('v11LevelSelect');
+      if(levelSelect){
+        levelSelect.value = 'beginner';
+        levelSelect.setAttribute('aria-label','レベル：初級');
+      }
+      const categorySelect = document.getElementById('categorySelect');
+      if(categorySelect){
+        categorySelect.value = 'greeting';
+        categorySelect.setAttribute('aria-label','ジャンル：挨拶');
+      }
+      const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
+      if(levelText) levelText.textContent = 'レベル：初級';
+      const categoryText = document.querySelector('.v16-meta-item[data-kind="category"] .v16-meta-text');
+      if(categoryText) categoryText.textContent = 'ジャンル：挨拶';
+
+      if(typeof renderAuto === 'function') renderAuto(first);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  const prevStartOrResume = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
+  window.startOrResumePlayback = function(){
+    try{
+      if(shouldStartListenFromDefault){
+        shouldStartListenFromDefault = false;
+        prepareDefaultListenStart();
+      }
+    }catch(e){}
+    if(typeof prevStartOrResume === 'function') return prevStartOrResume.apply(this, arguments);
+  };
+  try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
+
+  const prevSetAutoPlayback = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
+  if(typeof prevSetAutoPlayback === 'function'){
+    window.setAutoPlayback = function(action){
+      try{
+        if(action === 'play' && shouldStartListenFromDefault){
+          shouldStartListenFromDefault = false;
+          prepareDefaultListenStart();
+        }
+      }catch(e){}
+      return prevSetAutoPlayback.apply(this, arguments);
+    };
+    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
+  }
+
+  const prevSetView = window.setView || (typeof setView !== 'undefined' ? setView : null);
+  if(typeof prevSetView === 'function'){
+    window.setView = function(v){
+      const r = prevSetView.apply(this, arguments);
+      try{
+        if(v === 'player') shouldStartListenFromDefault = true;
+      }catch(e){}
+      return r;
+    };
+    try{ setView = window.setView; }catch(e){}
+  }
+
+  function apply(){
+    setVersion();
+    try{
+      if(view === 'list' && typeof renderList === 'function') renderList();
+    }catch(e){}
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final read header/meta swap guard ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function cleanWordSuffix(){
+    try{
+      document.querySelectorAll('.list-head-level').forEach(function(el){
+        el.textContent = (el.textContent || '').replace(/・単語/g, '').replace(/単語/g, function(m){
+          return '';
+        }).trim();
+      });
+      document.querySelectorAll('.list-group-head').forEach(function(el){
+        const aria = el.getAttribute('aria-label');
+        if(aria) el.setAttribute('aria-label', aria.replace(/・単語/g, '').replace(/\s+単語/g, ''));
+      });
+    }catch(e){}
+  }
+
+  function swapMetaOrder(){
+    try{
+      const bar = document.getElementById('v12MetaSelectBar') || document.querySelector('.meta-bar');
+      if(!bar) return;
+      const levelItem = bar.querySelector('.v16-meta-item[data-kind="level"]');
+      const categoryItem = bar.querySelector('.v16-meta-item[data-kind="category"]');
+      if(levelItem && categoryItem && bar.firstElementChild !== categoryItem){
+        bar.insertBefore(categoryItem, levelItem);
+      }
+    }catch(e){}
+  }
+
+  const prevListHeaderHtml = window.listHeaderHtml || (typeof listHeaderHtml !== 'undefined' ? listHeaderHtml : null);
+  window.listHeaderHtml = function(cat, lv, labelSuffix){
+    function escSafe(s){ return typeof esc === 'function' ? esc(s) : String(s || ''); }
+    function catLabel(c){ try{ return typeof categoryLabel === 'function' ? categoryLabel(c) : c; }catch(e){ return c; } }
+    function lvLabel(l){ try{ return levelNames && levelNames[l] ? levelNames[l] : l; }catch(e){ return l; } }
+    return '<div class="list-group-head" aria-label="' + escSafe(catLabel(cat)) + ' ' + escSafe(lvLabel(lv)) + '">' +
+      '<span class="list-head-genre">' + escSafe(catLabel(cat)) + '</span>' +
+      '<span class="list-head-label">レベル</span>' +
+      '<span class="list-head-level">' + escSafe(lvLabel(lv)) + '</span>' +
+    '</div>';
+  };
+  try{ listHeaderHtml = window.listHeaderHtml; }catch(e){}
+
+  function apply(){
+    setVersion();
+    swapMetaOrder();
+    cleanWordSuffix();
+  }
+
+  const prevRenderList = window.renderList || (typeof renderList !== 'undefined' ? renderList : null);
+  if(typeof prevRenderList === 'function'){
+    window.renderList = function(){
+      const r = prevRenderList.apply(this, arguments);
+      apply();
+      return r;
+    };
+    try{ renderList = window.renderList; }catch(e){}
+  }
+
+  const prevUpdate = window.updateButtons;
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      apply();
+      return r;
+    };
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 300);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 300);
   }
 })();
 </script>
