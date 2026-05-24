@@ -9,8 +9,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-24-v23-css-clean-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-24-v23-css-clean-v1">
+<!-- LingoFlow app version: 2026-05-24-v26-se-bottom-label-fit-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-24-v26-se-bottom-label-fit-v1">
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -18,7 +18,13 @@
 <meta property="og:url" content="https://lingoflowing.com">
 
 
+
 <style>
+/* ===== v24 review hotfix =====
+   Stable consolidation: all effective CSS from v23 kept in original cascade order.
+   This prevents review-screen breakage while the source-of-truth cleanup is redone safely.
+*/
+
 
 :root{
   --lf-blue:#007aff;
@@ -191,7 +197,9 @@ select#categorySelect{
   flex:1 1 auto;
   min-height:0;
   position:relative;
-  overflow:hidden;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
   padding:16px;
   border-radius:26px;
   background:var(--lf-card);
@@ -241,10 +249,11 @@ select#categorySelect{
 .card-main{
   min-height:0;
   display:block;
+  overflow:visible;
 }
 .lines-wrap{min-width:0}
 .line{
-  margin:0 0 11px;
+  margin:0 0 8px;
   white-space:normal;
   word-break:break-word;
   overflow-wrap:anywhere;
@@ -261,12 +270,12 @@ select#categorySelect{
   letter-spacing:.35px;
 }
 .pinyin{
-  font-size:clamp(19px, 5.0vw, 25px);
+  font-size:clamp(20px, 5.2vw, 26px);
   color:#1174df;
   font-style:italic;
 }
 .jp{
-  font-size:clamp(18px, 4.8vw, 24px);
+  font-size:clamp(19px, 5.0vw, 25px);
   color:#12223f;
   font-weight:820;
 }
@@ -1007,6 +1016,748 @@ body.is-player-controls-visible .app{
   .bottom-action-bar.v15-action-bar .v15-toggle-group button{height:32px !important;font-size:10.8px !important;letter-spacing:-.075em !important;border-radius:10px !important;padding:0 !important;}
 }
 
+
+
+
+/* ===== v17 patch: genre default + compact separated toggle buttons =====
+   - Default genre display: ジャンル：全部
+   - Bottom controls closer to independent button groups, not one continuous bar.
+   - Keep one-row layout and iPhone SE no horizontal scroll.
+*/
+#v12MetaSelectBar.v16-meta-bar{
+  grid-template-columns:1fr 1.18fr !important;
+  gap:4px !important;
+  margin:0 0 4px !important;
+}
+.v16-meta-item{
+  height:30px !important;
+  padding:0 22px 0 7px !important;
+  border-radius:999px !important;
+}
+.v16-meta-icon{
+  flex-basis:17px !important;
+  width:17px !important;
+  height:17px !important;
+}
+.v16-meta-icon svg{width:12px !important;height:12px !important;}
+.v16-meta-text{
+  font-size:11.5px !important;
+  letter-spacing:-.03em !important;
+}
+.v16-meta-item::after{right:8px !important;font-size:14px !important;}
+
+.bottom-action-bar.v15-action-bar{
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:9px !important;
+  padding:8px !important;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.12), inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:4px !important;
+  min-width:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group button{
+  height:35px !important;
+  line-height:1.04 !important;
+  min-width:0 !important;
+  padding:0 2px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(15,49,98,.08) !important;
+  background:#fff !important;
+  color:#0a1f3d !important;
+  box-shadow:0 4px 10px rgba(15,49,98,.055), inset 0 1px 0 rgba(255,255,255,.94) !important;
+  font-size:11.5px !important;
+  font-weight:950 !important;
+  letter-spacing:-.055em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group button + button{
+  border-left:1px solid rgba(15,49,98,.08) !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group button.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
+  border-color:rgba(0,122,255,.28) !important;
+  box-shadow:0 6px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.26) !important;
+}
+.bottom-action-bar.v15-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
+  color:#057a35 !important;
+  background:linear-gradient(145deg,#eaffef 0%,#dff8e7 100%) !important;
+  border-color:rgba(34,197,94,.28) !important;
+  box-shadow:0 6px 13px rgba(34,197,94,.12), inset 0 1px 1px rgba(255,255,255,.9) !important;
+}
+body.is-bottom-action-visible .app,
+body.is-player-controls-visible .app{
+  padding-bottom:74px !important;
+}
+@media(max-width:340px){
+  .bottom-action-bar.v15-action-bar{
+    width:calc(100% - 10px) !important;
+    gap:6px !important;
+    padding:7px !important;
+    border-radius:18px !important;
+  }
+  .bottom-action-bar.v15-action-bar .v15-toggle-group{gap:3px !important;}
+  .bottom-action-bar.v15-action-bar .v15-toggle-group button{
+    height:34px !important;
+    border-radius:11px !important;
+    font-size:10.4px !important;
+    letter-spacing:-.075em !important;
+    padding:0 1px !important;
+  }
+  .v16-meta-text{font-size:11px !important;}
+}
+
+
+
+/* ===== v18 patch: detached bottom groups / image(200)-style =====
+   - Bottom menu is no longer one connected bar.
+   - Four compact independent 2-choice groups.
+   - Each choice has clear active/inactive state.
+   - Keep iPhone SE 320px no-horizontal-scroll.
+*/
+.bottom-action-bar.v15-action-bar.v18-action-bar{
+  position:fixed !important;
+  z-index:7000 !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 48px) !important;
+  transform:translateX(-50%) !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:7px !important;
+  padding:8px !important;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.88) !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  box-shadow:0 12px 28px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(16px) !important;
+  overflow:hidden !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group{
+  flex:0 1 auto !important;
+  min-width:0 !important;
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:3px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button{
+  width:38px !important;
+  min-width:0 !important;
+  max-width:38px !important;
+  height:46px !important;
+  min-height:46px !important;
+  padding:3px 1px !important;
+  margin:0 !important;
+  border-radius:14px !important;
+  border:1px solid rgba(15,49,98,.08) !important;
+  background:#fff !important;
+  color:#0b2445 !important;
+  box-shadow:0 5px 12px rgba(15,49,98,.06), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:2px !important;
+  font-size:10px !important;
+  line-height:1.05 !important;
+  font-weight:950 !important;
+  letter-spacing:-.08em !important;
+  white-space:normal !important;
+  overflow:hidden !important;
+  text-align:center !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button + button{
+  border-left:1px solid rgba(15,49,98,.08) !important;
+}
+.bottom-action-bar.v18-action-bar .v18-mini-icon{
+  display:block !important;
+  width:14px !important;
+  height:14px !important;
+  line-height:14px !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  color:currentColor !important;
+}
+.bottom-action-bar.v18-action-bar .v18-label{
+  display:block !important;
+  max-width:100% !important;
+  line-height:1.05 !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
+  border-color:rgba(0,122,255,.28) !important;
+  box-shadow:0 7px 14px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.26) !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
+  color:#087a35 !important;
+  background:linear-gradient(145deg,#eaffef 0%,#dff8e7 100%) !important;
+  border-color:rgba(34,197,94,.30) !important;
+  box-shadow:0 7px 14px rgba(34,197,94,.13), inset 0 1px 1px rgba(255,255,255,.9) !important;
+}
+body.is-bottom-action-visible .app,
+body.is-player-controls-visible .app{
+  padding-bottom:78px !important;
+}
+@media(max-width:340px){
+  .bottom-action-bar.v15-action-bar.v18-action-bar{
+    width:calc(100vw - 10px) !important;
+    max-width:calc(100vw - 10px) !important;
+    gap:5px !important;
+    padding:7px !important;
+    border-radius:20px !important;
+  }
+  .bottom-action-bar.v18-action-bar .v15-toggle-group{gap:2px !important;}
+  .bottom-action-bar.v18-action-bar .v15-toggle-group button{
+    width:35px !important;
+    max-width:35px !important;
+    height:44px !important;
+    min-height:44px !important;
+    border-radius:13px !important;
+    font-size:9.4px !important;
+    letter-spacing:-.095em !important;
+    padding:3px 0 !important;
+  }
+  .bottom-action-bar.v18-action-bar .v18-mini-icon{width:13px !important;height:13px !important;line-height:13px !important;font-size:12px !important;}
+}
+
+
+
+/* ===== v19 patch: prevent detached bottom groups from visually overlapping old/underlying UI =====
+   Fix: v18 bar was translucent and sat over underlying controls, so older/behind buttons were visible.
+   v19 makes the bottom menu an opaque floating tray and gives the app enough bottom padding.
+*/
+.bottom-action-bar.v15-action-bar.v18-action-bar,
+.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 48px) !important;
+  background:#ffffff !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border:1px solid rgba(15,49,98,.08) !important;
+  box-shadow:0 14px 30px rgba(15,49,98,.15), inset 0 1px 0 rgba(255,255,255,.98) !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+}
+.bottom-action-bar.v15-action-bar.v18-action-bar::before,
+.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:-8px !important;
+  border-radius:26px !important;
+  background:#ffffff !important;
+  z-index:-1 !important;
+  box-shadow:0 10px 24px rgba(15,49,98,.08) !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group{
+  position:relative !important;
+  z-index:1 !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button{
+  position:relative !important;
+  z-index:2 !important;
+  background:#fff !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button.active{
+  z-index:3 !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
+  z-index:3 !important;
+}
+.content-toggle-bar,
+.word-question-mode-bar,
+#playerBottomBar{
+  display:none !important;
+}
+body.is-bottom-action-visible .app,
+body.is-player-controls-visible .app{
+  padding-bottom:104px !important;
+}
+@media(max-width:340px){
+  .bottom-action-bar.v15-action-bar.v18-action-bar,
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 46px) !important;
+  }
+  .bottom-action-bar.v15-action-bar.v18-action-bar::before,
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar::before{
+    inset:-7px !important;
+    border-radius:24px !important;
+  }
+  body.is-bottom-action-visible .app,
+  body.is-player-controls-visible .app{
+    padding-bottom:102px !important;
+  }
+}
+
+
+/* ===== v20 bottom nav no-overlap fix =====
+   - Move the fixed bottom toggle tray back to the real bottom.
+   - Reserve enough app bottom space so question nav never sits behind it.
+   - Keep the detached small-button visual style.
+*/
+.bottom-action-bar.v15-action-bar.v18-action-bar,
+.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  background:#fff !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.bottom-action-bar.v15-action-bar.v18-action-bar::before,
+.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar::before{
+  display:none !important;
+}
+body .app,
+body.is-bottom-action-visible .app,
+body.is-player-controls-visible .app,
+body.is-content-toggle-visible .app,
+body.is-word-question-controls-visible .app{
+  padding-bottom:86px !important;
+}
+.question-nav{
+  margin-bottom:4px !important;
+}
+@media(max-width:340px){
+  .bottom-action-bar.v15-action-bar.v18-action-bar,
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  }
+  body .app,
+  body.is-bottom-action-visible .app,
+  body.is-player-controls-visible .app,
+  body.is-content-toggle-visible .app,
+  body.is-word-question-controls-visible .app{
+    padding-bottom:88px !important;
+  }
+}
+
+
+
+/* ===== v21 patch: 55yo-readable two-row bottom controls =====
+   - Bottom controls: 4 pairs arranged as 2 columns x 2 rows.
+   - No explanatory headings.
+   - Larger text and buttons for readability.
+   - Meta selectors: larger text, same visual size class as top tabs while keeping compact height.
+*/
+#v12MetaSelectBar.v16-meta-bar{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:6px !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 0 6px !important;
+  padding:0 !important;
+}
+.v16-meta-item{
+  height:40px !important;
+  min-height:40px !important;
+  padding:0 28px 0 10px !important;
+  border-radius:16px !important;
+  background:#fff !important;
+  border:1px solid rgba(0,122,255,.13) !important;
+  box-shadow:0 4px 12px rgba(15,49,98,.06), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+.v16-meta-icon{
+  flex:0 0 24px !important;
+  width:24px !important;
+  height:24px !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+}
+.v16-meta-icon svg{
+  width:15px !important;
+  height:15px !important;
+}
+.v16-meta-text{
+  font-size:14px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+  color:#071a3a !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.v16-meta-item::after{
+  right:10px !important;
+  font-size:18px !important;
+  line-height:1 !important;
+  color:#071a3a !important;
+}
+
+.bottom-action-bar.v15-action-bar.v18-action-bar,
+.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
+  position:fixed !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  transform:translateX(-50%) !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  grid-template-rows:repeat(2,auto) !important;
+  gap:8px !important;
+  padding:10px !important;
+  border-radius:22px !important;
+  background:#fff !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 12px 30px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  overflow:hidden !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:6px !important;
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  padding:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border:0 !important;
+  overflow:visible !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button{
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  height:56px !important;
+  min-height:56px !important;
+  padding:5px 3px !important;
+  border-radius:16px !important;
+  border:1px solid rgba(15,49,98,.09) !important;
+  background:#fff !important;
+  box-shadow:0 4px 12px rgba(15,49,98,.08), inset 0 1px 0 rgba(255,255,255,.98) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:3px !important;
+  color:#071a3a !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button + button{
+  border-left:1px solid rgba(15,49,98,.09) !important;
+}
+.bottom-action-bar.v18-action-bar .v18-mini-icon{
+  display:block !important;
+  width:20px !important;
+  height:20px !important;
+  line-height:20px !important;
+  font-size:20px !important;
+  margin:0 !important;
+  color:currentColor !important;
+}
+.bottom-action-bar.v18-action-bar .v18-label{
+  display:block !important;
+  font-size:13px !important;
+  line-height:1.05 !important;
+  font-weight:950 !important;
+  letter-spacing:-.04em !important;
+  color:currentColor !important;
+  max-width:100% !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group button.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
+  border-color:rgba(0,122,255,.44) !important;
+  box-shadow:0 7px 16px rgba(0,122,255,.22), inset 0 1px 1px rgba(255,255,255,.26) !important;
+}
+.bottom-action-bar.v18-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
+  color:#087a35 !important;
+  background:linear-gradient(145deg,#dcfce7 0%,#bbf7d0 100%) !important;
+  border-color:rgba(34,197,94,.28) !important;
+  box-shadow:0 7px 16px rgba(34,197,94,.13), inset 0 1px 1px rgba(255,255,255,.45) !important;
+}
+body .app,
+body.is-bottom-action-visible .app,
+body.is-content-toggle-visible .app,
+body.is-player-controls-visible .app,
+body.is-word-question-controls-visible .app{
+  padding-bottom:168px !important;
+}
+
+@media(max-width:340px){
+  #v12MetaSelectBar.v16-meta-bar{gap:5px !important;margin-bottom:5px !important;}
+  .v16-meta-item{height:38px !important;min-height:38px !important;padding-left:8px !important;padding-right:24px !important;border-radius:15px !important;gap:6px !important;}
+  .v16-meta-icon{width:22px !important;height:22px !important;flex-basis:22px !important;}
+  .v16-meta-icon svg{width:14px !important;height:14px !important;}
+  .v16-meta-text{font-size:13px !important;letter-spacing:-.045em !important;}
+  .v16-meta-item::after{right:8px !important;font-size:16px !important;}
+  .bottom-action-bar.v15-action-bar.v18-action-bar,
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
+    width:calc(100vw - 10px) !important;
+    max-width:calc(100vw - 10px) !important;
+    gap:7px !important;
+    padding:8px !important;
+    border-radius:20px !important;
+  }
+  .bottom-action-bar.v18-action-bar .v15-toggle-group{gap:5px !important;}
+  .bottom-action-bar.v18-action-bar .v15-toggle-group button{
+    height:52px !important;
+    min-height:52px !important;
+    border-radius:15px !important;
+    padding:4px 2px !important;
+  }
+  .bottom-action-bar.v18-action-bar .v18-mini-icon{
+    width:18px !important;
+    height:18px !important;
+    line-height:18px !important;
+    font-size:18px !important;
+  }
+  .bottom-action-bar.v18-action-bar .v18-label{
+    font-size:12px !important;
+    letter-spacing:-.06em !important;
+  }
+  body .app,
+  body.is-bottom-action-visible .app,
+  body.is-content-toggle-visible .app,
+  body.is-player-controls-visible .app,
+  body.is-word-question-controls-visible .app{
+    padding-bottom:154px !important;
+  }
+}
+
+
+
+/* ===== v22 patch: compact two-row icon-left controls =====
+   - Bottom controls stay 2 rows / 2 groups per row.
+   - Icon moves to the left of text.
+   - Height is reduced while keeping 55yo-readable text.
+   - Direction buttons use book/speaking icons and full labels.
+*/
+.bottom-action-bar.v15-action-bar.v18-action-bar.v22-compact-two-row,
+.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar.v22-compact-two-row{
+  position:fixed !important;
+  left:50% !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
+  transform:translateX(-50%) !important;
+  width:min(748px, calc(100vw - 12px)) !important;
+  max-width:calc(100vw - 12px) !important;
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  grid-template-rows:repeat(2,auto) !important;
+  gap:7px !important;
+  padding:8px !important;
+  border-radius:20px !important;
+  background:#fff !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 12px 30px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  overflow:hidden !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:6px !important;
+  min-width:0 !important;
+  width:100% !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group button{
+  width:100% !important;
+  min-width:0 !important;
+  height:44px !important;
+  min-height:44px !important;
+  padding:0 6px !important;
+  border-radius:14px !important;
+  border:1px solid rgba(15,49,98,.09) !important;
+  background:#fff !important;
+  color:#071a3a !important;
+  box-shadow:0 4px 11px rgba(15,49,98,.07), inset 0 1px 0 rgba(255,255,255,.98) !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group button + button{
+  border-left:1px solid rgba(15,49,98,.09) !important;
+}
+.bottom-action-bar.v22-compact-two-row .v18-mini-icon{
+  flex:0 0 auto !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:18px !important;
+  height:18px !important;
+  line-height:18px !important;
+  font-size:18px !important;
+  margin:0 !important;
+  color:currentColor !important;
+}
+.bottom-action-bar.v22-compact-two-row .v18-mini-icon svg{
+  width:18px !important;
+  height:18px !important;
+  display:block !important;
+  stroke:currentColor !important;
+  fill:none !important;
+  stroke-width:2.4 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+}
+.bottom-action-bar.v22-compact-two-row .v18-label{
+  display:block !important;
+  min-width:0 !important;
+  font-size:13.5px !important;
+  line-height:1.05 !important;
+  font-weight:950 !important;
+  letter-spacing:-.045em !important;
+  color:currentColor !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="direction"] .v18-label{
+  font-size:12px !important;
+  letter-spacing:-.065em !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group button.active{
+  color:#fff !important;
+  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
+  border-color:rgba(0,122,255,.44) !important;
+  box-shadow:0 7px 16px rgba(0,122,255,.22), inset 0 1px 1px rgba(255,255,255,.26) !important;
+}
+.bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
+  color:#087a35 !important;
+  background:linear-gradient(145deg,#dcfce7 0%,#bbf7d0 100%) !important;
+  border-color:rgba(34,197,94,.28) !important;
+  box-shadow:0 7px 16px rgba(34,197,94,.13), inset 0 1px 1px rgba(255,255,255,.45) !important;
+}
+body .app,
+body.is-bottom-action-visible .app,
+body.is-content-toggle-visible .app,
+body.is-player-controls-visible .app,
+body.is-word-question-controls-visible .app{
+  padding-bottom:142px !important;
+}
+@media(max-width:340px){
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v22-compact-two-row,
+  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar.v22-compact-two-row{
+    width:calc(100vw - 10px) !important;
+    max-width:calc(100vw - 10px) !important;
+    gap:6px !important;
+    padding:7px !important;
+    border-radius:18px !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v15-toggle-group{gap:5px !important;}
+  .bottom-action-bar.v22-compact-two-row .v15-toggle-group button{
+    height:42px !important;
+    min-height:42px !important;
+    padding:0 4px !important;
+    border-radius:13px !important;
+    gap:4px !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v18-mini-icon,
+  .bottom-action-bar.v22-compact-two-row .v18-mini-icon svg{
+    width:16px !important;
+    height:16px !important;
+    font-size:16px !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v18-label{
+    font-size:12.3px !important;
+    letter-spacing:-.07em !important;
+  }
+  .bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="direction"] .v18-label{
+    font-size:10.8px !important;
+    letter-spacing:-.09em !important;
+  }
+  body .app,
+  body.is-bottom-action-visible .app,
+  body.is-content-toggle-visible .app,
+  body.is-player-controls-visible .app,
+  body.is-word-question-controls-visible .app{
+    padding-bottom:132px !important;
+  }
+}
+
+
+
+/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: iPhone SE bottom label fit ===== */
+.bottom-action-bar{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  padding:6px;
+}
+.toggle-group,
+.v15-toggle-group{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:3px;
+}
+.bottom-action-bar button,
+.bottom-action-bar .toggle-group button,
+.bottom-action-bar .v15-toggle-group button{
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;
+  padding-left:4px;
+  padding-right:4px;
+  letter-spacing:-.035em;
+}
+@media(max-width:380px){
+  .bottom-action-bar{
+    gap:5px;
+    padding:5px;
+  }
+  .toggle-group,
+  .v15-toggle-group{
+    gap:2px;
+  }
+  .bottom-action-bar button,
+  .bottom-action-bar .toggle-group button,
+  .bottom-action-bar .v15-toggle-group button{
+    font-size:12px;
+    padding-left:2px;
+    padding-right:2px;
+    letter-spacing:-.05em;
+  }
+}
+@media(max-width:340px){
+  .bottom-action-bar button,
+  .bottom-action-bar .toggle-group button,
+  .bottom-action-bar .v15-toggle-group button{
+    font-size:11.4px;
+    letter-spacing:-.07em;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1361,12 +2112,12 @@ const categoryNames = {
   all:"全部", greeting:"挨拶", cafe:"カフェ", restaurant:"食事", shopping:"買物",
   transport:"交通", hotel:"ホテル", tourism:"観光", daily:"日常", work:"仕事", emergency:"緊急"
 };
-const levelNames = { beginner:"初級", intermediate:"中級", advanced:"上級" };
-const levels = ["beginner","intermediate","advanced"];
+const levelNames = { all:"全部", beginner:"初級", intermediate:"中級", advanced:"上級" };
+const levels = ["all","beginner","intermediate","advanced"];
 const views = ["question","list","word","player"];
 
 let mode = "speaking";
-let level = "beginner";
+let level = "all";
 let view = "question";
 let category = "all";
 let step = 0;
@@ -2334,7 +3085,7 @@ function renderList(){
     let html = `<div class="category-title">${categoryNames[cat]}</div>`;
     let has = false;
 
-    levels.forEach(lv => {
+    ["beginner","intermediate","advanced"].forEach(lv => {
       const list = (DATA[lv] || []).filter(p => p.category === cat);
       if(!list.length) return;
 
@@ -2855,7 +3606,7 @@ function renderSentenceList(){
   currentListItems = [];
   let out = `<div class="list-status">文章一覧：タップすると音声に合わせて中国語だけ青色に進みます</div>`;
   Object.keys(categoryNames).filter(c => c !== "all").forEach(cat => {
-    levels.forEach(lv => {
+    ["beginner","intermediate","advanced"].forEach(lv => {
       const list = (DATA[lv] || []).filter(p => p.category === cat);
       if(!list.length) return;
       out += listHeaderHtml(cat, lv);
@@ -3367,7 +4118,7 @@ setView(view);
         const sel = document.createElement("select");
         sel.id = "v11LevelSelect";
         sel.setAttribute("aria-label", "レベル");
-        sel.innerHTML = '<option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
+        sel.innerHTML = '<option value="all">全部</option><option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
         filter.insertBefore(sel, categorySelect || null);
         sel.addEventListener("change", function(e){
           stopAudio();
@@ -3565,7 +4316,7 @@ setView(view);
         levelSelect = document.createElement('select');
         levelSelect.id = 'v12LevelSelect';
         levelSelect.setAttribute('aria-label','レベル');
-        levelSelect.innerHTML = '<option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
+        levelSelect.innerHTML = '<option value="all">全部</option><option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
         levelSelect.addEventListener('change', function(e){
           stopAudio();
           level = e.target.value;
@@ -3750,7 +4501,7 @@ setView(view);
 
 /* ===== v15 reflected JS patch: labels/order + paired toggles ===== */
 (function(){
-  const V15_VERSION = "2026-05-24-v23-css-clean-v1";
+  const V15_VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
   try{
     document.body.setAttribute('data-lingoflow-v15', V15_VERSION);
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
@@ -3903,7 +4654,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v23-css-clean-v1';
+  const VERSION = '2026-05-24-v26-se-bottom-label-fit-v1';
 
   const icons = {
     hear:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1v-5Z"/><path d="M20 13h-3v6h2a1 1 0 0 0 1-1v-5Z"/></svg>',
@@ -3920,7 +4671,7 @@ setView(view);
   }
 
   function jpLevel(value){
-    return value === 'advanced' ? '上級' : value === 'intermediate' ? '中級' : '初級';
+    return value === 'all' ? '全部' : value === 'advanced' ? '上級' : value === 'intermediate' ? '中級' : '初級';
   }
   function jpGenre(value){
     const map = {
@@ -4015,113 +4766,12 @@ setView(view);
 
 
 
-<style>
-/* ===== v17 patch: genre default + compact separated toggle buttons =====
-   - Default genre display: ジャンル：全部
-   - Bottom controls closer to independent button groups, not one continuous bar.
-   - Keep one-row layout and iPhone SE no horizontal scroll.
-*/
-#v12MetaSelectBar.v16-meta-bar{
-  grid-template-columns:1fr 1.18fr !important;
-  gap:4px !important;
-  margin:0 0 4px !important;
-}
-.v16-meta-item{
-  height:30px !important;
-  padding:0 22px 0 7px !important;
-  border-radius:999px !important;
-}
-.v16-meta-icon{
-  flex-basis:17px !important;
-  width:17px !important;
-  height:17px !important;
-}
-.v16-meta-icon svg{width:12px !important;height:12px !important;}
-.v16-meta-text{
-  font-size:11.5px !important;
-  letter-spacing:-.03em !important;
-}
-.v16-meta-item::after{right:8px !important;font-size:14px !important;}
 
-.bottom-action-bar.v15-action-bar{
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:9px !important;
-  padding:8px !important;
-  border-radius:20px !important;
-  background:rgba(255,255,255,.94) !important;
-  border:1px solid rgba(0,122,255,.08) !important;
-  box-shadow:0 10px 26px rgba(15,49,98,.12), inset 0 1px 0 rgba(255,255,255,.92) !important;
-}
-.bottom-action-bar.v15-action-bar .v15-toggle-group{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:4px !important;
-  min-width:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  overflow:visible !important;
-}
-.bottom-action-bar.v15-action-bar .v15-toggle-group button{
-  height:35px !important;
-  line-height:1.04 !important;
-  min-width:0 !important;
-  padding:0 2px !important;
-  border-radius:12px !important;
-  border:1px solid rgba(15,49,98,.08) !important;
-  background:#fff !important;
-  color:#0a1f3d !important;
-  box-shadow:0 4px 10px rgba(15,49,98,.055), inset 0 1px 0 rgba(255,255,255,.94) !important;
-  font-size:11.5px !important;
-  font-weight:950 !important;
-  letter-spacing:-.055em !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:clip !important;
-}
-.bottom-action-bar.v15-action-bar .v15-toggle-group button + button{
-  border-left:1px solid rgba(15,49,98,.08) !important;
-}
-.bottom-action-bar.v15-action-bar .v15-toggle-group button.active{
-  color:#fff !important;
-  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
-  border-color:rgba(0,122,255,.28) !important;
-  box-shadow:0 6px 13px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.26) !important;
-}
-.bottom-action-bar.v15-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
-  color:#057a35 !important;
-  background:linear-gradient(145deg,#eaffef 0%,#dff8e7 100%) !important;
-  border-color:rgba(34,197,94,.28) !important;
-  box-shadow:0 6px 13px rgba(34,197,94,.12), inset 0 1px 1px rgba(255,255,255,.9) !important;
-}
-body.is-bottom-action-visible .app,
-body.is-player-controls-visible .app{
-  padding-bottom:74px !important;
-}
-@media(max-width:340px){
-  .bottom-action-bar.v15-action-bar{
-    width:calc(100% - 10px) !important;
-    gap:6px !important;
-    padding:7px !important;
-    border-radius:18px !important;
-  }
-  .bottom-action-bar.v15-action-bar .v15-toggle-group{gap:3px !important;}
-  .bottom-action-bar.v15-action-bar .v15-toggle-group button{
-    height:34px !important;
-    border-radius:11px !important;
-    font-size:10.4px !important;
-    letter-spacing:-.075em !important;
-    padding:0 1px !important;
-  }
-  .v16-meta-text{font-size:11px !important;}
-}
-</style>
 
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v23-css-clean-v1';
+  const VERSION = '2026-05-24-v26-se-bottom-label-fit-v1';
   function setVersion(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -4155,136 +4805,12 @@ body.is-player-controls-visible .app{
 
 
 
-<style>
-/* ===== v18 patch: detached bottom groups / image(200)-style =====
-   - Bottom menu is no longer one connected bar.
-   - Four compact independent 2-choice groups.
-   - Each choice has clear active/inactive state.
-   - Keep iPhone SE 320px no-horizontal-scroll.
-*/
-.bottom-action-bar.v15-action-bar.v18-action-bar{
-  position:fixed !important;
-  z-index:7000 !important;
-  left:50% !important;
-  bottom:calc(env(safe-area-inset-bottom, 0px) + 48px) !important;
-  transform:translateX(-50%) !important;
-  width:min(748px, calc(100vw - 12px)) !important;
-  max-width:calc(100vw - 12px) !important;
-  min-width:0 !important;
-  display:flex !important;
-  flex-direction:row !important;
-  flex-wrap:nowrap !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  gap:7px !important;
-  padding:8px !important;
-  border-radius:22px !important;
-  background:rgba(255,255,255,.88) !important;
-  border:1px solid rgba(0,122,255,.08) !important;
-  box-shadow:0 12px 28px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.92) !important;
-  backdrop-filter:blur(16px) !important;
-  overflow:hidden !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group{
-  flex:0 1 auto !important;
-  min-width:0 !important;
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  gap:3px !important;
-  padding:0 !important;
-  margin:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  overflow:visible !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button{
-  width:38px !important;
-  min-width:0 !important;
-  max-width:38px !important;
-  height:46px !important;
-  min-height:46px !important;
-  padding:3px 1px !important;
-  margin:0 !important;
-  border-radius:14px !important;
-  border:1px solid rgba(15,49,98,.08) !important;
-  background:#fff !important;
-  color:#0b2445 !important;
-  box-shadow:0 5px 12px rgba(15,49,98,.06), inset 0 1px 0 rgba(255,255,255,.96) !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:2px !important;
-  font-size:10px !important;
-  line-height:1.05 !important;
-  font-weight:950 !important;
-  letter-spacing:-.08em !important;
-  white-space:normal !important;
-  overflow:hidden !important;
-  text-align:center !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button + button{
-  border-left:1px solid rgba(15,49,98,.08) !important;
-}
-.bottom-action-bar.v18-action-bar .v18-mini-icon{
-  display:block !important;
-  width:14px !important;
-  height:14px !important;
-  line-height:14px !important;
-  font-size:13px !important;
-  font-weight:950 !important;
-  color:currentColor !important;
-}
-.bottom-action-bar.v18-action-bar .v18-label{
-  display:block !important;
-  max-width:100% !important;
-  line-height:1.05 !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button.active{
-  color:#fff !important;
-  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
-  border-color:rgba(0,122,255,.28) !important;
-  box-shadow:0 7px 14px rgba(0,122,255,.18), inset 0 1px 1px rgba(255,255,255,.26) !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
-  color:#087a35 !important;
-  background:linear-gradient(145deg,#eaffef 0%,#dff8e7 100%) !important;
-  border-color:rgba(34,197,94,.30) !important;
-  box-shadow:0 7px 14px rgba(34,197,94,.13), inset 0 1px 1px rgba(255,255,255,.9) !important;
-}
-body.is-bottom-action-visible .app,
-body.is-player-controls-visible .app{
-  padding-bottom:78px !important;
-}
-@media(max-width:340px){
-  .bottom-action-bar.v15-action-bar.v18-action-bar{
-    width:calc(100vw - 10px) !important;
-    max-width:calc(100vw - 10px) !important;
-    gap:5px !important;
-    padding:7px !important;
-    border-radius:20px !important;
-  }
-  .bottom-action-bar.v18-action-bar .v15-toggle-group{gap:2px !important;}
-  .bottom-action-bar.v18-action-bar .v15-toggle-group button{
-    width:35px !important;
-    max-width:35px !important;
-    height:44px !important;
-    min-height:44px !important;
-    border-radius:13px !important;
-    font-size:9.4px !important;
-    letter-spacing:-.095em !important;
-    padding:3px 0 !important;
-  }
-  .bottom-action-bar.v18-action-bar .v18-mini-icon{width:13px !important;height:13px !important;line-height:13px !important;font-size:12px !important;}
-}
-</style>
+
 
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v23-css-clean-v1';
+  const VERSION = '2026-05-24-v26-se-bottom-label-fit-v1';
   function setVersionV18(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -4418,117 +4944,11 @@ body.is-player-controls-visible .app{
 
 
 
-<style>
-/* ===== v19 patch: prevent detached bottom groups from visually overlapping old/underlying UI =====
-   Fix: v18 bar was translucent and sat over underlying controls, so older/behind buttons were visible.
-   v19 makes the bottom menu an opaque floating tray and gives the app enough bottom padding.
-*/
-.bottom-action-bar.v15-action-bar.v18-action-bar,
-.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
-  bottom:calc(env(safe-area-inset-bottom, 0px) + 48px) !important;
-  background:#ffffff !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-  border:1px solid rgba(15,49,98,.08) !important;
-  box-shadow:0 14px 30px rgba(15,49,98,.15), inset 0 1px 0 rgba(255,255,255,.98) !important;
-  overflow:visible !important;
-  isolation:isolate !important;
-}
-.bottom-action-bar.v15-action-bar.v18-action-bar::before,
-.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar::before{
-  content:"" !important;
-  position:absolute !important;
-  inset:-8px !important;
-  border-radius:26px !important;
-  background:#ffffff !important;
-  z-index:-1 !important;
-  box-shadow:0 10px 24px rgba(15,49,98,.08) !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group{
-  position:relative !important;
-  z-index:1 !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button{
-  position:relative !important;
-  z-index:2 !important;
-  background:#fff !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button.active{
-  z-index:3 !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
-  z-index:3 !important;
-}
-.content-toggle-bar,
-.word-question-mode-bar,
-#playerBottomBar{
-  display:none !important;
-}
-body.is-bottom-action-visible .app,
-body.is-player-controls-visible .app{
-  padding-bottom:104px !important;
-}
-@media(max-width:340px){
-  .bottom-action-bar.v15-action-bar.v18-action-bar,
-  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 46px) !important;
-  }
-  .bottom-action-bar.v15-action-bar.v18-action-bar::before,
-  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar::before{
-    inset:-7px !important;
-    border-radius:24px !important;
-  }
-  body.is-bottom-action-visible .app,
-  body.is-player-controls-visible .app{
-    padding-bottom:102px !important;
-  }
-}
 
-
-/* ===== v20 bottom nav no-overlap fix =====
-   - Move the fixed bottom toggle tray back to the real bottom.
-   - Reserve enough app bottom space so question nav never sits behind it.
-   - Keep the detached small-button visual style.
-*/
-.bottom-action-bar.v15-action-bar.v18-action-bar,
-.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
-  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
-  background:#fff !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-.bottom-action-bar.v15-action-bar.v18-action-bar::before,
-.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar::before{
-  display:none !important;
-}
-body .app,
-body.is-bottom-action-visible .app,
-body.is-player-controls-visible .app,
-body.is-content-toggle-visible .app,
-body.is-word-question-controls-visible .app{
-  padding-bottom:86px !important;
-}
-.question-nav{
-  margin-bottom:4px !important;
-}
-@media(max-width:340px){
-  .bottom-action-bar.v15-action-bar.v18-action-bar,
-  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
-  }
-  body .app,
-  body.is-bottom-action-visible .app,
-  body.is-player-controls-visible .app,
-  body.is-content-toggle-visible .app,
-  body.is-word-question-controls-visible .app{
-    padding-bottom:88px !important;
-  }
-}
-</style>
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v23-css-clean-v1';
+  const VERSION='2026-05-24-v26-se-bottom-label-fit-v1';
   function setV19(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -4551,203 +4971,11 @@ body.is-word-question-controls-visible .app{
 </script>
 
 
-<style>
-/* ===== v21 patch: 55yo-readable two-row bottom controls =====
-   - Bottom controls: 4 pairs arranged as 2 columns x 2 rows.
-   - No explanatory headings.
-   - Larger text and buttons for readability.
-   - Meta selectors: larger text, same visual size class as top tabs while keeping compact height.
-*/
-#v12MetaSelectBar.v16-meta-bar{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:6px !important;
-  width:100% !important;
-  max-width:100% !important;
-  margin:0 0 6px !important;
-  padding:0 !important;
-}
-.v16-meta-item{
-  height:40px !important;
-  min-height:40px !important;
-  padding:0 28px 0 10px !important;
-  border-radius:16px !important;
-  background:#fff !important;
-  border:1px solid rgba(0,122,255,.13) !important;
-  box-shadow:0 4px 12px rgba(15,49,98,.06), inset 0 1px 0 rgba(255,255,255,.96) !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:8px !important;
-}
-.v16-meta-icon{
-  flex:0 0 24px !important;
-  width:24px !important;
-  height:24px !important;
-  border-radius:999px !important;
-  background:#eef6ff !important;
-}
-.v16-meta-icon svg{
-  width:15px !important;
-  height:15px !important;
-}
-.v16-meta-text{
-  font-size:14px !important;
-  line-height:1 !important;
-  font-weight:950 !important;
-  letter-spacing:-.02em !important;
-  color:#071a3a !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-}
-.v16-meta-item::after{
-  right:10px !important;
-  font-size:18px !important;
-  line-height:1 !important;
-  color:#071a3a !important;
-}
 
-.bottom-action-bar.v15-action-bar.v18-action-bar,
-.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
-  position:fixed !important;
-  left:50% !important;
-  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
-  transform:translateX(-50%) !important;
-  width:min(748px, calc(100vw - 12px)) !important;
-  max-width:calc(100vw - 12px) !important;
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  grid-template-rows:repeat(2,auto) !important;
-  gap:8px !important;
-  padding:10px !important;
-  border-radius:22px !important;
-  background:#fff !important;
-  border:1px solid rgba(0,122,255,.10) !important;
-  box-shadow:0 12px 30px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.96) !important;
-  overflow:hidden !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:6px !important;
-  min-width:0 !important;
-  width:100% !important;
-  max-width:100% !important;
-  padding:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  border:0 !important;
-  overflow:visible !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button{
-  width:100% !important;
-  max-width:none !important;
-  min-width:0 !important;
-  height:56px !important;
-  min-height:56px !important;
-  padding:5px 3px !important;
-  border-radius:16px !important;
-  border:1px solid rgba(15,49,98,.09) !important;
-  background:#fff !important;
-  box-shadow:0 4px 12px rgba(15,49,98,.08), inset 0 1px 0 rgba(255,255,255,.98) !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:3px !important;
-  color:#071a3a !important;
-  text-align:center !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button + button{
-  border-left:1px solid rgba(15,49,98,.09) !important;
-}
-.bottom-action-bar.v18-action-bar .v18-mini-icon{
-  display:block !important;
-  width:20px !important;
-  height:20px !important;
-  line-height:20px !important;
-  font-size:20px !important;
-  margin:0 !important;
-  color:currentColor !important;
-}
-.bottom-action-bar.v18-action-bar .v18-label{
-  display:block !important;
-  font-size:13px !important;
-  line-height:1.05 !important;
-  font-weight:950 !important;
-  letter-spacing:-.04em !important;
-  color:currentColor !important;
-  max-width:100% !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group button.active{
-  color:#fff !important;
-  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
-  border-color:rgba(0,122,255,.44) !important;
-  box-shadow:0 7px 16px rgba(0,122,255,.22), inset 0 1px 1px rgba(255,255,255,.26) !important;
-}
-.bottom-action-bar.v18-action-bar .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
-  color:#087a35 !important;
-  background:linear-gradient(145deg,#dcfce7 0%,#bbf7d0 100%) !important;
-  border-color:rgba(34,197,94,.28) !important;
-  box-shadow:0 7px 16px rgba(34,197,94,.13), inset 0 1px 1px rgba(255,255,255,.45) !important;
-}
-body .app,
-body.is-bottom-action-visible .app,
-body.is-content-toggle-visible .app,
-body.is-player-controls-visible .app,
-body.is-word-question-controls-visible .app{
-  padding-bottom:168px !important;
-}
-
-@media(max-width:340px){
-  #v12MetaSelectBar.v16-meta-bar{gap:5px !important;margin-bottom:5px !important;}
-  .v16-meta-item{height:38px !important;min-height:38px !important;padding-left:8px !important;padding-right:24px !important;border-radius:15px !important;gap:6px !important;}
-  .v16-meta-icon{width:22px !important;height:22px !important;flex-basis:22px !important;}
-  .v16-meta-icon svg{width:14px !important;height:14px !important;}
-  .v16-meta-text{font-size:13px !important;letter-spacing:-.045em !important;}
-  .v16-meta-item::after{right:8px !important;font-size:16px !important;}
-  .bottom-action-bar.v15-action-bar.v18-action-bar,
-  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar{
-    width:calc(100vw - 10px) !important;
-    max-width:calc(100vw - 10px) !important;
-    gap:7px !important;
-    padding:8px !important;
-    border-radius:20px !important;
-  }
-  .bottom-action-bar.v18-action-bar .v15-toggle-group{gap:5px !important;}
-  .bottom-action-bar.v18-action-bar .v15-toggle-group button{
-    height:52px !important;
-    min-height:52px !important;
-    border-radius:15px !important;
-    padding:4px 2px !important;
-  }
-  .bottom-action-bar.v18-action-bar .v18-mini-icon{
-    width:18px !important;
-    height:18px !important;
-    line-height:18px !important;
-    font-size:18px !important;
-  }
-  .bottom-action-bar.v18-action-bar .v18-label{
-    font-size:12px !important;
-    letter-spacing:-.06em !important;
-  }
-  body .app,
-  body.is-bottom-action-visible .app,
-  body.is-content-toggle-visible .app,
-  body.is-player-controls-visible .app,
-  body.is-word-question-controls-visible .app{
-    padding-bottom:154px !important;
-  }
-}
-</style>
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v23-css-clean-v1';
+  const VERSION='2026-05-24-v26-se-bottom-label-fit-v1';
   function applyV21(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -4784,166 +5012,11 @@ body.is-word-question-controls-visible .app{
 
 
 
-<style>
-/* ===== v22 patch: compact two-row icon-left controls =====
-   - Bottom controls stay 2 rows / 2 groups per row.
-   - Icon moves to the left of text.
-   - Height is reduced while keeping 55yo-readable text.
-   - Direction buttons use book/speaking icons and full labels.
-*/
-.bottom-action-bar.v15-action-bar.v18-action-bar.v22-compact-two-row,
-.bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar.v22-compact-two-row{
-  position:fixed !important;
-  left:50% !important;
-  bottom:calc(env(safe-area-inset-bottom, 0px) + 6px) !important;
-  transform:translateX(-50%) !important;
-  width:min(748px, calc(100vw - 12px)) !important;
-  max-width:calc(100vw - 12px) !important;
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  grid-template-rows:repeat(2,auto) !important;
-  gap:7px !important;
-  padding:8px !important;
-  border-radius:20px !important;
-  background:#fff !important;
-  border:1px solid rgba(0,122,255,.10) !important;
-  box-shadow:0 12px 30px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.96) !important;
-  overflow:hidden !important;
-}
-.bottom-action-bar.v22-compact-two-row .v15-toggle-group{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:6px !important;
-  min-width:0 !important;
-  width:100% !important;
-  padding:0 !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-}
-.bottom-action-bar.v22-compact-two-row .v15-toggle-group button{
-  width:100% !important;
-  min-width:0 !important;
-  height:44px !important;
-  min-height:44px !important;
-  padding:0 6px !important;
-  border-radius:14px !important;
-  border:1px solid rgba(15,49,98,.09) !important;
-  background:#fff !important;
-  color:#071a3a !important;
-  box-shadow:0 4px 11px rgba(15,49,98,.07), inset 0 1px 0 rgba(255,255,255,.98) !important;
-  display:flex !important;
-  flex-direction:row !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:6px !important;
-  text-align:center !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-}
-.bottom-action-bar.v22-compact-two-row .v15-toggle-group button + button{
-  border-left:1px solid rgba(15,49,98,.09) !important;
-}
-.bottom-action-bar.v22-compact-two-row .v18-mini-icon{
-  flex:0 0 auto !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  width:18px !important;
-  height:18px !important;
-  line-height:18px !important;
-  font-size:18px !important;
-  margin:0 !important;
-  color:currentColor !important;
-}
-.bottom-action-bar.v22-compact-two-row .v18-mini-icon svg{
-  width:18px !important;
-  height:18px !important;
-  display:block !important;
-  stroke:currentColor !important;
-  fill:none !important;
-  stroke-width:2.4 !important;
-  stroke-linecap:round !important;
-  stroke-linejoin:round !important;
-}
-.bottom-action-bar.v22-compact-two-row .v18-label{
-  display:block !important;
-  min-width:0 !important;
-  font-size:13.5px !important;
-  line-height:1.05 !important;
-  font-weight:950 !important;
-  letter-spacing:-.045em !important;
-  color:currentColor !important;
-  overflow:hidden !important;
-  text-overflow:clip !important;
-}
-.bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="direction"] .v18-label{
-  font-size:12px !important;
-  letter-spacing:-.065em !important;
-}
-.bottom-action-bar.v22-compact-two-row .v15-toggle-group button.active{
-  color:#fff !important;
-  background:linear-gradient(145deg,#168dff 0%,#006fe8 78%) !important;
-  border-color:rgba(0,122,255,.44) !important;
-  box-shadow:0 7px 16px rgba(0,122,255,.22), inset 0 1px 1px rgba(255,255,255,.26) !important;
-}
-.bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="run"] button.active[data-v15-value="play"]{
-  color:#087a35 !important;
-  background:linear-gradient(145deg,#dcfce7 0%,#bbf7d0 100%) !important;
-  border-color:rgba(34,197,94,.28) !important;
-  box-shadow:0 7px 16px rgba(34,197,94,.13), inset 0 1px 1px rgba(255,255,255,.45) !important;
-}
-body .app,
-body.is-bottom-action-visible .app,
-body.is-content-toggle-visible .app,
-body.is-player-controls-visible .app,
-body.is-word-question-controls-visible .app{
-  padding-bottom:142px !important;
-}
-@media(max-width:340px){
-  .bottom-action-bar.v15-action-bar.v18-action-bar.v22-compact-two-row,
-  .bottom-action-bar.v15-action-bar.v18-action-bar.v19-action-bar.v22-compact-two-row{
-    width:calc(100vw - 10px) !important;
-    max-width:calc(100vw - 10px) !important;
-    gap:6px !important;
-    padding:7px !important;
-    border-radius:18px !important;
-  }
-  .bottom-action-bar.v22-compact-two-row .v15-toggle-group{gap:5px !important;}
-  .bottom-action-bar.v22-compact-two-row .v15-toggle-group button{
-    height:42px !important;
-    min-height:42px !important;
-    padding:0 4px !important;
-    border-radius:13px !important;
-    gap:4px !important;
-  }
-  .bottom-action-bar.v22-compact-two-row .v18-mini-icon,
-  .bottom-action-bar.v22-compact-two-row .v18-mini-icon svg{
-    width:16px !important;
-    height:16px !important;
-    font-size:16px !important;
-  }
-  .bottom-action-bar.v22-compact-two-row .v18-label{
-    font-size:12.3px !important;
-    letter-spacing:-.07em !important;
-  }
-  .bottom-action-bar.v22-compact-two-row .v15-toggle-group[data-v15-group="direction"] .v18-label{
-    font-size:10.8px !important;
-    letter-spacing:-.09em !important;
-  }
-  body .app,
-  body.is-bottom-action-visible .app,
-  body.is-content-toggle-visible .app,
-  body.is-player-controls-visible .app,
-  body.is-word-question-controls-visible .app{
-    padding-bottom:132px !important;
-  }
-}
-</style>
+
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v23-css-clean-v1';
+  const VERSION='2026-05-24-v26-se-bottom-label-fit-v1';
   function escV22(s){
     return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});
   }
@@ -5014,7 +5087,7 @@ body.is-word-question-controls-visible .app{
       group('content',[btn('文章','content','sentence',c==='sentence'),btn('単語','content','word',c==='word')]),
       group('run',[btn('再生中','run','play',r==='play'),btn('停止','run','stop',r==='stop')]),
       group('order',[btn('連続','order','continuous',o==='continuous'),btn('ランダム','order','random',o==='random')]),
-      group('direction',[btn('中文→日本語','direction','zhjp',d==='zhjp'),btn('日本語→中文','direction','jpzh',d==='jpzh')])
+      group('direction',[btn('中→日','direction','zhjp',d==='zhjp'),btn('日→中','direction','jpzh',d==='jpzh')])
     ].join('');
     document.body.classList.add('is-bottom-action-visible');
     document.body.classList.remove('is-content-toggle-visible','is-word-question-controls-visible');
@@ -5034,6 +5107,825 @@ body.is-word-question-controls-visible .app{
   document.addEventListener('DOMContentLoaded', function(){ setVersion(); fixGenreAll(); setTopLabels(); setTimeout(function(){ if(window.renderUnifiedBottomActionBar) window.renderUnifiedBottomActionBar(); },0); });
   setTimeout(function(){ setVersion(); fixGenreAll(); setTopLabels(); if(window.renderUnifiedBottomActionBar) window.renderUnifiedBottomActionBar(); },0);
   setTimeout(function(){ if(window.renderUnifiedBottomActionBar) window.renderUnifiedBottomActionBar(); },300);
+})();
+</script>
+
+
+<script>
+/* ===== v24 pause/resume hotfix: keep current sentence/word card on stop ===== */
+(function(){
+  'use strict';
+
+  let lfPausedAutoMode = null;
+  let lfPausedContentMode = null;
+
+  const originalStartOrResumePlayback = startOrResumePlayback;
+  const originalSetView = setView;
+
+  stopPlaybackManual = function(){
+    const wasAuto = view === "continuous" || view === "random";
+    const pausedMode = wasAuto ? view : (autoMode === "random" ? "random" : "continuous");
+
+    track("play_stop_manual", {
+      playMode: pausedMode,
+      keepCurrentCard: wasAuto,
+      source: "v24_pause_resume_card_keep"
+    });
+
+    stopAudio();
+
+    if(wasAuto){
+      lfPausedAutoMode = pausedMode;
+      lfPausedContentMode = contentMode;
+      view = "player";
+      updateButtons();
+      // 重要:
+      // ここで renderPlaybackPanel() を呼ばない。
+      // 停止した瞬間に表示されていた文章/単語カードをそのまま残す。
+      return;
+    }
+
+    view = "player";
+    updateButtons();
+  };
+
+  startOrResumePlayback = function(){
+    if(!audioEnabled) return;
+
+    try{
+      if(speechSynthesis.paused && speechSynthesis.speaking){
+        speechSynthesis.resume();
+        track("play_resume_manual", { playMode: autoMode, source: "v24_native_resume" });
+        return;
+      }
+    }catch(e){}
+
+    const resumeMode = lfPausedAutoMode || (autoMode === "random" ? "random" : "continuous");
+    const resumeContent = lfPausedContentMode || contentMode;
+
+    if(lfPausedAutoMode){
+      autoMode = resumeMode;
+      contentMode = resumeContent;
+      view = resumeMode;
+      lfPausedAutoMode = null;
+      lfPausedContentMode = null;
+      track("play_resume_manual", {
+        playMode: resumeMode,
+        contentMode: contentMode,
+        source: "v24_resume_same_card"
+      });
+      updateButtons();
+      startAuto();
+      return;
+    }
+
+    track("play_start_manual", { playMode: resumeMode, source: "v24_start" });
+    originalSetView(resumeMode);
+  };
+
+  const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+  if(meta) meta.setAttribute('content', '2026-05-24-v26-se-bottom-label-fit-v1');
+})();
+</script>
+
+
+<script>
+/* ===== v24 exact same-card resume hotfix ===== */
+(function(){
+  'use strict';
+
+  let lfPausedState = null;
+
+  function captureDisplayedPlaybackState(pausedMode){
+    const state = {
+      mode: pausedMode,
+      contentMode: contentMode,
+      index: index,
+      wordIndex: wordIndex,
+      sentence: null,
+      word: null
+    };
+
+    if(contentMode === "word"){
+      state.word = currentWord ? currentWord() : null;
+    }else{
+      state.sentence = history[index] || null;
+    }
+    return state;
+  }
+
+  stopPlaybackManual = function(){
+    const wasAuto = view === "continuous" || view === "random";
+    const pausedMode = wasAuto ? view : (autoMode === "random" ? "random" : "continuous");
+
+    if(wasAuto){
+      lfPausedState = captureDisplayedPlaybackState(pausedMode);
+    }
+
+    track("play_stop_manual", {
+      playMode: pausedMode,
+      keepCurrentCard: wasAuto,
+      exactSameCard: !!lfPausedState,
+      source: "v24_resume_exact_same_card"
+    });
+
+    stopAudio();
+
+    if(wasAuto){
+      view = "player";
+      updateButtons();
+      // 停止時に表示中だったカードを保持するため、renderPlaybackPanel() は呼ばない。
+      return;
+    }
+
+    view = "player";
+    updateButtons();
+  };
+
+  startOrResumePlayback = function(){
+    if(!audioEnabled) return;
+
+    try{
+      if(speechSynthesis.paused && speechSynthesis.speaking){
+        speechSynthesis.resume();
+        track("play_resume_manual", { playMode: autoMode, source: "v24_native_resume" });
+        return;
+      }
+    }catch(e){}
+
+    if(lfPausedState){
+      autoMode = lfPausedState.mode || autoMode || "continuous";
+      contentMode = lfPausedState.contentMode || contentMode;
+      view = autoMode;
+      updateButtons();
+      track("play_resume_manual", {
+        playMode: autoMode,
+        contentMode: contentMode,
+        resumeIndex: lfPausedState.index,
+        resumeWordIndex: lfPausedState.wordIndex,
+        source: "v24_resume_exact_same_card"
+      });
+      startAuto();
+      return;
+    }
+
+    const nextMode = autoMode === "random" ? "random" : "continuous";
+    track("play_start_manual", { playMode: nextMode, source: "v24_normal_start" });
+    setView(nextMode);
+  };
+
+  startAuto = async function(){
+    if(!audioEnabled) return;
+    const id = ++autoId;
+
+    let resumeState = lfPausedState;
+    lfPausedState = null;
+
+    while(canContinueAuto(id)){
+      if(contentMode === "word"){
+        let w = null;
+        if(resumeState && resumeState.contentMode === "word"){
+          wordIndex = normalizeWordIndex(resumeState.wordIndex);
+          w = resumeState.word || currentWord();
+          resumeState = null;
+        }else{
+          w = autoMode === "random" ? pickWord() : currentWord();
+          if(autoMode === "random"){
+            const list = getWordList();
+            const pos = list.findIndex(x => x.id === w?.id);
+            if(pos >= 0) wordIndex = pos;
+          }
+        }
+
+        if(!w) break;
+        renderWordAuto(w);
+        await speakWordAudio(w.zh);
+        if(!canContinueAuto(id)) break;
+        await wait(700);
+        if(!canContinueAuto(id)) break;
+        if(autoMode === "continuous") wordIndex = normalizeWordIndex(wordIndex + 1);
+        continue;
+      }
+
+      let p = null;
+      if(resumeState && resumeState.contentMode !== "word"){
+        index = Math.max(-1, Number(resumeState.index));
+        p = resumeState.sentence || history[index] || null;
+        if(p && (!history[index] || history[index].zh !== p.zh)){
+          if(index < 0) index = 0;
+          history[index] = p;
+        }
+        resumeState = null;
+      }else{
+        p = history[index] || pick();
+      }
+
+      if(!p) break;
+      step = 2;
+      renderAuto(p);
+      await speakHighlight(p.zh);
+      if(!canContinueAuto(id)) break;
+      await wait(550);
+      if(!canContinueAuto(id)) break;
+      await speakJapanese(p.jp);
+      if(!canContinueAuto(id)) break;
+      await wait(900);
+      if(!canContinueAuto(id)) break;
+
+      const next = pick();
+      if(!next) break;
+      history.push(next);
+      index = history.length - 1;
+    }
+  };
+
+  const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+  if(meta) meta.setAttribute('content', '2026-05-24-v26-se-bottom-label-fit-v1');
+})();
+</script>
+
+
+<script>
+/* ===== v25 final hotfix: default Listen + All levels + review visible ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function enableAllLevelsData(){
+    try{
+      if(typeof levelNames !== 'undefined') levelNames.all = '全部';
+      if(typeof levels !== 'undefined' && Array.isArray(levels) && !levels.includes('all')){
+        levels.unshift('all');
+      }
+    }catch(e){}
+  }
+
+  function allSentenceList(){
+    const order = ['beginner','intermediate','advanced'];
+    let list = [];
+    order.forEach(function(lv){
+      const rows = (typeof DATA !== 'undefined' && DATA && DATA[lv]) ? DATA[lv] : [];
+      rows.forEach(function(p){ list.push(p); });
+    });
+    return list;
+  }
+
+  function filteredSentenceList(){
+    let base;
+    if(typeof level !== 'undefined' && level === 'all'){
+      base = allSentenceList();
+    }else{
+      base = (typeof DATA !== 'undefined' && DATA && DATA[level]) ? DATA[level] : [];
+    }
+    let filtered = base.filter(function(p){
+      return typeof category === 'undefined' || category === 'all' || p.category === category;
+    });
+    return filtered.length ? filtered : base;
+  }
+
+  // 重要: 既存関数を上書きして、level="all" を正しく扱う。
+  try{
+    getList = function(){ return filteredSentenceList(); };
+    pick = function(){
+      const list = getList();
+      return list[Math.floor(Math.random() * list.length)];
+    };
+    currentListCount = function(){ return getList().length || 1; };
+  }catch(e){}
+
+  function makeLevelOptionHtml(selectedValue){
+    const opts = [
+      ['all','全部'],
+      ['beginner','初級'],
+      ['intermediate','中級'],
+      ['advanced','上級']
+    ];
+    return opts.map(function(pair){
+      const selected = pair[0] === selectedValue ? ' selected' : '';
+      return '<option value="' + pair[0] + '"' + selected + '>' + pair[1] + '</option>';
+    }).join('');
+  }
+
+  function installAllLevelSelect(select){
+    if(!select) return;
+    const selectedValue = (typeof level !== 'undefined' ? level : 'all') || 'all';
+    select.innerHTML = makeLevelOptionHtml(selectedValue);
+    select.value = selectedValue;
+    if(select.dataset.v25AllLevelReady === '1') return;
+    select.dataset.v25AllLevelReady = '1';
+    select.addEventListener('change', function(e){
+      try{
+        stopAudio();
+        level = e.target.value || 'all';
+        step = 0;
+        history = [];
+        index = -1;
+        if(typeof track === 'function') track('level_change', { level: level, source: 'v25_all_level_select' });
+        if(typeof updateButtons === 'function') updateButtons();
+        if(view === 'list') renderList();
+        else if(view === 'word'){ wordIndex = 0; renderWord(); }
+        else if(view === 'player') renderPlaybackPanel();
+        else if(view === 'continuous' || view === 'random'){
+          // 自動再生中なら新しい条件で次のカードを描画。ただし音声許可前は鳴らない。
+          nextQuestion(true);
+          startAuto();
+        }else{
+          nextQuestion(true);
+        }
+      }catch(err){
+        if(typeof renderPlaybackPanel === 'function') renderPlaybackPanel();
+      }
+    });
+  }
+
+  function ensureAllLevelSelectors(){
+    ['v11LevelSelect','v12LevelSelect'].forEach(function(id){
+      installAllLevelSelect(document.getElementById(id));
+    });
+  }
+
+  function setDefaultListenWithoutBreakingReview(){
+    try{
+      enableAllLevelsData();
+      level = 'all';
+      autoMode = 'continuous';
+      contentMode = contentMode || 'sentence';
+      ensureAllLevelSelectors();
+
+      // 初期状態は「聞く」タブ選択。ただし音声は startOverlay の許可後まで鳴らさない。
+      // view="player" にして再生説明/レビュー画面を確実に描画する。
+      stopAudio();
+      view = 'player';
+      if(typeof updateButtons === 'function') updateButtons();
+      if(typeof renderPlaybackPanel === 'function') renderPlaybackPanel();
+
+      const questionBtn = document.getElementById('questionViewBtn');
+      const playBtn = document.getElementById('playViewBtn');
+      if(questionBtn) questionBtn.classList.remove('active');
+      if(playBtn) playBtn.classList.add('active');
+    }catch(e){
+      // 最悪でも空白にしない。レビューが描けない時は問題カードへ退避。
+      try{
+        view = 'question';
+        if(!history[index]) nextQuestion(true);
+        else renderQuestion();
+      }catch(_){}
+    }
+  }
+
+  // updateButtons が後続/既存パッチで level select を再生成しても、必ず all を維持する。
+  try{
+    const originalUpdateButtons = updateButtons;
+    updateButtons = function(){
+      const result = originalUpdateButtons.apply(this, arguments);
+      enableAllLevelsData();
+      ensureAllLevelSelectors();
+      try{
+        const levelSelect = document.getElementById('v11LevelSelect') || document.getElementById('v12LevelSelect');
+        if(levelSelect) levelSelect.value = level || 'all';
+      }catch(e){}
+      return result;
+    };
+  }catch(e){}
+
+  setVersion();
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', setDefaultListenWithoutBreakingReview, { once:true });
+  }else{
+    setDefaultListenWithoutBreakingReview();
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: level all default hard fix ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function enableAllLevelModel(){
+    try{
+      level = 'all';
+      if(typeof levelNames !== 'undefined') levelNames.all = '全部';
+      if(typeof levels !== 'undefined' && Array.isArray(levels) && !levels.includes('all')){
+        levels.unshift('all');
+      }
+    }catch(e){}
+  }
+
+  function levelOptions(){
+    return '<option value="all">全部</option>' +
+      '<option value="beginner">初級</option>' +
+      '<option value="intermediate">中級</option>' +
+      '<option value="advanced">上級</option>';
+  }
+
+  function forceLevelSelectAll(){
+    try{
+      const selectors = [
+        document.getElementById('v11LevelSelect'),
+        document.getElementById('v12LevelSelect')
+      ].filter(Boolean);
+
+      selectors.forEach(function(sel){
+        if(!sel.querySelector('option[value="all"]')){
+          sel.innerHTML = levelOptions();
+        }
+        sel.value = 'all';
+        sel.setAttribute('aria-label', 'レベル: 全部');
+      });
+
+      const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
+      if(levelText) levelText.textContent = 'レベル：全部';
+
+      const legacyLevelBtn = document.getElementById('levelBtn');
+      if(legacyLevelBtn){
+        legacyLevelBtn.textContent = '全部';
+        legacyLevelBtn.setAttribute('aria-label', 'レベル: 全部');
+      }
+    }catch(e){}
+  }
+
+  function allSentences(){
+    const order = ['beginner','intermediate','advanced'];
+    let out = [];
+    try{
+      order.forEach(function(lv){
+        const rows = DATA && DATA[lv] ? DATA[lv] : [];
+        rows.forEach(function(row){ out.push(row); });
+      });
+    }catch(e){}
+    return out;
+  }
+
+  function filteredAllSentences(){
+    const base = allSentences();
+    try{
+      if(typeof category !== 'undefined' && category !== 'all'){
+        const filtered = base.filter(function(row){ return row.category === category; });
+        return filtered.length ? filtered : base;
+      }
+    }catch(e){}
+    return base;
+  }
+
+  function installAllDataFunctions(){
+    try{
+      getList = function(){
+        if(typeof level !== 'undefined' && level === 'all') return filteredAllSentences();
+        const base = DATA && DATA[level] ? DATA[level] : [];
+        if(typeof category !== 'undefined' && category !== 'all'){
+          const filtered = base.filter(function(row){ return row.category === category; });
+          return filtered.length ? filtered : base;
+        }
+        return base;
+      };
+      pick = function(){
+        const list = getList();
+        return list[Math.floor(Math.random() * list.length)];
+      };
+      currentListCount = function(){ return getList().length || 1; };
+    }catch(e){}
+  }
+
+  function installSelectHandlers(){
+    ['v11LevelSelect','v12LevelSelect'].forEach(function(id){
+      const sel = document.getElementById(id);
+      if(!sel || sel.dataset.v25HardAllHandler === '1') return;
+      sel.dataset.v25HardAllHandler = '1';
+      sel.addEventListener('change', function(e){
+        try{
+          level = e.target.value || 'all';
+          if(level === 'all') enableAllLevelModel();
+          step = 0;
+          history = [];
+          index = -1;
+          installAllDataFunctions();
+          forceLevelSelectAll();
+          if(typeof updateButtons === 'function') updateButtons();
+          if(view === 'list') renderList();
+          else if(view === 'player') renderPlaybackPanel();
+          else if(view === 'continuous' || view === 'random') renderPlaybackPanel();
+          else nextQuestion(true);
+        }catch(err){}
+      });
+    });
+  }
+
+  function apply(){
+    setVersion();
+    enableAllLevelModel();
+    installAllDataFunctions();
+
+    // First allow existing UI builders to create the meta select, then force it.
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    forceLevelSelectAll();
+    installSelectHandlers();
+
+    // Default top menu should be 聞く, but do not autoplay.
+    try{
+      autoMode = 'continuous';
+      if(view === 'question') view = 'player';
+      const questionBtn = document.getElementById('questionViewBtn');
+      const playBtn = document.getElementById('playViewBtn');
+      if(questionBtn) questionBtn.classList.remove('active');
+      if(playBtn) playBtn.classList.add('active');
+      if(typeof renderPlaybackPanel === 'function' && view === 'player') renderPlaybackPanel();
+      forceLevelSelectAll();
+    }catch(e){}
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 80);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 80);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: verified level-all default ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  const REAL_LEVELS = ["beginner","intermediate","advanced"];
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-verified-version', VERSION);
+    }catch(e){}
+  }
+
+  function forceModelAll(){
+    try{
+      level = "all";
+      if(typeof levelNames !== "undefined") levelNames.all = "全部";
+      if(typeof levels !== "undefined" && Array.isArray(levels)){
+        levels.length = 0;
+        levels.push("all","beginner","intermediate","advanced");
+      }
+    }catch(e){}
+  }
+
+  function optionHtml(){
+    return '<option value="all">全部</option>' +
+      '<option value="beginner">初級</option>' +
+      '<option value="intermediate">中級</option>' +
+      '<option value="advanced">上級</option>';
+  }
+
+  function forceUIAll(){
+    try{
+      ["v11LevelSelect","v12LevelSelect"].forEach(function(id){
+        const sel = document.getElementById(id);
+        if(!sel) return;
+        if(!sel.querySelector('option[value="all"]')) sel.innerHTML = optionHtml();
+        sel.value = "all";
+        sel.setAttribute("aria-label", "レベル：全部");
+      });
+      const levelBtn = document.getElementById("levelBtn");
+      if(levelBtn){
+        levelBtn.textContent = "全部";
+        levelBtn.setAttribute("aria-label", "レベル：全部");
+      }
+      const metaText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
+      if(metaText) metaText.textContent = "レベル：全部";
+    }catch(e){}
+  }
+
+  function allSentenceRows(){
+    let rows = [];
+    try{
+      REAL_LEVELS.forEach(function(lv){
+        (DATA[lv] || []).forEach(function(row){ rows.push(row); });
+      });
+    }catch(e){}
+    return rows;
+  }
+
+  function filteredRows(){
+    let rows;
+    try{
+      rows = (level === "all") ? allSentenceRows() : (DATA[level] || []);
+      if(category && category !== "all"){
+        const filtered = rows.filter(function(row){ return row.category === category; });
+        return filtered.length ? filtered : rows;
+      }
+    }catch(e){ rows = []; }
+    return rows || [];
+  }
+
+  function installDataFns(){
+    try{
+      getList = function(){ return filteredRows(); };
+      currentListCount = function(){ return filteredRows().length || 1; };
+      pick = function(){
+        const rows = filteredRows();
+        return rows[Math.floor(Math.random() * rows.length)];
+      };
+    }catch(e){}
+  }
+
+  function bindSelectors(){
+    ["v11LevelSelect","v12LevelSelect"].forEach(function(id){
+      const sel = document.getElementById(id);
+      if(!sel || sel.dataset.verifiedAllBound === "1") return;
+      sel.dataset.verifiedAllBound = "1";
+      sel.addEventListener("change", function(e){
+        try{
+          level = e.target.value || "all";
+          if(level === "all") forceModelAll();
+          step = 0; history = []; index = -1;
+          installDataFns();
+          forceUIAll();
+          if(typeof updateButtons === "function") updateButtons();
+          forceUIAll();
+          if(view === "list") renderList();
+          else if(view === "player") renderPlaybackPanel();
+          else if(view === "continuous" || view === "random") renderPlaybackPanel();
+          else nextQuestion(true);
+        }catch(err){}
+      });
+    });
+  }
+
+  function apply(){
+    setVersion();
+    forceModelAll();
+    installDataFns();
+
+    try{ if(typeof updateButtons === "function") updateButtons(); }catch(e){}
+    forceUIAll();
+    bindSelectors();
+
+    try{
+      autoMode = "continuous";
+      if(view === "question") view = "player";
+      const questionBtn = document.getElementById("questionViewBtn");
+      const playBtn = document.getElementById("playViewBtn");
+      if(questionBtn) questionBtn.classList.remove("active");
+      if(playBtn) playBtn.classList.add("active");
+      if(view === "player" && typeof renderPlaybackPanel === "function") renderPlaybackPanel();
+      forceUIAll();
+    }catch(e){}
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", function(){
+      apply();
+      requestAnimationFrame(apply);
+      setTimeout(apply, 100);
+      setTimeout(apply, 500);
+    }, { once:true });
+  }else{
+    apply();
+    requestAnimationFrame(apply);
+    setTimeout(apply, 100);
+    setTimeout(apply, 500);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: final visible level-all display guard ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+
+  function applyLevelAllDisplay(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+
+      level = 'all';
+      if(typeof levelNames !== 'undefined') levelNames.all = '全部';
+
+      const html = '<option value="all">全部</option><option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
+      ['v11LevelSelect','v12LevelSelect'].forEach(function(id){
+        const sel = document.getElementById(id);
+        if(!sel) return;
+        if(!sel.querySelector('option[value="all"]')) sel.innerHTML = html;
+        sel.value = 'all';
+        sel.setAttribute('aria-label','レベル：全部');
+      });
+
+      const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
+      if(levelText) levelText.textContent = 'レベル：全部';
+
+      const levelBtn = document.getElementById('levelBtn');
+      if(levelBtn){
+        levelBtn.textContent = '全部';
+        levelBtn.setAttribute('aria-label','レベル：全部');
+      }
+    }catch(e){}
+  }
+
+  const prevUpdate = window.updateButtons;
+  window.updateButtons = function(){
+    if(typeof prevUpdate === 'function') prevUpdate.apply(this, arguments);
+    applyLevelAllDisplay();
+  };
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      applyLevelAllDisplay();
+      requestAnimationFrame(applyLevelAllDisplay);
+      setTimeout(applyLevelAllDisplay, 0);
+      setTimeout(applyLevelAllDisplay, 100);
+      setTimeout(applyLevelAllDisplay, 500);
+    }, { once:true });
+  }else{
+    applyLevelAllDisplay();
+    requestAnimationFrame(applyLevelAllDisplay);
+    setTimeout(applyLevelAllDisplay, 0);
+    setTimeout(applyLevelAllDisplay, 100);
+    setTimeout(applyLevelAllDisplay, 500);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v26-se-bottom-label-fit-v1: final short bottom labels guard ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v26-se-bottom-label-fit-v1";
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function shortenBottomLabels(){
+    try{
+      document.querySelectorAll('#bottomActionBar button, .bottom-action-bar button').forEach(function(btn){
+        const t = (btn.textContent || '').trim();
+        if(t === '中文→日本語' || t === '中文→日文') btn.textContent = '中→日';
+        if(t === '日本語→中文' || t === '日文→中文') btn.textContent = '日→中';
+      });
+    }catch(e){}
+  }
+  const prevRender = window.renderUnifiedBottomActionBar;
+  if(typeof prevRender === 'function'){
+    window.renderUnifiedBottomActionBar = function(){
+      const r = prevRender.apply(this, arguments);
+      setVersion();
+      shortenBottomLabels();
+      return r;
+    };
+  }
+  const prevUpdate = window.updateButtons;
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      shortenBottomLabels();
+      return r;
+    };
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      setVersion();
+      shortenBottomLabels();
+      setTimeout(shortenBottomLabels, 0);
+      setTimeout(shortenBottomLabels, 300);
+    }, { once:true });
+  }else{
+    setVersion();
+    shortenBottomLabels();
+    setTimeout(shortenBottomLabels, 0);
+    setTimeout(shortenBottomLabels, 300);
+  }
 })();
 </script>
 
