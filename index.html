@@ -9,8 +9,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-24-v42-word-quiz-tap-reveal-speak-next-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-24-v42-word-quiz-tap-reveal-speak-next-v1">
+<!-- LingoFlow app version: 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-24-v51-word-quiz-audio-on-reveal-only-v1">
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -10477,14 +10477,8 @@ setView(view);
     try{ wordQuestionRevealed = false; }catch(e){}
     try{ wordIndex = normalizeIndex((wordIndex || 0) + 1); }catch(e){}
     renderQuiz();
-    /* If the new problem itself displays Chinese, read it once as a user-initiated next action. */
-    try{
-      if(mode !== 'speaking'){
-        const w = getWord();
-        const token = ++speakingToken;
-        speakChineseOnly(w, token);
-      }
-    }catch(e){}
+    /* v51: Do not read aloud when the next 中→日 problem appears.
+       Audio must start only after the user reveals the answer, when pinyin/Japanese are shown. */
   }
   function handleQuizTap(e){
     if(!isWordQuiz()) return;
@@ -10537,6 +10531,1835 @@ setView(view);
   setVersion();
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setVersion, {once:true});
   else setTimeout(setVersion, 0);
+})();
+</script>
+
+
+
+<style>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+.fixed-card-nav{
+  z-index:9000 !important;
+}
+body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
+  display:grid !important;
+}
+.v44-sentence-meta{
+  display:inline-flex;
+  align-items:center;
+  max-width:100%;
+  min-height:26px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#eef6ff;
+  color:#0068d8;
+  font-size:12px;
+  font-weight:950;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.word-list-text .reading-active,
+.word-list-row.reading-active .list-zh,
+.word-list-row.reading-active .list-pinyin,
+.word-list-row.reading-active .list-jp{
+  color:#007aff !important;
+  text-shadow:0 0 8px rgba(0,122,255,.18) !important;
+}
+</style>
+
+<script>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+   Minimal patch on v42:
+   - keep fixed 前/もう一度/次 visible during 聞く→単語 playback
+   - keep sentence meta visible during 聞く→文章 playback
+   - stop sentence playback without resetting to first card
+   - remove visible 中国語→日本語→次の文 status
+   - 読む→単語: clicked word text turns blue in sync with audio
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  let lastSentence = null;
+  let lastSentenceIndex = 0;
+  let readWordToken = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function escSafe(v){
+    try{ return typeof esc === 'function' ? esc(v) : String(v ?? '').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+    catch(e){ return String(v ?? ''); }
+  }
+  function catLabel(cat){
+    try{ return typeof categoryLabel === 'function' ? categoryLabel(cat) : ((window.categoryNames && categoryNames[cat]) || cat || ''); }
+    catch(e){ return cat || ''; }
+  }
+  function lvLabel(lv){
+    try{ return window.levelNames && levelNames[lv] ? levelNames[lv] : (lv || '初級'); }
+    catch(e){ return lv || '初級'; }
+  }
+  function currentCount(){
+    try{ return typeof currentListCount === 'function' ? currentListCount() : ''; }
+    catch(e){ return ''; }
+  }
+  function cleanStatusText(){
+    try{
+      document.querySelectorAll('.status,.player-desc,.list-status').forEach(function(el){
+        const t = (el.textContent || '').replace(/\s/g,'');
+        if(!t || /中国語→日本語→次の文|中国語→日本語→次|台湾華語→次の単語|自動再生はこの画面|カードをタップすると台湾華語音声|単語一覧/.test(t)) el.remove();
+      });
+    }catch(e){}
+  }
+  function sentenceMetaHtml(p){
+    const cat = catLabel(p && p.category);
+    const lv = lvLabel((p && p.level) || (typeof level !== 'undefined' ? level : 'beginner'));
+    return '<div class="v44-sentence-meta">・' + escSafe(cat) + '/' + escSafe(lv) + '</div>';
+  }
+  function renderSentenceCard(p, audio){
+    if(!p) return;
+    lastSentence = p;
+    try{ lastSentenceIndex = Math.max(0, index || 0); }catch(e){}
+    let zh = '';
+    try{ zh = typeof renderChars === 'function' ? renderChars(p.zh) : escSafe(p.zh); }
+    catch(e){ zh = escSafe(p.zh); }
+    const total = currentCount();
+    try{
+      box.innerHTML = '<div class="auto-card-top">' +
+        sentenceMetaHtml(p) +
+        '<div class="counter">' + escSafe(String(lastSentenceIndex + 1) + (total ? ' / ' + total : '')) + '</div>' +
+      '</div>' +
+      '<div class="card-main"><div class="lines-wrap">' +
+        '<div class="line"><div class="zh' + (audio ? ' audio-active' : '') + '">' + zh + '</div></div>' +
+        '<div class="line"><div class="pinyin">' + escSafe(p.pinyin) + '</div></div>' +
+        '<div class="line"><div class="jp">' + escSafe(p.jp) + '</div></div>' +
+      '</div></div>';
+    }catch(e){}
+    cleanStatusText();
+    syncFixedNavSoon();
+  }
+  function getCurrentSentence(){
+    try{ if(history && history[index]) return history[index]; }catch(e){}
+    return lastSentence;
+  }
+  function stopSentencePreserve(){
+    try{ if(typeof autoId !== 'undefined') autoId++; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    const p = getCurrentSentence();
+    try{ view = 'player'; }catch(e){}
+    try{ updateButtons && updateButtons(); }catch(e){}
+    if(p) renderSentenceCard(p, false);
+    setTimeout(function(){ if(p) renderSentenceCard(p, false); }, 0);
+  }
+  function shouldShowFixedNav(){
+    try{ return view === 'question' || view === 'player' || view === 'continuous' || view === 'random'; }
+    catch(e){ return false; }
+  }
+  function syncFixedNav(){
+    try{
+      let nav = document.getElementById('fixedCardNav');
+      if(!nav) return;
+      const show = shouldShowFixedNav();
+      nav.classList.toggle('hidden-panel', !show);
+      document.body.classList.toggle('has-fixed-card-nav', show);
+      if(show){
+        nav.style.display = 'grid';
+        nav.style.visibility = 'visible';
+        nav.style.opacity = '1';
+      }else{
+        nav.style.display = '';
+      }
+    }catch(e){}
+  }
+  function syncFixedNavSoon(){
+    syncFixedNav();
+    setTimeout(syncFixedNav, 0);
+    setTimeout(syncFixedNav, 120);
+  }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  if(typeof prevRenderAuto === 'function'){
+    window.renderAuto = function(p){
+      if(p && contentMode !== 'word'){
+        renderSentenceCard(p, true);
+        return;
+      }
+      return prevRenderAuto.apply(this, arguments);
+    };
+    try{ renderAuto = window.renderAuto; }catch(e){}
+  }
+
+  const prevRenderPlaybackPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
+  window.renderPlaybackPanel = function(){
+    if(contentMode !== 'word' && lastSentence && view === 'player') return renderSentenceCard(lastSentence, false);
+    if(typeof prevRenderPlaybackPanel === 'function') return prevRenderPlaybackPanel.apply(this, arguments);
+  };
+  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
+
+  const prevStopManual = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
+  window.stopPlaybackManual = function(){
+    if(contentMode !== 'word' && (view === 'continuous' || view === 'random' || view === 'player')) return stopSentencePreserve();
+    if(typeof prevStopManual === 'function') return prevStopManual.apply(this, arguments);
+  };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+
+  const prevSetAuto = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
+  if(typeof prevSetAuto === 'function'){
+    window.setAutoPlayback = function(action){
+      if(action === 'stop' && contentMode !== 'word') return stopSentencePreserve();
+      return prevSetAuto.apply(this, arguments);
+    };
+    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
+  }
+
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-player-control="stop"]');
+    if(!btn || contentMode === 'word') return;
+    if(view === 'continuous' || view === 'random' || view === 'player'){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      stopSentencePreserve();
+    }
+  }, true);
+
+  async function speakZh(w){
+    if(!w || !w.zh) return;
+    if(typeof speakWordAudio === 'function') return speakWordAudio(w.zh);
+    if(typeof speakChinese === 'function') return speakChinese(w.zh);
+  }
+  async function speakJp(text){
+    if(!text) return;
+    if(typeof speakJapanese === 'function') return speakJapanese(text);
+    if(window.speechSynthesis && window.SpeechSynthesisUtterance){
+      return new Promise(function(resolve){
+        const u = new SpeechSynthesisUtterance(String(text));
+        u.lang = 'ja-JP';
+        u.onend = resolve; u.onerror = resolve;
+        window.speechSynthesis.speak(u);
+      });
+    }
+  }
+  function setRowBlue(row, selector, on){
+    try{
+      row.querySelectorAll(selector).forEach(function(el){ el.classList.toggle('reading-active', !!on); });
+    }catch(e){}
+  }
+  function clearReadWordBlue(){
+    try{
+      document.querySelectorAll('.word-list-row,.word-list-text .list-zh,.word-list-text .list-pinyin,.word-list-text .list-jp').forEach(function(el){
+        el.classList.remove('reading-active');
+      });
+    }catch(e){}
+  }
+  async function playReadWord(item, row){
+    const token = ++readWordToken;
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    clearReadWordBlue();
+    try{ row.classList.add('reading-active'); }catch(e){}
+    setRowBlue(row, '.list-zh,.list-pinyin', true);
+    try{ await speakZh(item); }catch(e){}
+    if(token !== readWordToken) return;
+    setRowBlue(row, '.list-zh,.list-pinyin', false);
+    setRowBlue(row, '.list-jp', true);
+    try{ await speakJp(item.jp); }catch(e){}
+    if(token !== readWordToken) return;
+    setRowBlue(row, '.list-jp', false);
+    try{ row.classList.remove('reading-active'); }catch(e){}
+  }
+  document.addEventListener('click', function(e){
+    try{
+      if(!(view === 'list' && contentMode === 'word')) return;
+      const itemEl = e.target.closest('.list-item[data-id]');
+      if(!itemEl) return;
+      const id = Number(itemEl.getAttribute('data-id'));
+      const item = window.currentListItems ? currentListItems[id] : null;
+      if(!item || item.type !== 'word') return;
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      const row = itemEl.querySelector('.word-list-row') || itemEl;
+      playReadWord(item, row);
+    }catch(err){}
+  }, true);
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      cleanStatusText();
+      syncFixedNavSoon();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  function apply(){
+    setVersion();
+    cleanStatusText();
+    syncFixedNavSoon();
+    try{
+      if(contentMode !== 'word' && view === 'player' && lastSentence) renderSentenceCard(lastSentence, false);
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,0); setTimeout(apply,300); }, {once:true});
+  else { apply(); setTimeout(apply,0); setTimeout(apply,300); }
+})();
+</script>
+
+
+
+<style>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+.v45-reading-blue,
+.word-list-row.v45-reading-blue .list-zh,
+.word-list-row.v45-reading-blue .list-pinyin,
+.word-list-row.v45-reading-blue .list-jp,
+.list-item.v45-reading-blue .list-zh,
+.list-item.v45-reading-blue .list-pinyin,
+.list-item.v45-reading-blue .list-jp{
+  color:#007aff !important;
+  text-shadow:0 0 8px rgba(0,122,255,.18) !important;
+}
+</style>
+
+<script>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+   Fixes:
+   - 聞く→文章 meta uses the same pill format/location as 聞く→単語, no leading dot, no all display.
+   - Start overlay unlock is silent; audio starts only after pressing 再生.
+   - 聞く→文章 stop preserves the current sentence card like 聞く→単語.
+   - 読む→単語 click playback visibly turns text blue during audio.
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  let v45LastSentence = null;
+  let v45LastIndex = 0;
+  let v45StartClosedAt = 0;
+  let v45ReadWordToken = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function escV(v){
+    try{ return typeof esc === 'function' ? esc(v) : String(v ?? '').replace(/[&<>]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+    catch(e){ return String(v ?? ''); }
+  }
+  function catV(c){
+    try{ return typeof categoryLabel === 'function' ? categoryLabel(c) : ((typeof categoryNames !== 'undefined' && categoryNames[c]) || c || ''); }
+    catch(e){ return c || ''; }
+  }
+  function lvV(lv){
+    try{
+      if(!lv || lv === 'all') lv = 'beginner';
+      if(typeof levelNames !== 'undefined' && levelNames[lv]) return levelNames[lv];
+    }catch(e){}
+    return lv === 'intermediate' ? '中級' : lv === 'advanced' ? '上級' : '初級';
+  }
+  function curCount(){ try{ return typeof currentListCount === 'function' ? currentListCount() : ''; }catch(e){ return ''; } }
+  function renderCharsV(text){
+    try{ return typeof renderChars === 'function' ? renderChars(text) : escV(text); }catch(e){ return escV(text); }
+  }
+  function cleanStatus(){
+    try{
+      document.querySelectorAll('.status,.player-desc,.list-status').forEach(function(el){
+        const t=(el.textContent||'').replace(/\s/g,'');
+        if(!t || /中国語→日本語→次の文|中国語→日本語→次|台湾華語→次の単語|自動再生はこの画面|カードをタップすると台湾華語音声|単語一覧/.test(t)) el.remove();
+      });
+    }catch(e){}
+  }
+  function sentenceHeader(p){
+    const lv = (p && p.level && p.level !== 'all') ? p.level : 'beginner';
+    const count = String(v45LastIndex + 1) + (curCount() ? ' / ' + curCount() : '');
+    return '<div class="question-card-top quiz-card-top">' +
+      '<div class="quiz-meta-pills" aria-label="' + escV(catV(p && p.category)) + ' ' + escV(lvV(lv)) + '">' +
+        '<span class="quiz-meta-genre">' + escV(catV(p && p.category)) + '</span>' +
+        '<span class="quiz-meta-level">' + escV(lvV(lv)) + '</span>' +
+      '</div>' +
+      '<div class="counter">' + escV(count) + '</div>' +
+    '</div>';
+  }
+  function renderSentence(p, audioActive){
+    if(!p) return;
+    v45LastSentence = p;
+    try{ v45LastIndex = Math.max(index || 0, 0); }catch(e){}
+    try{
+      box.innerHTML = sentenceHeader(p) +
+        '<div class="card-main"><div class="lines-wrap">' +
+          '<div class="line"><div class="zh' + (audioActive ? ' audio-active' : '') + '">' + renderCharsV(p.zh) + '</div></div>' +
+          '<div class="line"><div class="pinyin">' + escV(p.pinyin) + '</div></div>' +
+          '<div class="line"><div class="jp">' + escV(p.jp) + '</div></div>' +
+        '</div></div>';
+    }catch(e){}
+    cleanStatus();
+    showFixedNavSoon();
+  }
+  function currentSentence(){
+    try{ if(history && history[index]) return history[index]; }catch(e){}
+    return v45LastSentence;
+  }
+  function stopSentenceKeep(){
+    const p = currentSentence();
+    try{ if(typeof autoId !== 'undefined') autoId++; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    try{ view = 'player'; }catch(e){}
+    try{ updateButtons && updateButtons(); }catch(e){}
+    if(p) renderSentence(p, false);
+    setTimeout(function(){ if(p) renderSentence(p, false); },0);
+    setTimeout(function(){ if(p) renderSentence(p, false); },120);
+  }
+  function showFixedNav(){
+    try{
+      const nav = document.getElementById('fixedCardNav');
+      if(!nav) return;
+      const show = (view === 'player' || view === 'continuous' || view === 'random' || view === 'question');
+      nav.classList.toggle('hidden-panel', !show);
+      document.body.classList.toggle('has-fixed-card-nav', show);
+      if(show){ nav.style.display='grid'; nav.style.visibility='visible'; nav.style.opacity='1'; }
+    }catch(e){}
+  }
+  function showFixedNavSoon(){ showFixedNav(); setTimeout(showFixedNav,0); setTimeout(showFixedNav,120); }
+
+  // Silent start overlay. Do not speak "開始". Also block click-through after overlay closes.
+  try{ window.unlockIOSAudio = function(){ try{ speechSynthesis.getVoices(); }catch(e){} }; unlockIOSAudio = window.unlockIOSAudio; }catch(e){}
+  const prevClose = window.closeStartOverlay || (typeof closeStartOverlay !== 'undefined' ? closeStartOverlay : null);
+  window.closeStartOverlay = function(){
+    v45StartClosedAt = Date.now();
+    let r;
+    try{ r = typeof prevClose === 'function' ? prevClose.apply(this, arguments) : undefined; }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(view === 'player' && contentMode !== 'word' && v45LastSentence) renderSentence(v45LastSentence, false); }catch(e){}
+    return r;
+  };
+  try{ closeStartOverlay = window.closeStartOverlay; }catch(e){}
+  document.addEventListener('click', function(e){
+    if(Date.now() - v45StartClosedAt < 750 && !(e.target && e.target.closest && e.target.closest('#startOverlay'))){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(err){}
+    }
+  }, true);
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  window.renderAuto = function(p){
+    if(p && contentMode !== 'word'){
+      renderSentence(p, true);
+      return;
+    }
+    if(typeof prevRenderAuto === 'function') return prevRenderAuto.apply(this, arguments);
+  };
+  try{ renderAuto = window.renderAuto; }catch(e){}
+
+  const prevRenderPlaybackPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
+  window.renderPlaybackPanel = function(){
+    if(contentMode !== 'word' && view === 'player' && v45LastSentence) return renderSentence(v45LastSentence, false);
+    if(typeof prevRenderPlaybackPanel === 'function') return prevRenderPlaybackPanel.apply(this, arguments);
+  };
+  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
+
+  const prevStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
+  window.stopPlaybackManual = function(){
+    if(contentMode !== 'word' && (view === 'continuous' || view === 'random' || view === 'player')) return stopSentenceKeep();
+    if(typeof prevStop === 'function') return prevStop.apply(this, arguments);
+  };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+
+  document.addEventListener('click', function(e){
+    const runStop = e.target.closest('[data-player-control="stop"], [data-v15-toggle="run"][data-v15-value="stop"]');
+    if(!runStop || contentMode === 'word') return;
+    if(view === 'continuous' || view === 'random' || view === 'player'){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      stopSentenceKeep();
+    }
+  }, true);
+
+  // 読む→単語: blue highlight during audio. Use direct lexical currentListItems, not window.currentListItems.
+  function clearBlue(){
+    try{ document.querySelectorAll('.v45-reading-blue').forEach(function(el){ el.classList.remove('v45-reading-blue'); }); }catch(e){}
+  }
+  async function speakZhWord(w){
+    if(!w || !w.zh) return;
+    try{ if(typeof speakWordAudio === 'function') return await speakWordAudio(w.zh); }catch(e){}
+    try{ if(typeof speak === 'function') return await speak(w.zh); }catch(e){}
+  }
+  async function speakJpWord(w){
+    if(!w || !w.jp) return;
+    try{ if(typeof speakJapanese === 'function') return await speakJapanese(w.jp); }catch(e){}
+  }
+  async function playReadWordBlue(item, row){
+    const token = ++v45ReadWordToken;
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    clearBlue();
+    try{ row.classList.add('v45-reading-blue'); }catch(e){}
+    try{ row.querySelectorAll('.list-zh,.list-pinyin').forEach(function(el){ el.classList.add('v45-reading-blue'); }); }catch(e){}
+    await speakZhWord(item);
+    if(token !== v45ReadWordToken) return;
+    try{ row.querySelectorAll('.list-zh,.list-pinyin').forEach(function(el){ el.classList.remove('v45-reading-blue'); }); }catch(e){}
+    try{ row.querySelectorAll('.list-jp').forEach(function(el){ el.classList.add('v45-reading-blue'); }); }catch(e){}
+    await speakJpWord(item);
+    if(token !== v45ReadWordToken) return;
+    clearBlue();
+  }
+  document.addEventListener('click', function(e){
+    try{
+      if(!(view === 'list' && contentMode === 'word')) return;
+      const itemEl = e.target.closest('.list-item[data-id]');
+      if(!itemEl) return;
+      const id = Number(itemEl.getAttribute('data-id'));
+      const item = (typeof currentListItems !== 'undefined' && currentListItems) ? currentListItems[id] : null;
+      if(!item || item.type !== 'word') return;
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      playReadWordBlue(item, itemEl.querySelector('.word-list-row') || itemEl);
+    }catch(err){}
+  }, true);
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion(); cleanStatus(); showFixedNavSoon();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+  function apply(){
+    setVersion(); cleanStatus(); showFixedNavSoon();
+    try{ if(contentMode !== 'word' && view === 'player' && v45LastSentence) renderSentence(v45LastSentence, false); }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,0); setTimeout(apply,300); }, {once:true});
+  else { apply(); setTimeout(apply,0); setTimeout(apply,300); }
+})();
+</script>
+
+
+
+<style>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+.quiz-card-top .quiz-meta-pills,
+.auto-card-top .quiz-meta-pills,
+.question-card-top .quiz-meta-pills{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  min-width:0 !important;
+  max-width:calc(100% - 72px) !important;
+}
+.quiz-meta-genre,
+.quiz-meta-level{
+  display:inline-flex !important;
+  align-items:center !important;
+  min-height:26px !important;
+  padding:5px 10px !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  color:#0068d8 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+</style>
+
+<script>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+   Root cause:
+   - 聞く→文章の fixed nav が prevQuestion/nextQuestion を呼び、クイズ用 render 経路へ落ちていた。
+   - 停止時も「現在の聞くカード」ではなく renderPlaybackPanel / 初期描画に戻る経路が残っていた。
+   Countermeasure:
+   - 聞く→文章専用の current sentence store + render function を最終上書き。
+   - fixedCardNav を clone して古い click listener を除去し、聞く→文章では専用 prev/replay/next だけを使う。
+   - stop / renderPlaybackPanel / renderAuto を同一 renderListenSentence に統一。
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  let v46Sentence = null;
+  let v46SentencePos = 0;
+  let v46LastMode = 'continuous';
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function escV(v){
+    try{ return typeof esc === 'function' ? esc(v) : String(v ?? '').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+    catch(e){ return String(v ?? ''); }
+  }
+  function catV(c){
+    try{ return typeof categoryLabel === 'function' ? categoryLabel(c) : ((typeof categoryNames !== 'undefined' && categoryNames[c]) || c || ''); }
+    catch(e){ return c || ''; }
+  }
+  function lvName(lv){
+    try{ if(typeof levelNames !== 'undefined' && levelNames[lv]) return levelNames[lv]; }catch(e){}
+    return lv === 'intermediate' ? '中級' : lv === 'advanced' ? '上級' : '初級';
+  }
+  function categoriesForNow(){
+    try{
+      if(typeof category !== 'undefined' && category !== 'all') return [category];
+      return Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; });
+    }catch(e){ return []; }
+  }
+  function levelsForNow(){
+    try{
+      if(typeof level !== 'undefined' && level && level !== 'all') return [level];
+    }catch(e){}
+    return ['beginner','intermediate','advanced'];
+  }
+  function sentenceList(){
+    const out = [];
+    try{
+      categoriesForNow().forEach(function(cat){
+        levelsForNow().forEach(function(lv){
+          ((DATA && DATA[lv]) || []).forEach(function(p){
+            if(p && p.category === cat) out.push(Object.assign({}, p, {__level:lv}));
+          });
+        });
+      });
+    }catch(e){}
+    return out;
+  }
+  function sameSentence(a,b){
+    return !!(a && b && a.zh === b.zh && a.category === b.category);
+  }
+  function findLevel(p){
+    if(p && p.__level) return p.__level;
+    try{
+      const lvs = ['beginner','intermediate','advanced'];
+      for(const lv of lvs){
+        if(((DATA && DATA[lv]) || []).some(function(x){ return sameSentence(x,p); })) return lv;
+      }
+    }catch(e){}
+    try{ return (level && level !== 'all') ? level : 'beginner'; }catch(e){ return 'beginner'; }
+  }
+  function currentFromHistory(){
+    try{ if(history && history[index]) return history[index]; }catch(e){}
+    return null;
+  }
+  function setCurrent(p){
+    if(!p) return null;
+    const lv = findLevel(p);
+    const copy = Object.assign({}, p, {__level:lv});
+    v46Sentence = copy;
+    const list = sentenceList();
+    const pos = list.findIndex(function(x){ return sameSentence(x, copy); });
+    v46SentencePos = pos >= 0 ? pos : Math.max(0, (typeof index !== 'undefined' ? index : 0));
+    try{
+      if(Array.isArray(history)){
+        if(typeof index !== 'number' || index < 0) index = 0;
+        history[index] = copy;
+      }
+    }catch(e){}
+    return copy;
+  }
+  function countText(){
+    const list = sentenceList();
+    const total = list.length;
+    const n = Math.min(Math.max(v46SentencePos,0), Math.max(total-1,0)) + 1;
+    return String(n) + (total ? ' / ' + total : '');
+  }
+  function renderCharsV(text){
+    try{ return typeof renderChars === 'function' ? renderChars(text) : escV(text); }catch(e){ return escV(text); }
+  }
+  function removeBadStatus(){
+    try{
+      document.querySelectorAll('.status,.player-desc,.list-status').forEach(function(el){
+        const t = (el.textContent || '').replace(/\s/g,'');
+        if(!t || /中国語→日本語→次の文|中国語→日本語→次|台湾華語→次の単語|自動再生はこの画面|文章再生モード|単語再生モード/.test(t)) el.remove();
+      });
+    }catch(e){}
+  }
+  function headerHtml(p){
+    const lv = findLevel(p);
+    return '<div class="question-card-top quiz-card-top">' +
+      '<div class="quiz-meta-pills" aria-label="' + escV(catV(p && p.category)) + ' ' + escV(lvName(lv)) + '">' +
+        '<span class="quiz-meta-genre">' + escV(catV(p && p.category)) + '</span>' +
+        '<span class="quiz-meta-level">' + escV(lvName(lv)) + '</span>' +
+      '</div>' +
+      '<div class="counter">' + escV(countText()) + '</div>' +
+    '</div>';
+  }
+  function renderListenSentence(p, active){
+    p = setCurrent(p || currentFromHistory() || v46Sentence || sentenceList()[0]);
+    if(!p) return;
+    try{
+      box.innerHTML = headerHtml(p) +
+        '<div class="card-main"><div class="lines-wrap">' +
+          '<div class="line"><div class="zh' + (active ? ' audio-active' : '') + '">' + renderCharsV(p.zh) + '</div></div>' +
+          '<div class="line"><div class="pinyin">' + escV(p.pinyin) + '</div></div>' +
+          '<div class="line"><div class="jp">' + escV(p.jp) + '</div></div>' +
+        '</div></div>';
+    }catch(e){}
+    removeBadStatus();
+    showNavSoon();
+  }
+  function isListenSentence(){
+    try{ return contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random'); }catch(e){ return false; }
+  }
+  function stopKeep(){
+    const p = currentFromHistory() || v46Sentence || sentenceList()[v46SentencePos] || sentenceList()[0];
+    try{ if(typeof autoId !== 'undefined') autoId++; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    try{ view = 'player'; }catch(e){}
+    renderListenSentence(p, false);
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    renderListenSentence(p, false);
+    setTimeout(function(){ renderListenSentence(p, false); }, 0);
+    setTimeout(function(){ renderListenSentence(p, false); }, 180);
+  }
+  function moveSentence(delta){
+    const list = sentenceList();
+    if(!list.length) return;
+    let pos = v46Sentence ? list.findIndex(function(x){ return sameSentence(x, v46Sentence); }) : -1;
+    if(pos < 0){
+      const h = currentFromHistory();
+      pos = h ? list.findIndex(function(x){ return sameSentence(x,h); }) : -1;
+    }
+    if(pos < 0) pos = 0;
+    pos = (pos + delta + list.length) % list.length;
+    v46SentencePos = pos;
+    const p = setCurrent(list[pos]);
+    try{ view = 'player'; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    renderListenSentence(p, false);
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    renderListenSentence(p, false);
+  }
+  async function replaySentence(){
+    const p = v46Sentence || currentFromHistory();
+    if(!p) return;
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    renderListenSentence(p, true);
+    try{ if(typeof speakHighlight === 'function') await speakHighlight(p.zh); else if(typeof speakChinese === 'function') await speakChinese(p.zh); }catch(e){}
+    renderListenSentence(p, false);
+  }
+  function ensureFreshNav(){
+    let nav = document.getElementById('fixedCardNav');
+    if(!nav){
+      nav = document.createElement('div');
+      nav.id = 'fixedCardNav';
+      document.body.appendChild(nav);
+    }else if(nav.dataset.v46Bound !== '1'){
+      const clone = nav.cloneNode(false);
+      clone.id = 'fixedCardNav';
+      clone.className = nav.className;
+      clone.setAttribute('aria-label','カード操作');
+      nav.parentNode.replaceChild(clone, nav);
+      nav = clone;
+    }
+    if(nav.dataset.v46Bound !== '1'){
+      nav.innerHTML = '<button type="button" data-fixed-nav="prev">前</button><button type="button" data-fixed-nav="replay">もう一度</button><button type="button" data-fixed-nav="next">次</button>';
+      nav.dataset.v46Bound = '1';
+      nav.addEventListener('click', function(e){
+        const btn = e.target.closest('[data-fixed-nav]');
+        if(!btn) return;
+        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+        const action = btn.getAttribute('data-fixed-nav');
+        if(isListenSentence()){
+          if(action === 'prev') moveSentence(-1);
+          else if(action === 'next') moveSentence(1);
+          else replaySentence();
+          return;
+        }
+        if(contentMode === 'word'){
+          try{
+            if(action === 'prev' && typeof wordPrev === 'function') wordPrev();
+            else if(action === 'next' && typeof wordNext === 'function') wordNext();
+            else if(action === 'replay' && typeof speakWordAudio === 'function') speakWordAudio((typeof currentWord === 'function' ? currentWord() : {}).zh);
+          }catch(err){}
+          return;
+        }
+        try{
+          if(action === 'prev' && typeof prevQuestion === 'function') prevQuestion();
+          else if(action === 'next' && typeof nextQuestion === 'function') nextQuestion(true);
+          else if(action === 'replay' && typeof speakQuestionCurrent === 'function') speakQuestionCurrent();
+        }catch(err){}
+      }, true);
+    }
+    return nav;
+  }
+  function showNav(){
+    try{
+      const nav = ensureFreshNav();
+      const show = (view === 'question' || view === 'player' || view === 'continuous' || view === 'random');
+      nav.classList.toggle('hidden-panel', !show);
+      document.body.classList.toggle('has-fixed-card-nav', show);
+      if(show){ nav.style.display='grid'; nav.style.visibility='visible'; nav.style.opacity='1'; }
+    }catch(e){}
+  }
+  function showNavSoon(){ showNav(); setTimeout(showNav,0); setTimeout(showNav,120); }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  window.renderAuto = function(p){
+    if(p && contentMode !== 'word'){
+      try{ if(view === 'continuous' || view === 'random') v46LastMode = view; }catch(e){}
+      renderListenSentence(p, true);
+      return;
+    }
+    if(typeof prevRenderAuto === 'function') return prevRenderAuto.apply(this, arguments);
+  };
+  try{ renderAuto = window.renderAuto; }catch(e){}
+
+  const prevPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
+  window.renderPlaybackPanel = function(){
+    if(contentMode !== 'word' && view === 'player') return renderListenSentence(v46Sentence || currentFromHistory() || sentenceList()[v46SentencePos] || sentenceList()[0], false);
+    if(typeof prevPanel === 'function') return prevPanel.apply(this, arguments);
+  };
+  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
+
+  const prevStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
+  window.stopPlaybackManual = function(){
+    if(contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random')) return stopKeep();
+    if(typeof prevStop === 'function') return prevStop.apply(this, arguments);
+  };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+
+  const prevSetView = window.setView || (typeof setView !== 'undefined' ? setView : null);
+  if(typeof prevSetView === 'function'){
+    window.setView = function(v){
+      const r = prevSetView.apply(this, arguments);
+      if(contentMode !== 'word' && view === 'player') renderListenSentence(v46Sentence || currentFromHistory() || sentenceList()[0], false);
+      showNavSoon();
+      return r;
+    };
+    try{ setView = window.setView; }catch(e){}
+  }
+
+  document.addEventListener('click', function(e){
+    const b = e.target.closest('[data-player-control="stop"], [data-v15-toggle="run"][data-v15-value="stop"]');
+    if(!b || contentMode === 'word') return;
+    if(view === 'player' || view === 'continuous' || view === 'random'){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      stopKeep();
+    }
+  }, true);
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion(); removeBadStatus(); showNavSoon();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  function apply(){
+    setVersion(); ensureFreshNav(); removeBadStatus(); showNavSoon();
+    if(contentMode !== 'word' && view === 'player') renderListenSentence(v46Sentence || currentFromHistory() || sentenceList()[0], false);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,0); setTimeout(apply,300); }, {once:true});
+  else { apply(); setTimeout(apply,0); setTimeout(apply,300); }
+})();
+</script>
+
+
+
+<style>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 ===== */
+.quiz-word-card-v47,
+.listen-sentence-card-v47{
+  width:100% !important;
+}
+.quiz-word-card-v47{
+  display:grid !important;
+  grid-template-columns:92px minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:center !important;
+  min-height:150px !important;
+  padding:8px 0 4px !important;
+  cursor:pointer !important;
+  user-select:none !important;
+  -webkit-user-select:none !important;
+}
+.quiz-word-emoji-v47{
+  width:86px !important;
+  height:86px !important;
+  border-radius:24px !important;
+  display:grid !important;
+  place-items:center !important;
+  background:#eef6ff !important;
+  font-size:50px !important;
+  line-height:1 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 8px 18px rgba(15,49,98,.07) !important;
+}
+.quiz-word-lines-v47{
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  gap:6px !important;
+}
+.quiz-word-prompt-v47{
+  font-size:18px !important;
+  line-height:1.35 !important;
+  font-weight:950 !important;
+  color:#64748b !important;
+}
+.quiz-word-zh-v47{
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif !important;
+  font-size:clamp(30px,7.2vw,42px) !important;
+  line-height:1.18 !important;
+  font-weight:950 !important;
+  color:#111827 !important;
+  word-break:break-word !important;
+}
+.quiz-word-pinyin-v47{
+  font-size:clamp(19px,4.9vw,25px) !important;
+  line-height:1.25 !important;
+  font-weight:900 !important;
+  font-style:italic !important;
+  color:#1174df !important;
+  word-break:break-word !important;
+}
+.quiz-word-jp-v47{
+  font-size:clamp(18px,4.8vw,24px) !important;
+  line-height:1.28 !important;
+  font-weight:850 !important;
+  color:#12223f !important;
+  word-break:break-word !important;
+}
+.quiz-word-zh-v47.speaking,
+.quiz-word-card-v47 .char.done{
+  color:#007aff !important;
+  text-shadow:0 0 8px rgba(0,122,255,.20) !important;
+}
+@media(max-width:340px){
+  .quiz-word-card-v47{grid-template-columns:78px minmax(0,1fr) !important; gap:10px !important; min-height:132px !important;}
+  .quiz-word-emoji-v47{width:74px !important; height:74px !important; border-radius:22px !important; font-size:44px !important;}
+  .quiz-word-prompt-v47{font-size:16px !important;}
+}
+</style>
+
+<script>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+   正確な原因:
+   1) v46 の fixed nav が contentMode === 'word' を先に判定していたため、
+      クイズ→単語でも wordPrev/wordNext/renderWord 経路に落ち、クイズ用 renderQuestion が壊れた。
+   2) 聞く→文章の停止保持が history[index] を優先していたため、
+      現在表示中カードではなく、初期の 挨拶/初級 カードを拾う再描画経路が残っていた。
+   3) v24-v46 の後付け render/update/click listener が多数残っており、
+      stop/updateButtons 後に古い renderPlaybackPanel がもう一度走ることがあった。
+   確実な対策:
+   - 聞く→文章の「現在表示カード」を history ではなく専用 store に一本化。
+   - stop / playback panel / fixed nav / renderAuto を同じ renderListenSentenceV47 に集約。
+   - stop 後 1.5 秒は MutationObserver で古い初期カード再描画を検出して戻す。
+   - クイズ→単語は専用 renderWordQuizV47 と tap flow へ分離し、wordPrev/wordNext には流さない。
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  let sentenceStore = null;
+  let sentencePos = 0;
+  let stopGuardUntil = 0;
+  let quizSpeakToken = 0;
+  let lastQuizTapAt = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function escV(v){
+    try{ return typeof esc === 'function' ? esc(v) : String(v ?? '').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+    catch(e){ return String(v ?? ''); }
+  }
+  function catLabel(c){
+    try{ return typeof categoryLabel === 'function' ? categoryLabel(c) : ((categoryNames && categoryNames[c]) || c || ''); }
+    catch(e){ return c || ''; }
+  }
+  function lvLabel(lv){
+    try{ if(levelNames && levelNames[lv]) return levelNames[lv]; }catch(e){}
+    return lv === 'intermediate' ? '中級' : lv === 'advanced' ? '上級' : '初級';
+  }
+  function allCats(){
+    try{ if(typeof category !== 'undefined' && category !== 'all') return [category]; }catch(e){}
+    try{ return Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; }); }catch(e){ return []; }
+  }
+  function allLvs(){
+    try{ if(typeof level !== 'undefined' && level && level !== 'all') return [level]; }catch(e){}
+    return ['beginner','intermediate','advanced'];
+  }
+  function sameSentence(a,b){ return !!(a && b && a.zh === b.zh && a.category === b.category); }
+  function findLv(p){
+    if(p && p.__level) return p.__level;
+    try{
+      for(const lv of ['beginner','intermediate','advanced']){
+        if(((DATA && DATA[lv]) || []).some(function(x){ return sameSentence(x,p); })) return lv;
+      }
+    }catch(e){}
+    try{ return (level && level !== 'all') ? level : 'beginner'; }catch(e){ return 'beginner'; }
+  }
+  function sentenceList(){
+    const out=[];
+    try{
+      allCats().forEach(function(cat){
+        allLvs().forEach(function(lv){
+          ((DATA && DATA[lv]) || []).forEach(function(p){
+            if(p && p.category === cat) out.push(Object.assign({}, p, {__level:lv}));
+          });
+        });
+      });
+    }catch(e){}
+    return out;
+  }
+  function storeSentence(p){
+    if(!p) return sentenceStore;
+    const copy = Object.assign({}, p, {__level:findLv(p)});
+    sentenceStore = copy;
+    const list = sentenceList();
+    const pos = list.findIndex(function(x){ return sameSentence(x, copy); });
+    if(pos >= 0) sentencePos = pos;
+    try{
+      if(Array.isArray(history)){
+        if(typeof index !== 'number' || index < 0) index = 0;
+        history[index] = copy;
+      }
+    }catch(e){}
+    return copy;
+  }
+  function currentSentenceStrict(){
+    return sentenceStore || (sentenceList()[sentencePos] || null);
+  }
+  function countText(){
+    const list = sentenceList();
+    const total = list.length;
+    const n = total ? Math.min(Math.max(sentencePos,0), total-1) + 1 : 1;
+    return String(n) + (total ? ' / ' + total : '');
+  }
+  function charsV(text){
+    try{ return typeof renderChars === 'function' ? renderChars(text) : escV(text); }catch(e){ return escV(text); }
+  }
+  function headerHtml(p){
+    const lv = findLv(p);
+    return '<div class="question-card-top quiz-card-top">' +
+      '<div class="quiz-meta-pills" aria-label="' + escV(catLabel(p && p.category)) + ' ' + escV(lvLabel(lv)) + '">' +
+        '<span class="quiz-meta-genre">' + escV(catLabel(p && p.category)) + '</span>' +
+        '<span class="quiz-meta-level">' + escV(lvLabel(lv)) + '</span>' +
+      '</div>' +
+      '<div class="counter">' + escV(countText()) + '</div>' +
+    '</div>';
+  }
+  function cleanBadStatus(){
+    try{
+      document.querySelectorAll('.status,.player-desc,.list-status').forEach(function(el){
+        const t = (el.textContent || '').replace(/\s/g,'');
+        if(!t || /中国語→日本語→次の文|中国語→日本語→次|台湾華語→次の単語|自動再生はこの画面|文章再生モード|単語再生モード/.test(t)) el.remove();
+      });
+    }catch(e){}
+  }
+  function isListenSentenceMode(){
+    try{ return contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random'); }catch(e){ return false; }
+  }
+  function renderListenSentenceV47(p, active){
+    p = storeSentence(p || currentSentenceStrict() || sentenceList()[0]);
+    if(!p || typeof box === 'undefined' || !box) return;
+    box.innerHTML = headerHtml(p) +
+      '<div class="card-main listen-sentence-card-v47"><div class="lines-wrap">' +
+        '<div class="line"><div class="zh' + (active ? ' audio-active' : '') + '">' + charsV(p.zh) + '</div></div>' +
+        '<div class="line"><div class="pinyin">' + escV(p.pinyin) + '</div></div>' +
+        '<div class="line"><div class="jp">' + escV(p.jp) + '</div></div>' +
+      '</div></div>';
+    cleanBadStatus();
+    showFixedNavSoon();
+  }
+  function hardStopSentence(){
+    const p = currentSentenceStrict();
+    stopGuardUntil = Date.now() + 1500;
+    try{ if(typeof autoId !== 'undefined') autoId++; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    try{ view = 'player'; }catch(e){}
+    renderListenSentenceV47(p, false);
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    renderListenSentenceV47(p, false);
+    [0,80,220,520,1000,1450].forEach(function(ms){ setTimeout(function(){ if(Date.now() < stopGuardUntil) renderListenSentenceV47(p, false); }, ms); });
+  }
+  function moveSentence(delta){
+    const list = sentenceList();
+    if(!list.length) return;
+    let pos = sentenceStore ? list.findIndex(function(x){ return sameSentence(x, sentenceStore); }) : sentencePos;
+    if(pos < 0) pos = 0;
+    pos = (pos + delta + list.length) % list.length;
+    sentencePos = pos;
+    try{ view = 'player'; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    renderListenSentenceV47(list[pos], false);
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    renderListenSentenceV47(list[pos], false);
+  }
+  async function replaySentence(){
+    const p = currentSentenceStrict();
+    if(!p) return;
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    renderListenSentenceV47(p, true);
+    try{ if(typeof speakHighlight === 'function') await speakHighlight(p.zh); else if(typeof speakChinese === 'function') await speakChinese(p.zh); }catch(e){}
+    renderListenSentenceV47(p, false);
+  }
+
+  function wordList(){
+    try{ return typeof getWordList === 'function' ? getWordList() : (WORDS || []); }catch(e){ return []; }
+  }
+  function normWord(i){
+    try{ return typeof normalizeWordIndex === 'function' ? normalizeWordIndex(i) : i; }catch(e){ return i; }
+  }
+  function currentQuizWord(){
+    try{ return typeof currentWordQuestion === 'function' ? currentWordQuestion() : null; }catch(e){ return null; }
+  }
+  function wordCount(){
+    try{ return typeof currentWordCount === 'function' ? currentWordCount() : wordList().length; }catch(e){ return wordList().length; }
+  }
+  function renderWordQuizV47(){
+    const w = currentQuizWord();
+    if(!w || typeof box === 'undefined' || !box){ if(box) box.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+    const revealed = !!wordQuestionRevealed;
+    const right = revealed
+      ? '<div class="quiz-word-zh-v47">' + charsV(w.zh) + '</div><div class="quiz-word-pinyin-v47">' + escV(w.pinyin) + '</div><div class="quiz-word-jp-v47">' + escV(w.jp) + '</div>'
+      : '<div class="quiz-word-prompt-v47">タップして答え</div>';
+    box.innerHTML =
+      '<div class="question-card-top quiz-card-top">' +
+        '<div class="quiz-meta-pills"><span class="quiz-meta-genre">' + escV(catLabel(w.category)) + '</span><span class="quiz-meta-level">単語</span></div>' +
+        '<div class="counter">' + escV((Number(wordIndex) + 1) + ' / ' + wordCount()) + '</div>' +
+      '</div>' +
+      '<div class="quiz-word-card-v47" role="button" tabindex="0" aria-label="単語クイズ">' +
+        '<div class="quiz-word-emoji-v47" aria-hidden="true">' + escV(w.emoji || '🔤') + '</div>' +
+        '<div class="quiz-word-lines-v47">' + right + '</div>' +
+      '</div>';
+    cleanBadStatus();
+    showFixedNavSoon();
+  }
+  async function revealQuizWordAndSpeak(){
+    const w = currentQuizWord();
+    if(!w) return;
+    wordQuestionRevealed = true;
+    renderWordQuizV47();
+    const token = ++quizSpeakToken;
+    try{
+      if(typeof speakHighlight === 'function') await speakHighlight(w.zh);
+      else if(typeof speakWordAudio === 'function') await speakWordAudio(w.zh);
+      else if(typeof speakChinese === 'function') await speakChinese(w.zh);
+    }catch(e){}
+    if(token === quizSpeakToken) renderWordQuizV47();
+  }
+  function nextQuizWord(){
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    try{ wordIndex = normWord(Number(wordIndex || 0) + 1); }catch(e){}
+    wordQuestionRevealed = false;
+    renderWordQuizV47();
+  }
+  function prevQuizWord(){
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    try{ wordIndex = normWord(Number(wordIndex || 0) - 1); }catch(e){}
+    wordQuestionRevealed = false;
+    renderWordQuizV47();
+  }
+  function isWordQuiz(){
+    try{ return view === 'question' && contentMode === 'word'; }catch(e){ return false; }
+  }
+  function wordListenReplay(){
+    try{ const w = typeof currentWord === 'function' ? currentWord() : null; if(w && typeof speakWordAudio === 'function') speakWordAudio(w.zh); }catch(e){}
+  }
+
+  function ensureFixedNavV47(){
+    let nav = document.getElementById('fixedCardNav');
+    if(!nav){ nav = document.createElement('div'); nav.id = 'fixedCardNav'; document.body.appendChild(nav); }
+    if(nav.dataset.v47Bound !== '1'){
+      const clone = nav.cloneNode(false);
+      clone.id = 'fixedCardNav';
+      clone.className = (nav.className || '') + ' fixed-card-nav';
+      clone.setAttribute('aria-label','カード操作');
+      nav.parentNode.replaceChild(clone, nav);
+      nav = clone;
+      nav.innerHTML = '<button type="button" data-fixed-nav="prev">前</button><button type="button" data-fixed-nav="replay">もう一度</button><button type="button" data-fixed-nav="next">次</button>';
+      nav.dataset.v47Bound = '1';
+      nav.addEventListener('click', function(e){
+        const btn = e.target.closest('[data-fixed-nav]');
+        if(!btn) return;
+        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+        const action = btn.getAttribute('data-fixed-nav');
+        if(isListenSentenceMode()){
+          if(action === 'prev') moveSentence(-1);
+          else if(action === 'next') moveSentence(1);
+          else replaySentence();
+          return;
+        }
+        if(isWordQuiz()){
+          if(action === 'prev') prevQuizWord();
+          else if(action === 'next') nextQuizWord();
+          else revealQuizWordAndSpeak();
+          return;
+        }
+        if(contentMode === 'word'){
+          try{
+            if(action === 'prev' && typeof wordPrev === 'function') wordPrev();
+            else if(action === 'next' && typeof wordNext === 'function') wordNext();
+            else wordListenReplay();
+          }catch(err){}
+          return;
+        }
+        try{
+          if(action === 'prev' && typeof prevQuestion === 'function') prevQuestion();
+          else if(action === 'next' && typeof nextQuestion === 'function') nextQuestion(true);
+          else if(typeof speakQuestionCurrent === 'function') speakQuestionCurrent();
+        }catch(err){}
+      }, true);
+    }
+    return nav;
+  }
+  function showFixedNav(){
+    try{
+      const nav = ensureFixedNavV47();
+      const show = (view === 'question' || view === 'player' || view === 'continuous' || view === 'random');
+      nav.classList.toggle('hidden-panel', !show);
+      document.body.classList.toggle('has-fixed-card-nav', show);
+      if(show){ nav.style.display='grid'; nav.style.visibility='visible'; nav.style.opacity='1'; }
+    }catch(e){}
+  }
+  function showFixedNavSoon(){ showFixedNav(); setTimeout(showFixedNav,0); setTimeout(showFixedNav,160); }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  window.renderAuto = function(p){
+    if(p && contentMode !== 'word'){
+      renderListenSentenceV47(p, true);
+      return;
+    }
+    if(typeof prevRenderAuto === 'function') return prevRenderAuto.apply(this, arguments);
+  };
+  try{ renderAuto = window.renderAuto; }catch(e){}
+
+  const prevPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
+  window.renderPlaybackPanel = function(){
+    if(contentMode !== 'word') return renderListenSentenceV47(currentSentenceStrict() || sentenceList()[0], false);
+    if(typeof prevPanel === 'function') return prevPanel.apply(this, arguments);
+  };
+  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
+
+  const prevStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
+  window.stopPlaybackManual = function(){
+    if(contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random')) return hardStopSentence();
+    if(typeof prevStop === 'function') return prevStop.apply(this, arguments);
+  };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+
+  const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
+  window.renderQuestion = function(){
+    if(isWordQuiz()) return renderWordQuizV47();
+    if(typeof prevRenderQuestion === 'function') return prevRenderQuestion.apply(this, arguments);
+  };
+  try{ renderQuestion = window.renderQuestion; }catch(e){}
+  try{ renderWordQuestion = renderWordQuizV47; window.renderWordQuestion = renderWordQuizV47; }catch(e){}
+
+  const prevSetView = window.setView || (typeof setView !== 'undefined' ? setView : null);
+  if(typeof prevSetView === 'function'){
+    window.setView = function(v){
+      const r = prevSetView.apply(this, arguments);
+      if(isWordQuiz()) renderWordQuizV47();
+      else if(contentMode !== 'word' && view === 'player') renderListenSentenceV47(currentSentenceStrict() || sentenceList()[0], false);
+      showFixedNavSoon(); cleanBadStatus();
+      return r;
+    };
+    try{ setView = window.setView; }catch(e){}
+  }
+
+  function interceptStop(e){
+    const b = e.target && e.target.closest ? e.target.closest('[data-player-control="stop"], [data-v15-toggle="run"][data-v15-value="stop"]') : null;
+    if(!b || contentMode === 'word') return;
+    if(view === 'player' || view === 'continuous' || view === 'random'){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      hardStopSentence();
+    }
+  }
+  document.addEventListener('click', interceptStop, true);
+  document.addEventListener('touchend', interceptStop, true);
+
+  document.addEventListener('click', function(e){
+    if(!isWordQuiz()) return;
+    if(e.target.closest('[data-fixed-nav], [data-v15-toggle], .view-tabs, #v12MetaSelectBar, select, button')) return;
+    const card = e.target.closest('.quiz-word-card-v47, .box, #box');
+    if(!card) return;
+    const now = Date.now();
+    if(now - lastQuizTapAt < 250) return;
+    lastQuizTapAt = now;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    if(wordQuestionRevealed) nextQuizWord();
+    else revealQuizWordAndSpeak();
+  }, true);
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion(); cleanBadStatus(); showFixedNavSoon();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  try{
+    const mo = new MutationObserver(function(){
+      if(Date.now() < stopGuardUntil && contentMode !== 'word' && view === 'player'){
+        const hasMeta = !!document.querySelector('.quiz-meta-pills');
+        const p = currentSentenceStrict();
+        if(p && (!hasMeta || /再生モード|挨拶\s*\/\s*初級/.test((box && box.textContent) || ''))){
+          setTimeout(function(){ renderListenSentenceV47(p, false); },0);
+        }
+      }
+      if(isWordQuiz()){
+        const ok = !!document.querySelector('.quiz-word-card-v47');
+        if(!ok) setTimeout(renderWordQuizV47,0);
+      }
+    });
+    if(document.body) mo.observe(document.body, {childList:true, subtree:true});
+  }catch(e){}
+
+  function apply(){
+    setVersion(); ensureFixedNavV47(); cleanBadStatus(); showFixedNavSoon();
+    if(isWordQuiz()) renderWordQuizV47();
+    else if(contentMode !== 'word' && view === 'player') renderListenSentenceV47(currentSentenceStrict() || sentenceList()[0], false);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,0); setTimeout(apply,300); }, {once:true});
+  else { apply(); setTimeout(apply,0); setTimeout(apply,300); }
+})();
+
+
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+   クイズ→単語の構成修正:
+   - 中→日: イラスト + 中国語 → ピンイン / 日本語を答える
+   - 日→中: イラスト + 日本語 → 中国語 / ピンインを答える
+   - イラスト単独クイズには戻さない
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function chars(s){
+    return String(s == null ? '' : s).split('').map(function(ch){ return '<span class="char">' + esc(ch) + '</span>'; }).join('');
+  }
+  function isWordQuiz(){
+    try{ return view === 'question' && contentMode === 'word'; }catch(e){ return false; }
+  }
+  function getWord(){
+    try{ if(typeof currentWordQuestion === 'function') return currentWordQuestion(); }catch(e){}
+    try{ if(typeof getWordList === 'function'){ const a=getWordList(); return a && a.length ? a[(Number(wordIndex)||0)%a.length] : null; } }catch(e){}
+    try{ return WORDS && WORDS.length ? WORDS[(Number(wordIndex)||0)%WORDS.length] : null; }catch(e){ return null; }
+  }
+  function wordTotal(){
+    try{ if(typeof currentWordCount === 'function') return currentWordCount(); }catch(e){}
+    try{ if(typeof getWordList === 'function') return getWordList().length; }catch(e){}
+    try{ return WORDS.length; }catch(e){ return 0; }
+  }
+  function catText(w){
+    try{ return typeof catLabel === 'function' ? catLabel(w.category) : (w.category || '単語'); }catch(e){ return w.category || '単語'; }
+  }
+  function direction(){
+    try{ return mode === 'speaking' ? 'jpzh' : 'zhjp'; }catch(e){ return 'zhjp'; }
+  }
+  function renderWordQuizV48(){
+    const boxEl = (typeof box !== 'undefined' && box) ? box : document.getElementById('box');
+    if(!boxEl || !isWordQuiz()) return;
+    const w = getWord();
+    if(!w){ boxEl.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+    const revealed = !!wordQuestionRevealed;
+    const dir = direction();
+    let right = '';
+    if(dir === 'jpzh'){
+      right += '<div class="quiz-word-jp-v48 quiz-prompt-line-v48">' + esc(w.jp) + '</div>';
+      right += revealed
+        ? '<div class="quiz-answer-block-v48"><div class="quiz-word-zh-v48">' + chars(w.zh) + '</div><div class="quiz-word-pinyin-v48">' + esc(w.pinyin) + '</div></div>'
+        : '<div class="quiz-answer-placeholder-v48">タップして中国語</div>';
+    }else{
+      right += '<div class="quiz-word-zh-v48 quiz-prompt-line-v48">' + chars(w.zh) + '</div>';
+      right += revealed
+        ? '<div class="quiz-answer-block-v48"><div class="quiz-word-pinyin-v48">' + esc(w.pinyin) + '</div><div class="quiz-word-jp-v48">' + esc(w.jp) + '</div></div>'
+        : '<div class="quiz-answer-placeholder-v48">タップしてピンイン・日本語</div>';
+    }
+    boxEl.innerHTML =
+      '<div class="question-card-top quiz-card-top">' +
+        '<div class="quiz-meta-pills"><span class="quiz-meta-genre">' + esc(catText(w)) + '</span><span class="quiz-meta-level">単語</span></div>' +
+        '<div class="counter">' + esc((Number(wordIndex || 0) + 1) + ' / ' + wordTotal()) + '</div>' +
+      '</div>' +
+      '<div class="quiz-word-card-v47 quiz-word-card-v48" role="button" tabindex="0" aria-label="単語クイズ">' +
+        '<div class="quiz-word-emoji-v47 quiz-word-emoji-v48" aria-hidden="true">' + esc(w.emoji || '🔤') + '</div>' +
+        '<div class="quiz-word-lines-v47 quiz-word-lines-v48">' + right + '</div>' +
+      '</div>';
+    try{ if(typeof cleanBadStatus === 'function') cleanBadStatus(); }catch(e){}
+    try{ if(typeof showFixedNavSoon === 'function') showFixedNavSoon(); }catch(e){}
+  }
+  function scheduleRender(){
+    if(!isWordQuiz()) return;
+    setTimeout(renderWordQuizV48, 0);
+    setTimeout(renderWordQuizV48, 80);
+    setTimeout(renderWordQuizV48, 260);
+  }
+  try{ window.renderWordQuestion = renderWordQuizV48; renderWordQuestion = renderWordQuizV48; }catch(e){}
+  const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
+  window.renderQuestion = function(){
+    if(isWordQuiz()) return renderWordQuizV48();
+    if(typeof prevRenderQuestion === 'function') return prevRenderQuestion.apply(this, arguments);
+  };
+  try{ renderQuestion = window.renderQuestion; }catch(e){}
+  document.addEventListener('click', function(){ scheduleRender(); }, true);
+  document.addEventListener('touchend', function(){ scheduleRender(); }, true);
+  try{
+    const mo = new MutationObserver(function(){
+      if(!isWordQuiz()) return;
+      const card = document.querySelector('.quiz-word-card-v48');
+      const oldOnly = document.querySelector('.quiz-word-card-v47:not(.quiz-word-card-v48)');
+      if(!card || oldOnly) setTimeout(renderWordQuizV48, 0);
+    });
+    if(document.body) mo.observe(document.body, {childList:true, subtree:true});
+  }catch(e){}
+  try{
+    const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+    if(meta) meta.setAttribute('content', VERSION);
+  }catch(e){}
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scheduleRender, {once:true});
+  else scheduleRender();
+})();
+</script>
+
+
+
+<style>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1: quiz word pill + elegant typography final override ===== */
+.quiz-card-top .quiz-meta-pills,
+.question-card-top .quiz-meta-pills{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  min-width:0 !important;
+  max-width:calc(100% - 78px) !important;
+}
+.quiz-meta-genre,
+.quiz-meta-level{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-height:26px !important;
+  padding:5px 10px !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  color:#0068d8 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  letter-spacing:.01em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.quiz-word-card-v48,
+.quiz-word-card-v49{
+  display:grid !important;
+  grid-template-columns:92px minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:center !important;
+  min-height:150px !important;
+  padding:10px 0 6px !important;
+  cursor:pointer !important;
+}
+.quiz-word-emoji-v48,
+.quiz-word-emoji-v49{
+  width:86px !important;
+  height:86px !important;
+  border-radius:26px !important;
+  display:grid !important;
+  place-items:center !important;
+  background:linear-gradient(145deg,#f8fbff 0%,#eef6ff 100%) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.08), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  font-size:42px !important;
+  line-height:1 !important;
+}
+.quiz-word-lines-v48,
+.quiz-word-lines-v49{
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  gap:7px !important;
+}
+.quiz-word-zh-v48,
+.quiz-word-zh-v49{
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif !important;
+  font-size:clamp(30px, 7.2vw, 40px) !important;
+  line-height:1.22 !important;
+  font-weight:950 !important;
+  letter-spacing:.18px !important;
+  color:#087cff !important;
+}
+.quiz-word-pinyin-v48,
+.quiz-word-pinyin-v49{
+  font-size:clamp(19px, 4.8vw, 25px) !important;
+  line-height:1.26 !important;
+  font-weight:900 !important;
+  font-style:italic !important;
+  letter-spacing:.08px !important;
+  color:#1174df !important;
+}
+.quiz-word-jp-v48,
+.quiz-word-jp-v49{
+  font-size:clamp(18px, 4.7vw, 24px) !important;
+  line-height:1.32 !important;
+  font-weight:850 !important;
+  letter-spacing:.02em !important;
+  color:#12223f !important;
+}
+.quiz-answer-placeholder-v48,
+.quiz-answer-placeholder-v49{
+  display:inline-flex !important;
+  align-self:flex-start !important;
+  min-height:30px !important;
+  align-items:center !important;
+  padding:6px 10px !important;
+  border-radius:999px !important;
+  background:#f3f8ff !important;
+  border:1px solid rgba(0,122,255,.08) !important;
+  color:#64748b !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  letter-spacing:.01em !important;
+}
+.quiz-answer-block-v48,
+.quiz-answer-block-v49{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:6px !important;
+}
+@media(max-width:340px){
+  .quiz-word-card-v48,.quiz-word-card-v49{grid-template-columns:82px minmax(0,1fr) !important;gap:11px !important;}
+  .quiz-word-emoji-v48,.quiz-word-emoji-v49{width:78px !important;height:78px !important;border-radius:23px !important;font-size:38px !important;}
+  .quiz-meta-genre,.quiz-meta-level{font-size:11px !important;min-height:24px !important;padding:4px 8px !important;}
+}
+</style>
+
+<script>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1: final word quiz display correction =====
+   - Do not show internal category IDs such as greeting.
+   - Do not show 「単語」 as the level pill.
+   - Use the same refined pill pattern as 聞く: 「挨拶」「初級」.
+   - Preserve v48 quiz logic: 中→日 and 日→中 prompt/answer structure.
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const CATEGORY_LABELS = {
+    all:'全部', greeting:'挨拶', cafe:'カフェ', restaurant:'食事', shopping:'買物',
+    transport:'交通', hotel:'ホテル', tourism:'観光', daily:'日常', work:'仕事', emergency:'緊急'
+  };
+  const LEVEL_LABELS = {beginner:'初級', intermediate:'中級', advanced:'上級', all:'全部'};
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function chars(s){
+    return String(s == null ? '' : s).split('').map(function(ch){ return '<span class="char">' + esc(ch) + '</span>'; }).join('');
+  }
+  function isWordQuiz(){
+    try{ return view === 'question' && contentMode === 'word'; }catch(e){ return false; }
+  }
+  function getWord(){
+    try{ if(typeof currentWordQuestion === 'function') return currentWordQuestion(); }catch(e){}
+    try{ if(typeof getWordList === 'function'){ const a=getWordList(); return a && a.length ? a[(Number(wordIndex)||0)%a.length] : null; } }catch(e){}
+    try{ return WORDS && WORDS.length ? WORDS[(Number(wordIndex)||0)%WORDS.length] : null; }catch(e){ return null; }
+  }
+  function totalWords(){
+    try{ if(typeof currentWordCount === 'function') return currentWordCount(); }catch(e){}
+    try{ if(typeof getWordList === 'function') return getWordList().length; }catch(e){}
+    try{ return WORDS.length; }catch(e){ return 0; }
+  }
+  function categoryText(w){
+    const c = (w && w.category) || 'greeting';
+    return CATEGORY_LABELS[c] || c || '挨拶';
+  }
+  function levelText(w){
+    const lv = (w && w.level) || 'beginner';
+    return LEVEL_LABELS[lv] || '初級';
+  }
+  function direction(){
+    try{ return mode === 'speaking' ? 'jpzh' : 'zhjp'; }catch(e){ return 'zhjp'; }
+  }
+  function renderWordQuizV49(){
+    const boxEl = (typeof box !== 'undefined' && box) ? box : document.getElementById('box');
+    if(!boxEl || !isWordQuiz()) return;
+    const w = getWord();
+    if(!w){ boxEl.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+    const revealed = !!wordQuestionRevealed;
+    const dir = direction();
+    let right = '';
+    if(dir === 'jpzh'){
+      right += '<div class="quiz-word-jp-v49 quiz-prompt-line-v49">' + esc(w.jp) + '</div>';
+      right += revealed
+        ? '<div class="quiz-answer-block-v49"><div class="quiz-word-zh-v49">' + chars(w.zh) + '</div><div class="quiz-word-pinyin-v49">' + esc(w.pinyin) + '</div></div>'
+        : '<div class="quiz-answer-placeholder-v49">タップして中国語</div>';
+    }else{
+      right += '<div class="quiz-word-zh-v49 quiz-prompt-line-v49">' + chars(w.zh) + '</div>';
+      right += revealed
+        ? '<div class="quiz-answer-block-v49"><div class="quiz-word-pinyin-v49">' + esc(w.pinyin) + '</div><div class="quiz-word-jp-v49">' + esc(w.jp) + '</div></div>'
+        : '<div class="quiz-answer-placeholder-v49">タップしてピンイン・日本語</div>';
+    }
+    boxEl.innerHTML =
+      '<div class="question-card-top quiz-card-top">' +
+        '<div class="quiz-meta-pills" aria-label="' + esc(categoryText(w)) + ' ' + esc(levelText(w)) + '">' +
+          '<span class="quiz-meta-genre">' + esc(categoryText(w)) + '</span>' +
+          '<span class="quiz-meta-level">' + esc(levelText(w)) + '</span>' +
+        '</div>' +
+        '<div class="counter">' + esc((Number(wordIndex || 0) + 1) + ' / ' + totalWords()) + '</div>' +
+      '</div>' +
+      '<div class="quiz-word-card-v47 quiz-word-card-v48 quiz-word-card-v49" role="button" tabindex="0" aria-label="単語クイズ">' +
+        '<div class="quiz-word-emoji-v47 quiz-word-emoji-v48 quiz-word-emoji-v49" aria-hidden="true">' + esc(w.emoji || '🔤') + '</div>' +
+        '<div class="quiz-word-lines-v47 quiz-word-lines-v48 quiz-word-lines-v49">' + right + '</div>' +
+      '</div>';
+    try{ if(typeof cleanBadStatus === 'function') cleanBadStatus(); }catch(e){}
+    try{ if(typeof showFixedNavSoon === 'function') showFixedNavSoon(); }catch(e){}
+  }
+  function schedule(){
+    setVersion();
+    if(!isWordQuiz()) return;
+    setTimeout(renderWordQuizV49, 0);
+    setTimeout(renderWordQuizV49, 90);
+    setTimeout(renderWordQuizV49, 280);
+  }
+  try{ window.renderWordQuestion = renderWordQuizV49; renderWordQuestion = renderWordQuizV49; }catch(e){}
+  const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
+  window.renderQuestion = function(){
+    if(isWordQuiz()) return renderWordQuizV49();
+    if(typeof prevRenderQuestion === 'function') return prevRenderQuestion.apply(this, arguments);
+  };
+  try{ renderQuestion = window.renderQuestion; }catch(e){}
+  document.addEventListener('click', schedule, true);
+  document.addEventListener('touchend', schedule, true);
+  try{
+    const mo = new MutationObserver(function(){
+      if(!isWordQuiz()) return;
+      const txt = ((typeof box !== 'undefined' && box) ? box.textContent : document.body.textContent) || '';
+      if(/greeting|cafe|restaurant|shopping|transport|hotel|tourism|daily|work|emergency|単語/.test(txt) && document.querySelector('.quiz-word-card-v48')){
+        setTimeout(renderWordQuizV49, 0);
+      }
+    });
+    if(document.body) mo.observe(document.body, {childList:true, subtree:true, characterData:true});
+  }catch(e){}
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule, {once:true});
+  else schedule();
+})();
+</script>
+
+
+
+<style>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1: remove tap hints + lock quiz text geometry ===== */
+.quiz-word-card-v50{
+  display:grid !important;
+  grid-template-columns:92px minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:center !important;
+  min-height:176px !important;
+  padding:10px 0 6px !important;
+  cursor:pointer !important;
+}
+.quiz-word-lines-v50{
+  min-width:0 !important;
+  display:grid !important;
+  grid-template-rows:auto minmax(72px, auto) !important;
+  align-content:center !important;
+  row-gap:8px !important;
+}
+.quiz-prompt-slot-v50,
+.quiz-answer-slot-v50{
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+}
+.quiz-prompt-slot-v50{
+  min-height:48px !important;
+}
+.quiz-answer-slot-v50{
+  min-height:78px !important;
+}
+.quiz-answer-block-v50{
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  gap:6px !important;
+  min-height:78px !important;
+}
+.quiz-answer-block-v50.is-hidden{
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+.quiz-answer-placeholder-v48,
+.quiz-answer-placeholder-v49{
+  display:none !important;
+}
+.quiz-word-emoji-v50{
+  width:86px !important;
+  height:86px !important;
+  border-radius:26px !important;
+  display:grid !important;
+  place-items:center !important;
+  background:linear-gradient(145deg,#f8fbff 0%,#eef6ff 100%) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.08), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  font-size:42px !important;
+  line-height:1 !important;
+}
+@media(max-width:340px){
+  .quiz-word-card-v50{grid-template-columns:82px minmax(0,1fr) !important;gap:11px !important;min-height:168px !important;}
+  .quiz-word-emoji-v50{width:78px !important;height:78px !important;border-radius:23px !important;font-size:38px !important;}
+  .quiz-word-lines-v50{grid-template-rows:auto minmax(70px, auto) !important;row-gap:7px !important;}
+  .quiz-answer-slot-v50,.quiz-answer-block-v50{min-height:74px !important;}
+}
+</style>
+
+<script>
+/* ===== 2026-05-24-v51-word-quiz-audio-on-reveal-only-v1 =====
+   - Remove 「タップして中国語」 / 「タップしてピンイン・日本語」.
+   - Keep answer area height reserved while hidden, so text does not jump vertically on reveal.
+   - Preserve v49 pill/elegant typography and v48 direction logic.
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v51-word-quiz-audio-on-reveal-only-v1';
+  const CATEGORY_LABELS = {
+    all:'全部', greeting:'挨拶', cafe:'カフェ', restaurant:'食事', shopping:'買物',
+    transport:'交通', hotel:'ホテル', tourism:'観光', daily:'日常', work:'仕事', emergency:'緊急'
+  };
+  const LEVEL_LABELS = {beginner:'初級', intermediate:'中級', advanced:'上級', all:'全部'};
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function chars(s){
+    return String(s == null ? '' : s).split('').map(function(ch){ return '<span class="char">' + esc(ch) + '</span>'; }).join('');
+  }
+  function isWordQuiz(){
+    try{ return view === 'question' && contentMode === 'word'; }catch(e){ return false; }
+  }
+  function getWord(){
+    try{ if(typeof currentWordQuestion === 'function') return currentWordQuestion(); }catch(e){}
+    try{ if(typeof getWordList === 'function'){ const a=getWordList(); return a && a.length ? a[(Number(wordIndex)||0)%a.length] : null; } }catch(e){}
+    try{ return WORDS && WORDS.length ? WORDS[(Number(wordIndex)||0)%WORDS.length] : null; }catch(e){ return null; }
+  }
+  function totalWords(){
+    try{ if(typeof currentWordCount === 'function') return currentWordCount(); }catch(e){}
+    try{ if(typeof getWordList === 'function') return getWordList().length; }catch(e){}
+    try{ return WORDS.length; }catch(e){ return 0; }
+  }
+  function categoryText(w){
+    const c = (w && w.category) || 'greeting';
+    return CATEGORY_LABELS[c] || c || '挨拶';
+  }
+  function levelText(w){
+    const lv = (w && w.level) || 'beginner';
+    return LEVEL_LABELS[lv] || '初級';
+  }
+  function direction(){
+    try{ return mode === 'speaking' ? 'jpzh' : 'zhjp'; }catch(e){ return 'zhjp'; }
+  }
+  function answerBlock(html, revealed){
+    return '<div class="quiz-answer-slot-v50"><div class="quiz-answer-block-v49 quiz-answer-block-v50' + (revealed ? '' : ' is-hidden') + '">' + html + '</div></div>';
+  }
+  function renderWordQuizV50(){
+    const boxEl = (typeof box !== 'undefined' && box) ? box : document.getElementById('box');
+    if(!boxEl || !isWordQuiz()) return;
+    const w = getWord();
+    if(!w){ boxEl.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+    const revealed = !!wordQuestionRevealed;
+    const dir = direction();
+    let right = '';
+    if(dir === 'jpzh'){
+      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-jp-v49 quiz-prompt-line-v49">' + esc(w.jp) + '</div></div>';
+      right += answerBlock('<div class="quiz-word-zh-v49">' + chars(w.zh) + '</div><div class="quiz-word-pinyin-v49">' + esc(w.pinyin) + '</div>', revealed);
+    }else{
+      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-zh-v49 quiz-prompt-line-v49">' + chars(w.zh) + '</div></div>';
+      right += answerBlock('<div class="quiz-word-pinyin-v49">' + esc(w.pinyin) + '</div><div class="quiz-word-jp-v49">' + esc(w.jp) + '</div>', revealed);
+    }
+    boxEl.innerHTML =
+      '<div class="question-card-top quiz-card-top">' +
+        '<div class="quiz-meta-pills" aria-label="' + esc(categoryText(w)) + ' ' + esc(levelText(w)) + '">' +
+          '<span class="quiz-meta-genre">' + esc(categoryText(w)) + '</span>' +
+          '<span class="quiz-meta-level">' + esc(levelText(w)) + '</span>' +
+        '</div>' +
+        '<div class="counter">' + esc((Number(wordIndex || 0) + 1) + ' / ' + totalWords()) + '</div>' +
+      '</div>' +
+      '<div class="quiz-word-card-v47 quiz-word-card-v48 quiz-word-card-v49 quiz-word-card-v50" role="button" tabindex="0" aria-label="単語クイズ">' +
+        '<div class="quiz-word-emoji-v47 quiz-word-emoji-v48 quiz-word-emoji-v49 quiz-word-emoji-v50" aria-hidden="true">' + esc(w.emoji || '🔤') + '</div>' +
+        '<div class="quiz-word-lines-v47 quiz-word-lines-v48 quiz-word-lines-v49 quiz-word-lines-v50">' + right + '</div>' +
+      '</div>';
+    try{ if(typeof cleanBadStatus === 'function') cleanBadStatus(); }catch(e){}
+    try{ if(typeof showFixedNavSoon === 'function') showFixedNavSoon(); }catch(e){}
+  }
+  function schedule(){
+    setVersion();
+    if(!isWordQuiz()) return;
+    setTimeout(renderWordQuizV50, 0);
+    setTimeout(renderWordQuizV50, 90);
+    setTimeout(renderWordQuizV50, 280);
+  }
+  try{ window.renderWordQuestion = renderWordQuizV50; renderWordQuestion = renderWordQuizV50; }catch(e){}
+  const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
+  window.renderQuestion = function(){
+    if(isWordQuiz()) return renderWordQuizV50();
+    if(typeof prevRenderQuestion === 'function') return prevRenderQuestion.apply(this, arguments);
+  };
+  try{ renderQuestion = window.renderQuestion; }catch(e){}
+  document.addEventListener('click', schedule, true);
+  document.addEventListener('touchend', schedule, true);
+  try{
+    const mo = new MutationObserver(function(){
+      if(!isWordQuiz()) return;
+      const boxEl = (typeof box !== 'undefined' && box) ? box : document.getElementById('box');
+      const txt = (boxEl && boxEl.textContent) || '';
+      if(/タップして中国語|タップしてピンイン・日本語|greeting|cafe|restaurant|shopping|transport|hotel|tourism|daily|work|emergency|単語/.test(txt) || (boxEl && !boxEl.querySelector('.quiz-word-card-v50'))){
+        setTimeout(renderWordQuizV50, 0);
+      }
+    });
+    if(document.body) mo.observe(document.body, {childList:true, subtree:true, characterData:true});
+  }catch(e){}
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule, {once:true});
+  else schedule();
 })();
 </script>
 
