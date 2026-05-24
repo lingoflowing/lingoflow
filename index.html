@@ -9,8 +9,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-24-v28-read-list-black-meta-swap-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-24-v28-read-list-black-meta-swap-v1">
+<!-- LingoFlow app version: 2026-05-24-v31-listen-meta-pills-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-24-v31-listen-meta-pills-v1">
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -1707,7 +1707,7 @@ body.is-word-question-controls-visible .app{
 
 
 
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: iPhone SE bottom label fit ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: iPhone SE bottom label fit ===== */
 .bottom-action-bar{
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:6px;
@@ -1760,7 +1760,7 @@ body.is-word-question-controls-visible .app{
 
 
 
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: selectable level + SE random fit ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: selectable level + SE random fit ===== */
 .bottom-action-bar,
 .bottom-action-bar.v15-action-bar,
 .bottom-action-bar.v18-action-bar,
@@ -1807,7 +1807,7 @@ body.is-word-question-controls-visible .app{
 
 
 
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: SE random text final fit ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: SE random text final fit ===== */
 .bottom-action-bar.v15-action-bar,
 .bottom-action-bar.v18-action-bar,
 .bottom-action-bar.v22-compact-two-row,
@@ -1834,7 +1834,7 @@ body.is-word-question-controls-visible .app{
 
 
 
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: read mode typography aligned with listen mode ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: read mode typography aligned with listen mode ===== */
 .list-item{
   padding:14px 14px !important;
   border-radius:20px !important;
@@ -1890,7 +1890,7 @@ body.is-word-question-controls-visible .app{
 
 
 
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: polished read category headers ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: polished read category headers ===== */
 .list-group-head{
   display:inline-flex !important;
   align-items:center !important;
@@ -1965,7 +1965,7 @@ body.is-word-question-controls-visible .app{
 
 
 
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: read list black text + meta row swap ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: read list black text + meta row swap ===== */
 #v12MetaSelectBar.v16-meta-bar,
 .meta-bar{
   grid-template-columns:1.15fr 1fr !important;
@@ -1997,6 +1997,166 @@ body.is-word-question-controls-visible .app{
 }
 .list-head-level::after{
   content:"" !important;
+}
+
+
+
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: fixed previous/replay/next nav for quiz/listen ===== */
+.fixed-card-nav{
+  position:fixed !important;
+  z-index:7999 !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 126px) !important;
+  transform:translateX(-50%) !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:6px !important;
+  width:calc(100% - 16px) !important;
+  max-width:748px !important;
+  padding:5px !important;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.94) !important;
+  border:1px solid rgba(0,122,255,.10) !important;
+  box-shadow:0 10px 26px rgba(15,49,98,.13), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.fixed-card-nav.hidden-panel{
+  display:none !important;
+}
+.fixed-card-nav button{
+  height:36px !important;
+  min-width:0 !important;
+  border:1px solid rgba(0,122,255,.12) !important;
+  border-radius:999px !important;
+  background:#eef6ff !important;
+  color:#005bbb !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+.fixed-card-nav button:active{
+  transform:translateY(1px) !important;
+}
+body.has-fixed-card-nav .app{
+  padding-bottom:176px !important;
+}
+body.has-fixed-card-nav .question-nav{
+  display:none !important;
+}
+@media(max-width:380px){
+  .fixed-card-nav{
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 118px) !important;
+    width:calc(100% - 12px) !important;
+    gap:5px !important;
+    padding:4px !important;
+    border-radius:18px !important;
+  }
+  .fixed-card-nav button{
+    height:34px !important;
+    font-size:12.5px !important;
+  }
+  body.has-fixed-card-nav .app{
+    padding-bottom:170px !important;
+  }
+}
+
+
+
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: separate fixed nav from bottom action bar ===== */
+.fixed-card-nav{
+  margin-bottom:0 !important;
+}
+.fixed-card-nav::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:-10px;
+  height:10px;
+  pointer-events:none;
+}
+.bottom-action-bar{
+  z-index:7000 !important;
+}
+.fixed-card-nav{
+  z-index:7999 !important;
+}
+
+
+
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: listen meta pills aligned with read headers ===== */
+.listen-card-top{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  margin:0 0 12px !important;
+}
+.listen-meta-pills{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  min-width:0 !important;
+  max-width:calc(100% - 70px) !important;
+  padding:6px 9px !important;
+  border-radius:999px !important;
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(238,246,255,.92)) !important;
+  border:1px solid rgba(0,122,255,.12) !important;
+  box-shadow:0 5px 14px rgba(15,49,98,.055), inset 0 1px 0 rgba(255,255,255,.9) !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+}
+.listen-meta-genre,
+.listen-meta-level{
+  display:inline-flex !important;
+  align-items:center !important;
+  min-width:0 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  letter-spacing:.01em !important;
+  color:#0068d8 !important;
+}
+.listen-meta-level{
+  color:#38516f !important;
+}
+.listen-meta-genre::before{
+  content:"";
+  width:7px;
+  height:7px;
+  flex:0 0 7px;
+  margin-right:5px;
+  border-radius:999px;
+  background:#007aff;
+  box-shadow:0 0 0 4px rgba(0,122,255,.10);
+}
+.listen-meta-level::before{
+  content:"";
+  width:1px;
+  height:13px;
+  margin:0 2px 0 0;
+  background:rgba(0,122,255,.18);
+}
+.listen-card-top .counter{
+  flex:0 0 auto !important;
+  margin-left:auto !important;
+}
+@media(max-width:380px){
+  .listen-card-top{
+    gap:8px !important;
+    margin-bottom:10px !important;
+  }
+  .listen-meta-pills{
+    gap:5px !important;
+    padding:5px 8px !important;
+    max-width:calc(100% - 62px) !important;
+  }
+  .listen-meta-genre,
+  .listen-meta-level{
+    font-size:11.5px !important;
+  }
 }
 
 </style>
@@ -4742,7 +4902,7 @@ setView(view);
 
 /* ===== v15 reflected JS patch: labels/order + paired toggles ===== */
 (function(){
-  const V15_VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const V15_VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   try{
     document.body.setAttribute('data-lingoflow-v15', V15_VERSION);
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
@@ -4895,7 +5055,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v28-read-list-black-meta-swap-v1';
+  const VERSION = '2026-05-24-v31-listen-meta-pills-v1';
 
   const icons = {
     hear:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2"/><path d="M4 13h3v6H5a1 1 0 0 1-1-1v-5Z"/><path d="M20 13h-3v6h2a1 1 0 0 0 1-1v-5Z"/></svg>',
@@ -5012,7 +5172,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v28-read-list-black-meta-swap-v1';
+  const VERSION = '2026-05-24-v31-listen-meta-pills-v1';
   function setVersion(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -5051,7 +5211,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v28-read-list-black-meta-swap-v1';
+  const VERSION = '2026-05-24-v31-listen-meta-pills-v1';
   function setVersionV18(){
     const meta = document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -5189,7 +5349,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v28-read-list-black-meta-swap-v1';
+  const VERSION='2026-05-24-v31-listen-meta-pills-v1';
   function setV19(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -5216,7 +5376,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v28-read-list-black-meta-swap-v1';
+  const VERSION='2026-05-24-v31-listen-meta-pills-v1';
   function applyV21(){
     const meta=document.querySelector('meta[name="lingoflow-app-version"]');
     if(meta) meta.setAttribute('content', VERSION);
@@ -5257,7 +5417,7 @@ setView(view);
 <script>
 (function(){
   'use strict';
-  const VERSION='2026-05-24-v28-read-list-black-meta-swap-v1';
+  const VERSION='2026-05-24-v31-listen-meta-pills-v1';
   function escV22(s){
     return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});
   }
@@ -5425,7 +5585,7 @@ setView(view);
   };
 
   const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-  if(meta) meta.setAttribute('content', '2026-05-24-v28-read-list-black-meta-swap-v1');
+  if(meta) meta.setAttribute('content', '2026-05-24-v31-listen-meta-pills-v1');
 })();
 </script>
 
@@ -5581,7 +5741,7 @@ setView(view);
   };
 
   const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-  if(meta) meta.setAttribute('content', '2026-05-24-v28-read-list-black-meta-swap-v1');
+  if(meta) meta.setAttribute('content', '2026-05-24-v31-listen-meta-pills-v1');
 })();
 </script>
 
@@ -5590,7 +5750,7 @@ setView(view);
 /* ===== v25 final hotfix: default Listen + All levels + review visible ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
 
   function setVersion(){
     try{
@@ -5748,10 +5908,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: level all default hard fix ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: level all default hard fix ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
 
   function setVersion(){
     try{
@@ -5909,10 +6069,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: verified level-all default ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: verified level-all default ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   const REAL_LEVELS = ["beginner","intermediate","advanced"];
 
   function setVersion(){
@@ -6056,10 +6216,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final visible level-all display guard ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: final visible level-all display guard ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
 
   function applyLevelAllDisplay(){
     try{
@@ -6116,10 +6276,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final short bottom labels guard ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: final short bottom labels guard ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   function setVersion(){
     try{
       const meta = document.querySelector('meta[name="lingoflow-app-version"]');
@@ -6172,10 +6332,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: level selectable + SE bottom labels final guard ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: level selectable + SE bottom labels final guard ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   const LEVEL_LABELS = { all:'全部', beginner:'初級', intermediate:'中級', advanced:'上級' };
   const LEVEL_OPTION_HTML = '<option value="all">全部</option><option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
 
@@ -6339,10 +6499,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: reset level select events, preserve selected level ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: reset level select events, preserve selected level ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   const LABELS = { all:'全部', beginner:'初級', intermediate:'中級', advanced:'上級' };
   const REAL_LEVELS = ['beginner','intermediate','advanced'];
   const OPTIONS = '<option value="all">全部</option><option value="beginner">初級</option><option value="intermediate">中級</option><option value="advanced">上級</option>';
@@ -6532,10 +6692,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final 順不同 label guard ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: final 順不同 label guard ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   function apply(){
     try{
       const meta = document.querySelector('meta[name="lingoflow-app-version"]');
@@ -6579,10 +6739,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: fix read sentence list when level=all ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: fix read sentence list when level=all ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   const REAL_LEVELS = ['beginner','intermediate','advanced'];
 
   function setVersion(){
@@ -6689,10 +6849,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: read header polish + listen starts from beginner/greeting ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: read header polish + listen starts from beginner/greeting ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
   let shouldStartListenFromDefault = true;
 
   function setVersion(){
@@ -6828,10 +6988,10 @@ setView(view);
 
 
 <script>
-/* ===== 2026-05-24-v28-read-list-black-meta-swap-v1: final read header/meta swap guard ===== */
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: final read header/meta swap guard ===== */
 (function(){
   'use strict';
-  const VERSION = "2026-05-24-v28-read-list-black-meta-swap-v1";
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
 
   function setVersion(){
     try{
@@ -6916,6 +7076,450 @@ setView(view);
     apply();
     setTimeout(apply, 0);
     setTimeout(apply, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: fixed nav for quiz/listen ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function ensureFixedNav(){
+    let nav = document.getElementById('fixedCardNav');
+    if(nav) return nav;
+
+    nav = document.createElement('div');
+    nav.id = 'fixedCardNav';
+    nav.className = 'fixed-card-nav hidden-panel';
+    nav.setAttribute('aria-label', 'カード操作');
+    nav.innerHTML =
+      '<button type="button" data-fixed-nav="prev">前</button>' +
+      '<button type="button" data-fixed-nav="replay">もう一度</button>' +
+      '<button type="button" data-fixed-nav="next">次</button>';
+
+    document.body.appendChild(nav);
+
+    nav.addEventListener('click', function(e){
+      const btn = e.target.closest('[data-fixed-nav]');
+      if(!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const action = btn.getAttribute('data-fixed-nav');
+      handleFixedNav(action);
+    }, true);
+
+    return nav;
+  }
+
+  function isListenView(){
+    return view === 'player' || view === 'continuous' || view === 'random';
+  }
+
+  function shouldShowFixedNav(){
+    try{
+      if(view === 'question') return true;
+      if(isListenView() && contentMode !== 'word') return true;
+    }catch(e){}
+    return false;
+  }
+
+  function syncFixedNav(){
+    const nav = ensureFixedNav();
+    const show = shouldShowFixedNav();
+    nav.classList.toggle('hidden-panel', !show);
+    document.body.classList.toggle('has-fixed-card-nav', show);
+  }
+
+  function currentSentence(){
+    try{
+      if(history && history[index]) return history[index];
+    }catch(e){}
+    return null;
+  }
+
+  async function replayCurrent(){
+    try{
+      const p = currentSentence();
+      if(!p){
+        if(typeof nextQuestion === 'function') nextQuestion(true);
+        return;
+      }
+
+      if(view === 'question'){
+        if(typeof speakQuestionCurrent === 'function') await speakQuestionCurrent();
+        else if(typeof speakChinese === 'function') await speakChinese(p.zh);
+        return;
+      }
+
+      if(isListenView()){
+        stopAudio();
+        if(typeof renderAuto === 'function') renderAuto(p);
+        if(typeof speakChinese === 'function') await speakChinese(p.zh);
+        if(typeof speakJapanese === 'function') await speakJapanese(p.jp);
+      }
+    }catch(e){}
+  }
+
+  function prevForListen(){
+    try{
+      stopAudio();
+      if(index > 0) index -= 1;
+      const p = history[index] || history[0] || null;
+      if(p && typeof renderAuto === 'function') renderAuto(p);
+    }catch(e){}
+  }
+
+  function nextForListen(){
+    try{
+      stopAudio();
+      let p = null;
+      if(typeof pick === 'function') p = pick();
+      if(!p && typeof getList === 'function'){
+        const list = getList();
+        p = list && list.length ? list[0] : null;
+      }
+      if(!p) return;
+      history.push(p);
+      index = history.length - 1;
+      if(typeof renderAuto === 'function') renderAuto(p);
+    }catch(e){}
+  }
+
+  function handleFixedNav(action){
+    try{
+      if(view === 'question'){
+        if(action === 'prev' && typeof prevQuestion === 'function') return prevQuestion();
+        if(action === 'replay') return replayCurrent();
+        if(action === 'next' && typeof nextQuestion === 'function') return nextQuestion(true);
+      }
+
+      if(isListenView()){
+        if(action === 'prev') return prevForListen();
+        if(action === 'replay') return replayCurrent();
+        if(action === 'next') return nextForListen();
+      }
+    }finally{
+      setTimeout(syncFixedNav, 0);
+    }
+  }
+
+  // Hide any existing in-card nav by relying on CSS class, but keep old handlers untouched.
+  const prevUpdateButtons = window.updateButtons;
+  if(typeof prevUpdateButtons === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdateButtons.apply(this, arguments);
+      setVersion();
+      syncFixedNav();
+      return r;
+    };
+  }
+
+  const wrapNames = ['renderQuestion','renderPlaybackPanel','renderAuto','setView','nextQuestion','prevQuestion'];
+  wrapNames.forEach(function(name){
+    try{
+      const original = window[name] || eval(name);
+      if(typeof original !== 'function') return;
+      const wrapped = function(){
+        const r = original.apply(this, arguments);
+        setTimeout(syncFixedNav, 0);
+        return r;
+      };
+      window[name] = wrapped;
+      try{ eval(name + ' = wrapped'); }catch(e){}
+    }catch(e){}
+  });
+
+  function apply(){
+    setVersion();
+    ensureFixedNav();
+    syncFixedNav();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 300);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: continuous order by category then beginner/intermediate/advanced ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
+  const REAL_LEVELS = ['beginner','intermediate','advanced'];
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function categoryOrder(){
+    try{
+      return Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; });
+    }catch(e){
+      return ['greeting','cafe','restaurant','shopping','transport','hotel','tourism','daily','work','emergency'];
+    }
+  }
+
+  function selectedCategoryOrder(){
+    try{
+      if(typeof category !== 'undefined' && category !== 'all') return [category];
+    }catch(e){}
+    return categoryOrder();
+  }
+
+  function selectedLevelOrder(){
+    try{
+      if(typeof level !== 'undefined' && level !== 'all') return [level];
+    }catch(e){}
+    return REAL_LEVELS.slice();
+  }
+
+  function orderedSentenceList(){
+    let out = [];
+    try{
+      selectedCategoryOrder().forEach(function(cat){
+        selectedLevelOrder().forEach(function(lv){
+          const rows = (DATA && DATA[lv]) ? DATA[lv] : [];
+          rows.forEach(function(row){
+            if(!cat || cat === 'all' || row.category === cat) out.push(row);
+          });
+        });
+      });
+    }catch(e){}
+    return out;
+  }
+
+  function applyOrderedDataFns(){
+    try{
+      window.getOrderedContinuousList = orderedSentenceList;
+      getList = function(){
+        const rows = orderedSentenceList();
+        return rows.length ? rows : [];
+      };
+      currentListCount = function(){
+        const rows = orderedSentenceList();
+        return rows.length || 1;
+      };
+      pick = function(){
+        const rows = orderedSentenceList();
+        if(!rows.length) return null;
+        if(autoMode === 'random' || view === 'random'){
+          return rows[Math.floor(Math.random() * rows.length)];
+        }
+        const current = history && index >= 0 ? history[index] : null;
+        if(!current) return rows[0];
+        const pos = rows.findIndex(function(r){
+          return r.zh === current.zh && r.pinyin === current.pinyin && r.jp === current.jp && r.category === current.category;
+        });
+        return rows[(pos + 1 + rows.length) % rows.length];
+      };
+    }catch(e){}
+  }
+
+  function startContinuousFromFirst(){
+    try{
+      const rows = orderedSentenceList();
+      if(!rows.length) return false;
+      history = [rows[0]];
+      index = 0;
+      step = 0;
+      if(typeof renderAuto === 'function') renderAuto(rows[0]);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  const previousStartAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
+  if(typeof previousStartAuto === 'function'){
+    window.startAuto = function(){
+      applyOrderedDataFns();
+
+      // 連続モード開始時、履歴がない/条件変更直後なら必ず先頭から。
+      try{
+        if((view === 'continuous' || autoMode === 'continuous') && (!history || index < 0 || !history[index])){
+          startContinuousFromFirst();
+        }
+      }catch(e){}
+
+      return previousStartAuto.apply(this, arguments);
+    };
+    try{ startAuto = window.startAuto; }catch(e){}
+  }
+
+  const previousSetAutoPlayback = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
+  if(typeof previousSetAutoPlayback === 'function'){
+    window.setAutoPlayback = function(action){
+      applyOrderedDataFns();
+      try{
+        if(action === 'continuous' || action === 'play'){
+          if(autoMode !== 'random'){
+            // 再生ボタンで連続開始する時は、ジャンル内の初級先頭から。
+            if(!history || index < 0 || !history[index]) startContinuousFromFirst();
+          }
+        }
+      }catch(e){}
+      return previousSetAutoPlayback.apply(this, arguments);
+    };
+    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
+  }
+
+  const previousUpdateButtons = window.updateButtons;
+  if(typeof previousUpdateButtons === 'function'){
+    window.updateButtons = function(){
+      const r = previousUpdateButtons.apply(this, arguments);
+      applyOrderedDataFns();
+      setVersion();
+      return r;
+    };
+  }
+
+  function apply(){
+    setVersion();
+    applyOrderedDataFns();
+    try{
+      if(view === 'continuous' && (!history || index < 0 || !history[index])) startContinuousFromFirst();
+    }catch(e){}
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 300);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-24-v31-listen-meta-pills-v1: render listen meta pills beside counter ===== */
+(function(){
+  'use strict';
+  const VERSION = "2026-05-24-v31-listen-meta-pills-v1";
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function escSafe(v){
+    try{ return typeof esc === 'function' ? esc(v) : String(v || '').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+    catch(e){ return String(v || ''); }
+  }
+
+  function categoryText(cat){
+    try{
+      if(typeof categoryLabel === 'function') return categoryLabel(cat);
+      if(typeof categoryNames !== 'undefined' && categoryNames[cat]) return categoryNames[cat];
+    }catch(e){}
+    return cat || '';
+  }
+
+  function levelOfSentence(p){
+    try{
+      for(const lv of ['beginner','intermediate','advanced']){
+        const rows = DATA && DATA[lv] ? DATA[lv] : [];
+        if(rows.some(function(row){ return row === p || (row.zh === p.zh && row.pinyin === p.pinyin && row.jp === p.jp && row.category === p.category); })){
+          return lv;
+        }
+      }
+    }catch(e){}
+    return typeof level !== 'undefined' && level !== 'all' ? level : 'beginner';
+  }
+
+  function levelText(lv){
+    try{
+      if(typeof levelNames !== 'undefined' && levelNames[lv]) return levelNames[lv];
+    }catch(e){}
+    return lv === 'beginner' ? '初級' : lv === 'intermediate' ? '中級' : lv === 'advanced' ? '上級' : '全部';
+  }
+
+  function metaHtml(p){
+    const cat = categoryText(p && p.category);
+    const lv = levelText(levelOfSentence(p || {}));
+    return '<div class="listen-meta-pills" aria-label="' + escSafe(cat) + ' ' + escSafe(lv) + '">' +
+      '<span class="listen-meta-genre">' + escSafe(cat) + '</span>' +
+      '<span class="listen-meta-level">' + escSafe(lv) + '</span>' +
+    '</div>';
+  }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  if(typeof prevRenderAuto === 'function'){
+    window.renderAuto = function(p){
+      const r = prevRenderAuto.apply(this, arguments);
+      try{
+        const top = box.querySelector('.auto-card-top');
+        if(top){
+          top.classList.add('listen-card-top');
+          const oldMeta = top.querySelector('.meta-left');
+          const counter = top.querySelector('.counter');
+          if(oldMeta) oldMeta.remove();
+          if(!top.querySelector('.listen-meta-pills')){
+            const wrap = document.createElement('div');
+            wrap.innerHTML = metaHtml(p);
+            top.insertBefore(wrap.firstElementChild, counter || top.firstChild);
+          }
+        }
+      }catch(e){}
+      setVersion();
+      return r;
+    };
+    try{ renderAuto = window.renderAuto; }catch(e){}
+  }
+
+  function apply(){
+    setVersion();
+    try{
+      if((view === 'continuous' || view === 'random') && history && history[index] && typeof renderAuto === 'function'){
+        renderAuto(history[index]);
+      }
+    }catch(e){}
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+    }, { once:true });
+  }else{
+    apply();
+    setTimeout(apply, 0);
   }
 })();
 </script>
