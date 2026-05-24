@@ -9,8 +9,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-24-v52-word-quiz-nav-reset-question-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-24-v52-word-quiz-nav-reset-question-v1">
+<!-- LingoFlow app version: 2026-05-24-v53-stable-controller-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-24-v53-stable-controller-v1">
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -12580,6 +12580,326 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
   }catch(e){}
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,0); setTimeout(apply,300); }, {once:true});
   else { apply(); setTimeout(apply,0); setTimeout(apply,300); }
+})();
+</script>
+
+
+
+<style>
+/* ===== 2026-05-24-v53-stable-controller-v1 =====
+   Stable Controller patch: UIを変えず、state/render/audioの入口を一本化する。
+*/
+body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .status,
+body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .player-desc,
+body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .player-title{
+  display:none !important;
+}
+.v53-sentence-card,
+.v53-word-quiz-card{width:100% !important;}
+.v53-hidden-answer{visibility:hidden !important;}
+</style>
+
+<script>
+/* ===== 2026-05-24-v53-stable-controller-v1 =====
+   目的:
+   - v52をベースに、UIを変えずに状態管理だけ安定化。
+   - renderCurrentState() / audioController / appState を唯一の入口にする。
+   - 聞く→文章の停止保持、pill維持、クイズ→単語のreveal/nav状態を再発防止。
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-24-v53-stable-controller-v1';
+  const CAT = {all:'全部',greeting:'挨拶',cafe:'カフェ',restaurant:'食事',shopping:'買物',transport:'交通',hotel:'ホテル',tourism:'観光',daily:'日常',work:'仕事',emergency:'緊急'};
+  const LV = {all:'全部',beginner:'初級',intermediate:'中級',advanced:'上級'};
+  const LEVEL_ORDER = ['beginner','intermediate','advanced'];
+  let tapGuardAt = 0;
+
+  const appState = window.LingoFlowStateV53 = window.LingoFlowStateV53 || {
+    view:'question', contentMode:'sentence', mode:'reading', autoMode:'continuous',
+    index:0, wordIndex:0, quizReveal:false, isPlaying:false, audioToken:0,
+    currentSentence:null, currentWord:null
+  };
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function esc(v){ return String(v == null ? '' : v).replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function chars(v){ return String(v == null ? '' : v).split('').map(ch => '<span class="char">'+esc(ch)+'</span>').join(''); }
+  function boxEl(){ return (typeof box !== 'undefined' && box) ? box : document.getElementById('box'); }
+  function syncFromGlobals(){
+    try{ appState.view = view; }catch(e){}
+    try{ appState.contentMode = contentMode; }catch(e){}
+    try{ appState.mode = mode; }catch(e){}
+    try{ appState.autoMode = autoMode; }catch(e){}
+    try{ appState.index = Number(index || 0); }catch(e){}
+    try{ appState.wordIndex = Number(wordIndex || 0); }catch(e){}
+    try{ appState.quizReveal = !!wordQuestionRevealed; }catch(e){}
+  }
+  function commitToGlobals(){
+    try{ view = appState.view; }catch(e){}
+    try{ contentMode = appState.contentMode; }catch(e){}
+    try{ mode = appState.mode; }catch(e){}
+    try{ autoMode = appState.autoMode; }catch(e){}
+    try{ index = appState.index; }catch(e){}
+    try{ wordIndex = appState.wordIndex; }catch(e){}
+    try{ wordQuestionRevealed = appState.quizReveal; }catch(e){}
+  }
+  function allSentences(){
+    let rows = [];
+    try{
+      const lv = (typeof level !== 'undefined' ? level : 'all');
+      const cat = (typeof category !== 'undefined' ? category : 'all');
+      const sourceLevels = lv === 'all' ? LEVEL_ORDER : [lv];
+      sourceLevels.forEach(k => {
+        const arr = (DATA && DATA[k]) ? DATA[k] : [];
+        arr.forEach(p => { if(cat === 'all' || p.category === cat) rows.push(p); });
+      });
+      if(!rows.length && DATA){ LEVEL_ORDER.forEach(k => (DATA[k]||[]).forEach(p => rows.push(p))); }
+    }catch(e){}
+    return rows;
+  }
+  function norm(n, len){ len = len || 1; return ((Number(n)||0) % len + len) % len; }
+  function sentenceAt(n){ const rows = allSentences(); return rows.length ? rows[norm(n, rows.length)] : null; }
+  function wordRows(){
+    try{ if(typeof getWordList === 'function') return getWordList() || []; }catch(e){}
+    try{ return WORDS || []; }catch(e){ return []; }
+  }
+  function wordAt(n){ const rows = wordRows(); return rows.length ? rows[norm(n, rows.length)] : null; }
+  function catLabel(v){ return CAT[v] || v || '挨拶'; }
+  function lvLabel(v){ return LV[v] || v || '初級'; }
+  function cleanStatus(){
+    try{ document.querySelectorAll('.status,.player-desc,.player-title').forEach(el => el.remove()); }catch(e){}
+  }
+  function showFixedNav(){
+    try{
+      const nav = document.getElementById('fixedCardNav');
+      if(!nav) return;
+      const show = (appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random' || appState.view === 'question');
+      nav.classList.toggle('hidden-panel', !show);
+      document.body.classList.toggle('has-fixed-card-nav', show);
+      if(show){ nav.style.display='grid'; nav.style.visibility='visible'; nav.style.opacity='1'; }
+    }catch(e){}
+  }
+  function sentenceHeader(p, countText){
+    const c = catLabel(p && p.category);
+    const l = lvLabel((p && p.level) || 'beginner');
+    return '<div class="question-card-top quiz-card-top">' +
+      '<div class="quiz-meta-pills" aria-label="'+esc(c)+' '+esc(l)+'">' +
+        '<span class="quiz-meta-genre">'+esc(c)+'</span>' +
+        '<span class="quiz-meta-level">'+esc(l)+'</span>' +
+      '</div>' +
+      '<div class="counter">'+esc(countText || '')+'</div>' +
+    '</div>';
+  }
+  function renderSentence(active){
+    syncFromGlobals();
+    const b = boxEl(); if(!b) return;
+    let p = appState.currentSentence || sentenceAt(appState.index) || sentenceAt(0);
+    if(!p){ b.innerHTML = '<div class="error">表示できる文章データがありません。</div>'; return; }
+    appState.currentSentence = p;
+    const rows = allSentences();
+    const n = rows.length || 1;
+    b.innerHTML = sentenceHeader(p, (norm(appState.index,n)+1)+' / '+n) +
+      '<div class="card-main v53-sentence-card"><div class="lines-wrap">' +
+        '<div class="line"><div class="zh'+(active?' audio-active':'')+'">'+chars(p.zh)+'</div></div>' +
+        '<div class="line"><div class="pinyin">'+esc(p.pinyin)+'</div></div>' +
+        '<div class="line"><div class="jp">'+esc(p.jp)+'</div></div>' +
+      '</div></div>';
+    cleanStatus(); showFixedNav();
+  }
+  function renderWordQuiz(){
+    syncFromGlobals();
+    const b = boxEl(); if(!b) return;
+    const rows = wordRows();
+    const n = rows.length || 1;
+    const w = wordAt(appState.wordIndex);
+    if(!w){ b.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
+    appState.currentWord = w;
+    const revealed = !!appState.quizReveal;
+    const jpToZh = appState.mode === 'speaking';
+    let right = '';
+    if(jpToZh){
+      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-jp-v49 quiz-prompt-line-v49">'+esc(w.jp)+'</div></div>';
+      right += '<div class="quiz-answer-slot-v50"><div class="quiz-answer-block-v49 quiz-answer-block-v50'+(revealed?'':' is-hidden v53-hidden-answer')+'"><div class="quiz-word-zh-v49">'+chars(w.zh)+'</div><div class="quiz-word-pinyin-v49">'+esc(w.pinyin)+'</div></div></div>';
+    }else{
+      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-zh-v49 quiz-prompt-line-v49">'+chars(w.zh)+'</div></div>';
+      right += '<div class="quiz-answer-slot-v50"><div class="quiz-answer-block-v49 quiz-answer-block-v50'+(revealed?'':' is-hidden v53-hidden-answer')+'"><div class="quiz-word-pinyin-v49">'+esc(w.pinyin)+'</div><div class="quiz-word-jp-v49">'+esc(w.jp)+'</div></div></div>';
+    }
+    b.innerHTML = '<div class="question-card-top quiz-card-top">' +
+      '<div class="quiz-meta-pills" aria-label="'+esc(catLabel(w.category || 'greeting'))+' '+esc(lvLabel(w.level || 'beginner'))+'">' +
+        '<span class="quiz-meta-genre">'+esc(catLabel(w.category || 'greeting'))+'</span>' +
+        '<span class="quiz-meta-level">'+esc(lvLabel(w.level || 'beginner'))+'</span>' +
+      '</div>' +
+      '<div class="counter">'+esc((norm(appState.wordIndex,n)+1)+' / '+n)+'</div>' +
+    '</div>' +
+    '<div class="quiz-word-card-v47 quiz-word-card-v48 quiz-word-card-v49 quiz-word-card-v50 quiz-word-card-v52 v53-word-quiz-card" role="button" tabindex="0" aria-label="単語クイズ">' +
+      '<div class="quiz-word-emoji-v47 quiz-word-emoji-v48 quiz-word-emoji-v49 quiz-word-emoji-v50" aria-hidden="true">'+esc(w.emoji || '🔤')+'</div>' +
+      '<div class="quiz-word-lines-v47 quiz-word-lines-v48 quiz-word-lines-v49 quiz-word-lines-v50">'+right+'</div>' +
+    '</div>';
+    cleanStatus(); showFixedNav();
+  }
+  function renderCurrentState(opts){
+    opts = opts || {};
+    setVersion(); syncFromGlobals();
+    if(appState.view === 'question' && appState.contentMode === 'word') return renderWordQuiz();
+    if((appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random') && appState.contentMode !== 'word') return renderSentence(!!opts.audioActive);
+    cleanStatus(); showFixedNav();
+  }
+
+  const audioController = window.LingoFlowAudioV53 = {
+    token:0,
+    stop(reason){
+      this.token++; appState.audioToken = this.token; appState.isPlaying = false;
+      try{ if(typeof autoId !== 'undefined') autoId++; }catch(e){}
+      try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+      try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+      if(reason !== 'silent') renderCurrentState({audioActive:false});
+    },
+    async zh(text){
+      try{ if(typeof speakHighlight === 'function') return await speakHighlight(text); }catch(e){}
+      try{ if(typeof speakWordAudio === 'function') return await speakWordAudio(text); }catch(e){}
+      try{ if(typeof speak === 'function') return await speak(text); }catch(e){}
+    },
+    async jp(text){
+      try{ if(typeof speakJapanese === 'function') return await speakJapanese(text); }catch(e){}
+    },
+    async sentenceLoop(){
+      const token = ++this.token; appState.audioToken = token; appState.isPlaying = true;
+      try{ appState.view = (appState.autoMode === 'random') ? 'random' : 'continuous'; commitToGlobals(); updateButtons && updateButtons(); }catch(e){}
+      while(token === this.token && appState.isPlaying){
+        const rows = allSentences(); if(!rows.length) break;
+        if(appState.autoMode === 'random') appState.index = Math.floor(Math.random()*rows.length);
+        appState.currentSentence = sentenceAt(appState.index);
+        commitToGlobals(); renderSentence(true);
+        await this.zh(appState.currentSentence.zh);
+        if(token !== this.token || !appState.isPlaying) break;
+        await new Promise(r=>setTimeout(r,420));
+        await this.jp(appState.currentSentence.jp);
+        if(token !== this.token || !appState.isPlaying) break;
+        await new Promise(r=>setTimeout(r,700));
+        if(appState.autoMode !== 'random') appState.index = norm(appState.index + 1, rows.length);
+      }
+      if(token === this.token){ appState.isPlaying = false; appState.view='player'; commitToGlobals(); renderSentence(false); }
+    },
+    async revealWord(){
+      const w = appState.currentWord || wordAt(appState.wordIndex); if(!w) return;
+      const token = ++this.token; appState.audioToken = token;
+      appState.quizReveal = true; commitToGlobals(); renderWordQuiz();
+      await this.zh(w.zh);
+      if(token === this.token) renderWordQuiz();
+    }
+  };
+
+  function startManaged(){
+    syncFromGlobals();
+    if(appState.contentMode === 'word'){
+      try{ if(typeof startOrResumeWordPlayback === 'function') return startOrResumeWordPlayback(); }catch(e){}
+      return;
+    }
+    audioController.stop('silent');
+    audioController.sentenceLoop();
+  }
+  function stopManaged(){
+    syncFromGlobals();
+    if(appState.contentMode !== 'word' && (appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random')){
+      appState.view = 'player'; commitToGlobals();
+      audioController.stop('stop'); renderSentence(false); return;
+    }
+    audioController.stop('stop');
+  }
+  function moveSentence(delta){
+    syncFromGlobals(); audioController.stop('silent');
+    const rows = allSentences(); appState.index = norm(appState.index + delta, rows.length || 1);
+    appState.currentSentence = sentenceAt(appState.index); appState.view = 'player'; appState.isPlaying = false;
+    commitToGlobals(); try{ updateButtons && updateButtons(); }catch(e){} renderSentence(false);
+  }
+  function moveWordQuiz(delta){
+    syncFromGlobals(); audioController.stop('silent');
+    const rows = wordRows(); appState.wordIndex = norm(appState.wordIndex + delta, rows.length || 1); appState.quizReveal = false;
+    commitToGlobals(); renderWordQuiz();
+  }
+  function replayCurrent(){
+    syncFromGlobals();
+    if(appState.view === 'question' && appState.contentMode === 'word') return audioController.revealWord();
+    if((appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random') && appState.contentMode !== 'word'){
+      const p = appState.currentSentence || sentenceAt(appState.index); if(!p) return;
+      audioController.stop('silent');
+      (async function(){ const token = ++audioController.token; renderSentence(true); await audioController.zh(p.zh); if(token===audioController.token) await audioController.jp(p.jp); if(token===audioController.token) renderSentence(false); })();
+    }
+  }
+
+  const oldStart = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
+  window.startOrResumePlayback = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return startManaged(); if(typeof oldStart === 'function') return oldStart.apply(this, arguments); };
+  try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
+  const oldStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
+  window.stopPlaybackManual = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return stopManaged(); if(typeof oldStop === 'function') return oldStop.apply(this, arguments); };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+  const oldAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
+  window.startAuto = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return audioController.sentenceLoop(); if(typeof oldAuto === 'function') return oldAuto.apply(this, arguments); };
+  try{ startAuto = window.startAuto; }catch(e){}
+  const oldRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  window.renderAuto = function(p){ syncFromGlobals(); if(appState.contentMode !== 'word'){ if(p){ appState.currentSentence = p; } return renderSentence(true); } if(typeof oldRenderAuto === 'function') return oldRenderAuto.apply(this, arguments); };
+  try{ renderAuto = window.renderAuto; }catch(e){}
+  const oldPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
+  window.renderPlaybackPanel = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return renderSentence(false); if(typeof oldPanel === 'function') return oldPanel.apply(this, arguments); };
+  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
+  const oldQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
+  window.renderQuestion = function(){ syncFromGlobals(); if(appState.contentMode === 'word' && appState.view === 'question') return renderWordQuiz(); if(typeof oldQuestion === 'function') return oldQuestion.apply(this, arguments); };
+  try{ renderQuestion = window.renderQuestion; window.renderWordQuestion = renderWordQuiz; renderWordQuestion = renderWordQuiz; }catch(e){}
+
+  document.addEventListener('click', function(e){
+    const t = e.target && e.target.closest ? e.target.closest('[data-v15-toggle], [data-player-control], [data-fixed-nav]') : null;
+    if(!t) return;
+    syncFromGlobals();
+    const group = t.getAttribute('data-v15-toggle');
+    const value = t.getAttribute('data-v15-value');
+    const control = t.getAttribute('data-player-control');
+    const nav = t.getAttribute('data-fixed-nav');
+    if(group === 'run' || control === 'play' || control === 'stop'){
+      if(appState.contentMode !== 'word'){
+        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+        if(value === 'play' || control === 'play') startManaged(); else stopManaged();
+      }
+      return;
+    }
+    if(nav){
+      if(appState.view === 'question' && appState.contentMode === 'word'){
+        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+        if(nav === 'prev') moveWordQuiz(-1); else if(nav === 'next') moveWordQuiz(1); else audioController.revealWord();
+        return;
+      }
+      if((appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random') && appState.contentMode !== 'word'){
+        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+        if(nav === 'prev') moveSentence(-1); else if(nav === 'next') moveSentence(1); else replayCurrent();
+      }
+    }
+  }, true);
+
+  document.addEventListener('click', function(e){
+    syncFromGlobals();
+    if(!(appState.view === 'question' && appState.contentMode === 'word')) return;
+    if(e.target.closest('[data-fixed-nav], [data-v15-toggle], [data-player-control], .view-tabs, #v12MetaSelectBar, select, button')) return;
+    if(!e.target.closest('.v53-word-quiz-card, .quiz-word-card-v52, #box, .box')) return;
+    const now = Date.now(); if(now - tapGuardAt < 250) return; tapGuardAt = now;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    if(appState.quizReveal) moveWordQuiz(1); else audioController.revealWord();
+  }, true);
+
+  function apply(){
+    setVersion(); syncFromGlobals();
+    if(!appState.currentSentence) appState.currentSentence = sentenceAt(appState.index) || sentenceAt(0);
+    if(!appState.currentWord) appState.currentWord = wordAt(appState.wordIndex) || wordAt(0);
+    commitToGlobals(); renderCurrentState({audioActive:false});
+    setTimeout(function(){ setVersion(); cleanStatus(); showFixedNav(); }, 60);
+  }
+  window.renderCurrentState = renderCurrentState;
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply, {once:true});
+  else apply();
 })();
 </script>
 
