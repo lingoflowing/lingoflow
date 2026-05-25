@@ -9,8 +9,8 @@
 <title>LingoFlow | 台湾華語を聞き流しで学ぶ中国語学習アプリ</title>
 <meta name="description" content="LingoFlowは、台湾華語を聞き流し感覚で学べる無料の中国語学習アプリです。繁体字・ピンイン・日本語対応。">
 
-<!-- LingoFlow app version: 2026-05-24-v53-stable-controller-v1 -->
-<meta name="lingoflow-app-version" content="2026-05-24-v53-stable-controller-v1">
+<!-- LingoFlow app version: 2026-05-25-v68b-unified-listen-playback-engine-v1 -->
+<meta name="lingoflow-app-version" content="2026-05-25-v68b-unified-listen-playback-engine-v1">
 <meta property="og:title" content="LingoFlow">
 <meta property="og:description" content="台湾華語を、聞き流しで自然に学ぶ。">
 <meta property="og:type" content="website">
@@ -6050,82 +6050,9 @@ setView(view);
 </script>
 
 
-<script>
-/* ===== v24 pause/resume hotfix: keep current sentence/word card on stop ===== */
-(function(){
-  'use strict';
 
-  let lfPausedAutoMode = null;
-  let lfPausedContentMode = null;
+<!-- removed by 2026-05-25-v68b-unified-listen-playback-engine-v1 old v24 pause/resume override -->
 
-  const originalStartOrResumePlayback = startOrResumePlayback;
-  const originalSetView = setView;
-
-  stopPlaybackManual = function(){
-    const wasAuto = view === "continuous" || view === "random";
-    const pausedMode = wasAuto ? view : (autoMode === "random" ? "random" : "continuous");
-
-    track("play_stop_manual", {
-      playMode: pausedMode,
-      keepCurrentCard: wasAuto,
-      source: "v24_pause_resume_card_keep"
-    });
-
-    stopAudio();
-
-    if(wasAuto){
-      lfPausedAutoMode = pausedMode;
-      lfPausedContentMode = contentMode;
-      view = "player";
-      updateButtons();
-      // 重要:
-      // ここで renderPlaybackPanel() を呼ばない。
-      // 停止した瞬間に表示されていた文章/単語カードをそのまま残す。
-      return;
-    }
-
-    view = "player";
-    updateButtons();
-  };
-
-  startOrResumePlayback = function(){
-    if(!audioEnabled) return;
-
-    try{
-      if(speechSynthesis.paused && speechSynthesis.speaking){
-        speechSynthesis.resume();
-        track("play_resume_manual", { playMode: autoMode, source: "v24_native_resume" });
-        return;
-      }
-    }catch(e){}
-
-    const resumeMode = lfPausedAutoMode || (autoMode === "random" ? "random" : "continuous");
-    const resumeContent = lfPausedContentMode || contentMode;
-
-    if(lfPausedAutoMode){
-      autoMode = resumeMode;
-      contentMode = resumeContent;
-      view = resumeMode;
-      lfPausedAutoMode = null;
-      lfPausedContentMode = null;
-      track("play_resume_manual", {
-        playMode: resumeMode,
-        contentMode: contentMode,
-        source: "v24_resume_same_card"
-      });
-      updateButtons();
-      startAuto();
-      return;
-    }
-
-    track("play_start_manual", { playMode: resumeMode, source: "v24_start" });
-    originalSetView(resumeMode);
-  };
-
-  const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-  if(meta) meta.setAttribute('content', '2026-05-24-v40-word-quiz-text-stop-preserve-v1');
-})();
-</script>
 
 
 <script>
@@ -7386,143 +7313,9 @@ setView(view);
 </script>
 
 
-<script>
-/* ===== 2026-05-24-v40-word-quiz-text-stop-preserve-v1: read header polish + listen starts from beginner/greeting ===== */
-(function(){
-  'use strict';
-  const VERSION = "2026-05-24-v40-word-quiz-text-stop-preserve-v1";
-  let shouldStartListenFromDefault = true;
 
-  function setVersion(){
-    try{
-      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-      if(meta) meta.setAttribute('content', VERSION);
-      window.LINGOFLOW_APP_VERSION = VERSION;
-      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
-    }catch(e){}
-  }
+<!-- removed listen default reset block in v58 -->
 
-  function labelCategory(cat){
-    try{
-      if(typeof categoryLabel === 'function') return categoryLabel(cat);
-      if(typeof categoryNames !== 'undefined' && categoryNames[cat]) return categoryNames[cat];
-    }catch(e){}
-    return cat || '';
-  }
-
-  function labelLevel(lv){
-    try{
-      if(typeof levelNames !== 'undefined' && levelNames[lv]) return levelNames[lv];
-    }catch(e){}
-    return lv === 'beginner' ? '初級' : lv === 'intermediate' ? '中級' : lv === 'advanced' ? '上級' : '全部';
-  }
-
-  window.listHeaderHtml = function(cat, lv, labelSuffix){
-    return '<div class="list-group-head" aria-label="' + esc(labelCategory(cat)) + ' ' + esc(labelLevel(lv)) + '">' +
-      '<span class="list-head-genre">' + esc(labelCategory(cat)) + '</span>' +
-      '<span class="list-head-label">レベル</span>' +
-      '<span class="list-head-level">' + esc(labelLevel(lv)) + '</span>' +
-    '</div>';
-  };
-
-  function findBeginnerGreetingFirst(){
-    try{
-      const rows = (DATA && DATA.beginner) ? DATA.beginner : [];
-      return rows.find(function(p){ return p.category === 'greeting'; }) || rows[0] || null;
-    }catch(e){
-      return null;
-    }
-  }
-
-  function prepareDefaultListenStart(){
-    try{
-      const first = findBeginnerGreetingFirst();
-      if(!first) return false;
-
-      level = 'beginner';
-      category = 'greeting';
-      step = 0;
-      history = [first];
-      index = 0;
-
-      const levelSelect = document.getElementById('v12LevelSelect') || document.getElementById('v11LevelSelect');
-      if(levelSelect){
-        levelSelect.value = 'beginner';
-        levelSelect.setAttribute('aria-label','レベル：初級');
-      }
-      const categorySelect = document.getElementById('categorySelect');
-      if(categorySelect){
-        categorySelect.value = 'greeting';
-        categorySelect.setAttribute('aria-label','ジャンル：挨拶');
-      }
-      const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
-      if(levelText) levelText.textContent = 'レベル：初級';
-      const categoryText = document.querySelector('.v16-meta-item[data-kind="category"] .v16-meta-text');
-      if(categoryText) categoryText.textContent = 'ジャンル：挨拶';
-
-      if(typeof renderAuto === 'function') renderAuto(first);
-      return true;
-    }catch(e){
-      return false;
-    }
-  }
-
-  const prevStartOrResume = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
-  window.startOrResumePlayback = function(){
-    try{
-      if(shouldStartListenFromDefault){
-        shouldStartListenFromDefault = false;
-        prepareDefaultListenStart();
-      }
-    }catch(e){}
-    if(typeof prevStartOrResume === 'function') return prevStartOrResume.apply(this, arguments);
-  };
-  try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
-
-  const prevSetAutoPlayback = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
-  if(typeof prevSetAutoPlayback === 'function'){
-    window.setAutoPlayback = function(action){
-      try{
-        if(action === 'play' && shouldStartListenFromDefault){
-          shouldStartListenFromDefault = false;
-          prepareDefaultListenStart();
-        }
-      }catch(e){}
-      return prevSetAutoPlayback.apply(this, arguments);
-    };
-    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
-  }
-
-  const prevSetView = window.setView || (typeof setView !== 'undefined' ? setView : null);
-  if(typeof prevSetView === 'function'){
-    window.setView = function(v){
-      const r = prevSetView.apply(this, arguments);
-      try{
-        if(v === 'player') shouldStartListenFromDefault = true;
-      }catch(e){}
-      return r;
-    };
-    try{ setView = window.setView; }catch(e){}
-  }
-
-  function apply(){
-    setVersion();
-    try{
-      if(view === 'list' && typeof renderList === 'function') renderList();
-    }catch(e){}
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      apply();
-      setTimeout(apply, 0);
-    }, { once:true });
-  }else{
-    apply();
-    setTimeout(apply, 0);
-  }
-})();
-</script>
 
 
 <script>
@@ -7619,346 +7412,14 @@ setView(view);
 </script>
 
 
-<script>
-/* ===== 2026-05-24-v40-word-quiz-text-stop-preserve-v1: fixed nav for quiz/listen ===== */
-(function(){
-  'use strict';
-  const VERSION = "2026-05-24-v40-word-quiz-text-stop-preserve-v1";
 
-  function setVersion(){
-    try{
-      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-      if(meta) meta.setAttribute('content', VERSION);
-      window.LINGOFLOW_APP_VERSION = VERSION;
-      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
-    }catch(e){}
-  }
-
-  function ensureFixedNav(){
-    let nav = document.getElementById('fixedCardNav');
-    if(nav) return nav;
-
-    nav = document.createElement('div');
-    nav.id = 'fixedCardNav';
-    nav.className = 'fixed-card-nav hidden-panel';
-    nav.setAttribute('aria-label', 'カード操作');
-    nav.innerHTML =
-      '<button type="button" data-fixed-nav="prev">前</button>' +
-      '<button type="button" data-fixed-nav="replay">もう一度</button>' +
-      '<button type="button" data-fixed-nav="next">次</button>';
-
-    document.body.appendChild(nav);
-
-    nav.addEventListener('click', function(e){
-      const btn = e.target.closest('[data-fixed-nav]');
-      if(!btn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const action = btn.getAttribute('data-fixed-nav');
-      handleFixedNav(action);
-    }, true);
-
-    return nav;
-  }
-
-  function isListenView(){
-    return view === 'player' || view === 'continuous' || view === 'random';
-  }
-
-  function shouldShowFixedNav(){
-    try{
-      if(view === 'question') return true;
-      if(isListenView() && contentMode !== 'word') return true;
-    }catch(e){}
-    return false;
-  }
-
-  function syncFixedNav(){
-    const nav = ensureFixedNav();
-    const show = shouldShowFixedNav();
-    nav.classList.toggle('hidden-panel', !show);
-    document.body.classList.toggle('has-fixed-card-nav', show);
-  }
-
-  function currentSentence(){
-    try{
-      if(history && history[index]) return history[index];
-    }catch(e){}
-    return null;
-  }
-
-  async function replayCurrent(){
-    try{
-      const p = currentSentence();
-      if(!p){
-        if(typeof nextQuestion === 'function') nextQuestion(true);
-        return;
-      }
-
-      if(view === 'question'){
-        if(typeof speakQuestionCurrent === 'function') await speakQuestionCurrent();
-        else if(typeof speakChinese === 'function') await speakChinese(p.zh);
-        return;
-      }
-
-      if(isListenView()){
-        stopAudio();
-        if(typeof renderAuto === 'function') renderAuto(p);
-        if(typeof speakChinese === 'function') await speakChinese(p.zh);
-        if(typeof speakJapanese === 'function') await speakJapanese(p.jp);
-      }
-    }catch(e){}
-  }
-
-  function prevForListen(){
-    try{
-      stopAudio();
-      if(index > 0) index -= 1;
-      const p = history[index] || history[0] || null;
-      if(p && typeof renderAuto === 'function') renderAuto(p);
-    }catch(e){}
-  }
-
-  function nextForListen(){
-    try{
-      stopAudio();
-      let p = null;
-      if(typeof pick === 'function') p = pick();
-      if(!p && typeof getList === 'function'){
-        const list = getList();
-        p = list && list.length ? list[0] : null;
-      }
-      if(!p) return;
-      history.push(p);
-      index = history.length - 1;
-      if(typeof renderAuto === 'function') renderAuto(p);
-    }catch(e){}
-  }
-
-  function handleFixedNav(action){
-    try{
-      if(view === 'question'){
-        if(action === 'prev' && typeof prevQuestion === 'function') return prevQuestion();
-        if(action === 'replay') return replayCurrent();
-        if(action === 'next' && typeof nextQuestion === 'function') return nextQuestion(true);
-      }
-
-      if(isListenView()){
-        if(action === 'prev') return prevForListen();
-        if(action === 'replay') return replayCurrent();
-        if(action === 'next') return nextForListen();
-      }
-    }finally{
-      setTimeout(syncFixedNav, 0);
-    }
-  }
-
-  // Hide any existing in-card nav by relying on CSS class, but keep old handlers untouched.
-  const prevUpdateButtons = window.updateButtons;
-  if(typeof prevUpdateButtons === 'function'){
-    window.updateButtons = function(){
-      const r = prevUpdateButtons.apply(this, arguments);
-      setVersion();
-      syncFixedNav();
-      return r;
-    };
-  }
-
-  const wrapNames = ['renderQuestion','renderPlaybackPanel','renderAuto','setView','nextQuestion','prevQuestion'];
-  wrapNames.forEach(function(name){
-    try{
-      const original = window[name] || eval(name);
-      if(typeof original !== 'function') return;
-      const wrapped = function(){
-        const r = original.apply(this, arguments);
-        setTimeout(syncFixedNav, 0);
-        return r;
-      };
-      window[name] = wrapped;
-      try{ eval(name + ' = wrapped'); }catch(e){}
-    }catch(e){}
-  });
-
-  function apply(){
-    setVersion();
-    ensureFixedNav();
-    syncFixedNav();
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      apply();
-      setTimeout(apply, 0);
-      setTimeout(apply, 300);
-    }, { once:true });
-  }else{
-    apply();
-    setTimeout(apply, 0);
-    setTimeout(apply, 300);
-  }
-})();
-</script>
+<!-- removed by 2026-05-25-v68b-unified-listen-playback-engine-v1 old fixed nav for quiz/listen -->
 
 
-<script>
-/* ===== 2026-05-24-v40-word-quiz-text-stop-preserve-v1: continuous order by category then beginner/intermediate/advanced ===== */
-(function(){
-  'use strict';
-  const VERSION = "2026-05-24-v40-word-quiz-text-stop-preserve-v1";
-  const REAL_LEVELS = ['beginner','intermediate','advanced'];
 
-  function setVersion(){
-    try{
-      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-      if(meta) meta.setAttribute('content', VERSION);
-      window.LINGOFLOW_APP_VERSION = VERSION;
-      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
-    }catch(e){}
-  }
 
-  function categoryOrder(){
-    try{
-      return Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; });
-    }catch(e){
-      return ['greeting','cafe','restaurant','shopping','transport','hotel','tourism','daily','work','emergency'];
-    }
-  }
+<!-- removed by 2026-05-25-v68b-unified-listen-playback-engine-v1 old continuous start-from-first controller -->
 
-  function selectedCategoryOrder(){
-    try{
-      if(typeof category !== 'undefined' && category !== 'all') return [category];
-    }catch(e){}
-    return categoryOrder();
-  }
-
-  function selectedLevelOrder(){
-    try{
-      if(typeof level !== 'undefined' && level !== 'all') return [level];
-    }catch(e){}
-    return REAL_LEVELS.slice();
-  }
-
-  function orderedSentenceList(){
-    let out = [];
-    try{
-      selectedCategoryOrder().forEach(function(cat){
-        selectedLevelOrder().forEach(function(lv){
-          const rows = (DATA && DATA[lv]) ? DATA[lv] : [];
-          rows.forEach(function(row){
-            if(!cat || cat === 'all' || row.category === cat) out.push(row);
-          });
-        });
-      });
-    }catch(e){}
-    return out;
-  }
-
-  function applyOrderedDataFns(){
-    try{
-      window.getOrderedContinuousList = orderedSentenceList;
-      getList = function(){
-        const rows = orderedSentenceList();
-        return rows.length ? rows : [];
-      };
-      currentListCount = function(){
-        const rows = orderedSentenceList();
-        return rows.length || 1;
-      };
-      pick = function(){
-        const rows = orderedSentenceList();
-        if(!rows.length) return null;
-        if(autoMode === 'random' || view === 'random'){
-          return rows[Math.floor(Math.random() * rows.length)];
-        }
-        const current = history && index >= 0 ? history[index] : null;
-        if(!current) return rows[0];
-        const pos = rows.findIndex(function(r){
-          return r.zh === current.zh && r.pinyin === current.pinyin && r.jp === current.jp && r.category === current.category;
-        });
-        return rows[(pos + 1 + rows.length) % rows.length];
-      };
-    }catch(e){}
-  }
-
-  function startContinuousFromFirst(){
-    try{
-      const rows = orderedSentenceList();
-      if(!rows.length) return false;
-      history = [rows[0]];
-      index = 0;
-      step = 0;
-      if(typeof renderAuto === 'function') renderAuto(rows[0]);
-      return true;
-    }catch(e){
-      return false;
-    }
-  }
-
-  const previousStartAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
-  if(typeof previousStartAuto === 'function'){
-    window.startAuto = function(){
-      applyOrderedDataFns();
-
-      // 連続モード開始時、履歴がない/条件変更直後なら必ず先頭から。
-      try{
-        if((view === 'continuous' || autoMode === 'continuous') && (!history || index < 0 || !history[index])){
-          startContinuousFromFirst();
-        }
-      }catch(e){}
-
-      return previousStartAuto.apply(this, arguments);
-    };
-    try{ startAuto = window.startAuto; }catch(e){}
-  }
-
-  const previousSetAutoPlayback = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
-  if(typeof previousSetAutoPlayback === 'function'){
-    window.setAutoPlayback = function(action){
-      applyOrderedDataFns();
-      try{
-        if(action === 'continuous' || action === 'play'){
-          if(autoMode !== 'random'){
-            // 再生ボタンで連続開始する時は、ジャンル内の初級先頭から。
-            if(!history || index < 0 || !history[index]) startContinuousFromFirst();
-          }
-        }
-      }catch(e){}
-      return previousSetAutoPlayback.apply(this, arguments);
-    };
-    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
-  }
-
-  const previousUpdateButtons = window.updateButtons;
-  if(typeof previousUpdateButtons === 'function'){
-    window.updateButtons = function(){
-      const r = previousUpdateButtons.apply(this, arguments);
-      applyOrderedDataFns();
-      setVersion();
-      return r;
-    };
-  }
-
-  function apply(){
-    setVersion();
-    applyOrderedDataFns();
-    try{
-      if(view === 'continuous' && (!history || index < 0 || !history[index])) startContinuousFromFirst();
-    }catch(e){}
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      apply();
-      setTimeout(apply, 0);
-      setTimeout(apply, 300);
-    }, { once:true });
-  }else{
-    apply();
-    setTimeout(apply, 0);
-    setTimeout(apply, 300);
-  }
-})();
-</script>
 
 
 <script>
@@ -8450,135 +7911,9 @@ setView(view);
 </script>
 
 
-<script>
-/* ===== 2026-05-24-v40-word-quiz-text-stop-preserve-v1: listen idle shows default card, no mode title ===== */
-(function(){
-  'use strict';
-  const VERSION = "2026-05-24-v40-word-quiz-text-stop-preserve-v1";
 
-  function setVersion(){
-    try{
-      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-      if(meta) meta.setAttribute('content', VERSION);
-      window.LINGOFLOW_APP_VERSION = VERSION;
-      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
-    }catch(e){}
-  }
+<!-- removed listen reset block in v58 -->
 
-  function firstGreetingBeginner(){
-    try{
-      const rows = DATA && DATA.beginner ? DATA.beginner : [];
-      return rows.find(function(p){ return p.category === 'greeting'; }) || rows[0] || null;
-    }catch(e){
-      return null;
-    }
-  }
-
-  function applyDefaultListenState(){
-    try{
-      level = 'beginner';
-      category = 'greeting';
-      const p = firstGreetingBeginner();
-      if(!p) return null;
-      history = [p];
-      index = 0;
-      step = 0;
-
-      const levelSelect = document.getElementById('v12LevelSelect') || document.getElementById('v11LevelSelect');
-      if(levelSelect) levelSelect.value = 'beginner';
-      const categorySelect = document.getElementById('categorySelect');
-      if(categorySelect) categorySelect.value = 'greeting';
-
-      const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
-      if(levelText) levelText.textContent = 'レベル：初級';
-      const categoryText = document.querySelector('.v16-meta-item[data-kind="category"] .v16-meta-text');
-      if(categoryText) categoryText.textContent = 'ジャンル：挨拶';
-
-      return p;
-    }catch(e){
-      return null;
-    }
-  }
-
-  function renderListenIdleCard(){
-    try{
-      const p = applyDefaultListenState();
-      if(!p) return;
-
-      if(typeof renderAuto === 'function'){
-        renderAuto(p);
-      }
-
-      // 念押し: モード説明タイトルが残っていたらカードへ差し替え済みなので削除。
-      document.querySelectorAll('.player-title,.player-desc,.player-main + .status').forEach(function(el){
-        el.remove();
-      });
-    }catch(e){}
-  }
-
-  window.renderPlaybackPanel = function(){
-    renderListenIdleCard();
-  };
-  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
-
-  function cleanReadExplanations(){
-    try{
-      document.querySelectorAll('.list-status').forEach(function(el){
-        el.remove();
-      });
-    }catch(e){}
-  }
-
-  const prevRenderList = window.renderList || (typeof renderList !== 'undefined' ? renderList : null);
-  if(typeof prevRenderList === 'function'){
-    window.renderList = function(){
-      const r = prevRenderList.apply(this, arguments);
-      cleanReadExplanations();
-      return r;
-    };
-    try{ renderList = window.renderList; }catch(e){}
-  }
-
-  const prevSetView = window.setView || (typeof setView !== 'undefined' ? setView : null);
-  if(typeof prevSetView === 'function'){
-    window.setView = function(v){
-      const r = prevSetView.apply(this, arguments);
-      if(v === 'player') renderListenIdleCard();
-      return r;
-    };
-    try{ setView = window.setView; }catch(e){}
-  }
-
-  function apply(){
-    setVersion();
-    cleanReadExplanations();
-    try{
-      if(view === 'player') renderListenIdleCard();
-    }catch(e){}
-  }
-
-  const prevUpdate = window.updateButtons;
-  if(typeof prevUpdate === 'function'){
-    window.updateButtons = function(){
-      const r = prevUpdate.apply(this, arguments);
-      apply();
-      return r;
-    };
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      apply();
-      setTimeout(apply, 0);
-      setTimeout(apply, 300);
-    }, { once:true });
-  }else{
-    apply();
-    setTimeout(apply, 0);
-    setTimeout(apply, 300);
-  }
-})();
-</script>
 
 
 <script>
@@ -8718,157 +8053,9 @@ setView(view);
 </script>
 
 
-<script>
-/* ===== 2026-05-24-v40-word-quiz-text-stop-preserve-v1: selectors default all, visible card starts greeting/beginner ===== */
-(function(){
-  'use strict';
-  const VERSION = "2026-05-24-v40-word-quiz-text-stop-preserve-v1";
 
-  function setVersion(){
-    try{
-      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-      if(meta) meta.setAttribute('content', VERSION);
-      window.LINGOFLOW_APP_VERSION = VERSION;
-      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
-    }catch(e){}
-  }
+<!-- removed listen reset block in v58 -->
 
-  function firstGreetingBeginner(){
-    try{
-      const rows = DATA && DATA.beginner ? DATA.beginner : [];
-      return rows.find(function(p){ return p.category === 'greeting'; }) || rows[0] || null;
-    }catch(e){ return null; }
-  }
-
-  function setSelectorDefaultsAll(){
-    try{
-      level = 'all';
-      category = 'all';
-
-      const levelSelect = document.getElementById('v12LevelSelect') || document.getElementById('v11LevelSelect');
-      if(levelSelect){
-        if(!levelSelect.querySelector('option[value="all"]')){
-          levelSelect.insertAdjacentHTML('afterbegin', '<option value="all">全部</option>');
-        }
-        levelSelect.value = 'all';
-        levelSelect.setAttribute('aria-label','レベル：全部');
-      }
-
-      const categorySelect = document.getElementById('categorySelect');
-      if(categorySelect){
-        categorySelect.value = 'all';
-        categorySelect.setAttribute('aria-label','ジャンル：全部');
-        const opt = categorySelect.querySelector('option[value="all"]');
-        if(opt) opt.textContent = '全部';
-      }
-
-      const levelText = document.querySelector('.v16-meta-item[data-kind="level"] .v16-meta-text');
-      if(levelText) levelText.textContent = 'レベル：全部';
-
-      const categoryText = document.querySelector('.v16-meta-item[data-kind="category"] .v16-meta-text');
-      if(categoryText) categoryText.textContent = 'ジャンル：全部';
-    }catch(e){}
-  }
-
-  function ensureVisibleStartsGreetingBeginner(){
-    try{
-      const p = firstGreetingBeginner();
-      if(!p) return;
-      if(!history || !history[index] || history[index].category !== 'greeting'){
-        history = [p];
-        index = 0;
-        step = 0;
-      }
-    }catch(e){}
-  }
-
-  function applyCardOnlyStart(){
-    ensureVisibleStartsGreetingBeginner();
-    setSelectorDefaultsAll();
-  }
-
-  const prevRenderPlaybackPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
-  if(typeof prevRenderPlaybackPanel === 'function'){
-    window.renderPlaybackPanel = function(){
-      applyCardOnlyStart();
-      const p = firstGreetingBeginner();
-      if(p && typeof renderAuto === 'function') renderAuto(p);
-      setSelectorDefaultsAll();
-    };
-    try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
-  }
-
-  const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
-  if(typeof prevRenderQuestion === 'function'){
-    window.renderQuestion = function(){
-      ensureVisibleStartsGreetingBeginner();
-      const r = prevRenderQuestion.apply(this, arguments);
-      setSelectorDefaultsAll();
-      return r;
-    };
-    try{ renderQuestion = window.renderQuestion; }catch(e){}
-  }
-
-  const prevRenderList = window.renderList || (typeof renderList !== 'undefined' ? renderList : null);
-  if(typeof prevRenderList === 'function'){
-    window.renderList = function(){
-      const r = prevRenderList.apply(this, arguments);
-      setSelectorDefaultsAll();
-      return r;
-    };
-    try{ renderList = window.renderList; }catch(e){}
-  }
-
-  const prevSetView = window.setView || (typeof setView !== 'undefined' ? setView : null);
-  if(typeof prevSetView === 'function'){
-    window.setView = function(v){
-      if(v === 'player' || v === 'question') ensureVisibleStartsGreetingBeginner();
-      const r = prevSetView.apply(this, arguments);
-      setSelectorDefaultsAll();
-      if(v === 'player'){
-        const p = firstGreetingBeginner();
-        if(p && typeof renderAuto === 'function') renderAuto(p);
-      }
-      return r;
-    };
-    try{ setView = window.setView; }catch(e){}
-  }
-
-  const prevUpdate = window.updateButtons;
-  if(typeof prevUpdate === 'function'){
-    window.updateButtons = function(){
-      const r = prevUpdate.apply(this, arguments);
-      setVersion();
-      setSelectorDefaultsAll();
-      return r;
-    };
-  }
-
-  function apply(){
-    setVersion();
-    applyCardOnlyStart();
-    try{
-      if(view === 'player'){
-        const p = firstGreetingBeginner();
-        if(p && typeof renderAuto === 'function') renderAuto(p);
-      }
-      if(view === 'question' && typeof renderQuestion === 'function') renderQuestion();
-    }catch(e){}
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      apply();
-      setTimeout(apply, 0);
-      setTimeout(apply, 300);
-    }, { once:true });
-  }else{
-    apply();
-    setTimeout(apply, 0);
-    setTimeout(apply, 300);
-  }
-})();
-</script>
 
 
 <script>
@@ -9651,688 +8838,15 @@ setView(view);
 </script>
 
 
-<script>
-/* ===== 2026-05-24-v40-word-quiz-text-stop-preserve-v1: restore fixed nav, stable word quiz, non-stopping word listen ===== */
-(function(){
-  'use strict';
-  const VERSION = "2026-05-24-v40-word-quiz-text-stop-preserve-v1";
-  let wordListenToken = 0;
-  let wordListenStopped = true;
-  let savedWordIndex = null;
 
-  function setVersion(){
-    try{
-      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-      if(meta) meta.setAttribute('content', VERSION);
-      window.LINGOFLOW_APP_VERSION = VERSION;
-      document.body && document.body.setAttribute('data-lingoflow-final-version', VERSION);
-    }catch(e){}
-  }
-
-  function escSafe(v){
-    try{ return typeof esc === 'function' ? esc(v) : String(v ?? '').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
-    catch(e){ return String(v ?? ''); }
-  }
-
-  function labelCat(cat){
-    try{ return typeof categoryLabel === 'function' ? categoryLabel(cat) : (categoryNames && categoryNames[cat]) || cat; }
-    catch(e){ return cat || ''; }
-  }
-
-  function labelLv(lv){
-    try{ return levelNames && levelNames[lv] ? levelNames[lv] : lv; }
-    catch(e){ return lv || ''; }
-  }
-
-  function wordListSafe(){
-    try{
-      if(typeof getWordList === 'function') return getWordList();
-      return WORDS || [];
-    }catch(e){ return []; }
-  }
-
-  function normalizeWordIndexSafe(i){
-    try{
-      if(typeof normalizeWordIndex === 'function') return normalizeWordIndex(i);
-      const list = wordListSafe();
-      if(!list.length) return 0;
-      return ((i % list.length) + list.length) % list.length;
-    }catch(e){ return 0; }
-  }
-
-  function currentWordSafe(){
-    try{
-      const list = wordListSafe();
-      if(!list.length) return null;
-      wordIndex = normalizeWordIndexSafe(wordIndex || 0);
-      return list[wordIndex];
-    }catch(e){ return null; }
-  }
-
-  function wordCountSafe(){
-    try{ return wordListSafe().length || 0; }
-    catch(e){ return 0; }
-  }
-
-  function wordHeader(w){
-    const lv = (w && w.level) || 'beginner';
-    return '<div class="question-card-top quiz-card-top">' +
-      '<div class="quiz-meta-pills" aria-label="' + escSafe(labelCat(w.category)) + ' ' + escSafe(labelLv(lv)) + '">' +
-        '<span class="quiz-meta-genre">' + escSafe(labelCat(w.category)) + '</span>' +
-        '<span class="quiz-meta-level">' + escSafe(labelLv(lv)) + '</span>' +
-      '</div>' +
-      '<div class="counter">' + escSafe(String((wordIndex || 0) + 1) + ' / ' + wordCountSafe()) + '</div>' +
-    '</div>';
-  }
-
-  function wordCard(w, revealed, audio){
-    const show = !!revealed;
-    return '<div class="word-fixed-card">' +
-      '<div class="word-fixed-emoji" aria-hidden="true">' + escSafe(w.emoji || '🔤') + '</div>' +
-      '<div class="word-fixed-lines' + (audio ? ' is-audio' : '') + '">' +
-        '<div class="word-zh' + (show ? '' : ' hidden-line') + '">' + escSafe(w.zh) + '</div>' +
-        '<div class="word-pinyin' + (show ? '' : ' hidden-line') + '">' + escSafe(w.pinyin) + '</div>' +
-        '<div class="word-jp' + (show ? '' : ' hidden-line') + '">' + escSafe(w.jp) + '</div>' +
-      '</div>' +
-    '</div>';
-  }
-
-  function renderWordListen(audio){
-    const w = currentWordSafe();
-    if(!w){
-      box.innerHTML = '<div class="error">この条件で表示できる単語データがありません。</div>';
-      return null;
-    }
-    box.innerHTML = wordHeader(w) + wordCard(w, true, !!audio);
-    return w;
-  }
-
-  function renderWordQuiz(audio){
-    const w = currentWordSafe();
-    if(!w){
-      box.innerHTML = '<div class="error">この条件で出題できる単語データがありません。</div>';
-      return null;
-    }
-    box.innerHTML = wordHeader(w) + wordCard(w, !!wordQuestionRevealed, !!audio);
-    return w;
-  }
-
-  async function speakJaFallback(text){
-    if(!text) return;
-    if(typeof speakJapanese === 'function') return speakJapanese(text);
-    if(window.speechSynthesis && window.SpeechSynthesisUtterance){
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ja-JP';
-      return new Promise(function(resolve){
-        u.onend = resolve;
-        u.onerror = resolve;
-        speechSynthesis.speak(u);
-      });
-    }
-  }
-
-  async function speakWordZhJp(w, token){
-    if(!w) return;
-    try{
-      if(token !== wordListenToken) return;
-      if(typeof speakWordAudio === 'function') await speakWordAudio(w.zh);
-      else if(typeof speakChinese === 'function') await speakChinese(w.zh);
-
-      if(token !== wordListenToken) return;
-      if(typeof wait === 'function') await wait(420);
-
-      if(token !== wordListenToken) return;
-      await speakJaFallback(w.jp);
-    }catch(e){}
-  }
-
-  async function wordListenLoop(){
-    const token = ++wordListenToken;
-    wordListenStopped = false;
-    if(savedWordIndex !== null){
-      wordIndex = savedWordIndex;
-      savedWordIndex = null;
-    }
-    view = view === 'random' ? 'random' : 'continuous';
-    autoMode = view === 'random' ? 'random' : 'continuous';
-    updateButtons && updateButtons();
-
-    while(token === wordListenToken && !wordListenStopped && contentMode === 'word' && (view === 'continuous' || view === 'random')){
-      const w = renderWordListen(true);
-      savedWordIndex = wordIndex;
-      await speakWordZhJp(w, token);
-      if(token !== wordListenToken || wordListenStopped) break;
-
-      renderWordListen(false);
-      if(typeof wait === 'function') await wait(650);
-      if(token !== wordListenToken || wordListenStopped) break;
-
-      const count = wordCountSafe();
-      if(count <= 0) break;
-      if(view === 'random' || autoMode === 'random'){
-        wordIndex = Math.floor(Math.random() * count);
-      }else{
-        wordIndex = normalizeWordIndexSafe(wordIndex + 1);
-      }
-      savedWordIndex = wordIndex;
-    }
-  }
-
-  function stopWordListen(){
-    try{
-      savedWordIndex = wordIndex;
-      wordListenStopped = true;
-      wordListenToken++;
-      stopAudio && stopAudio();
-      view = 'player';
-      updateButtons && updateButtons();
-      renderWordListen(false);
-    }catch(e){}
-  }
-
-  function ensureFixedNav(){
-    let nav = document.getElementById('fixedCardNav');
-    if(!nav){
-      nav = document.createElement('div');
-      nav.id = 'fixedCardNav';
-      nav.className = 'fixed-card-nav hidden-panel';
-      nav.setAttribute('aria-label','カード操作');
-      nav.innerHTML = '<button type="button" data-fixed-nav="prev">前</button><button type="button" data-fixed-nav="replay">もう一度</button><button type="button" data-fixed-nav="next">次</button>';
-      document.body.appendChild(nav);
-    }
-    return nav;
-  }
-
-  function shouldShowNav(){
-    try{
-      return view === 'question' || view === 'player' || view === 'continuous' || view === 'random';
-    }catch(e){ return false; }
-  }
-
-  function syncFixedNav(){
-    const nav = ensureFixedNav();
-    const show = shouldShowNav();
-    nav.classList.toggle('hidden-panel', !show);
-    document.body.classList.toggle('has-fixed-card-nav', show);
-  }
-
-  function navPrev(){
-    if(contentMode === 'word'){
-      stopAudio && stopAudio();
-      wordListenToken++;
-      wordListenStopped = true;
-      wordQuestionRevealed = false;
-      wordIndex = normalizeWordIndexSafe((wordIndex || 0) - 1);
-      savedWordIndex = wordIndex;
-      if(view === 'question') renderWordQuiz(false); else renderWordListen(false);
-      return;
-    }
-    try{ if(typeof prevQuestion === 'function') prevQuestion(); }catch(e){}
-  }
-
-  function navReplay(){
-    if(contentMode === 'word'){
-      const w = currentWordSafe();
-      wordQuestionRevealed = true;
-      if(view === 'question') renderWordQuiz(true); else renderWordListen(true);
-      const token = ++wordListenToken;
-      speakWordZhJp(w, token).finally(function(){
-        if(view === 'question') renderWordQuiz(false); else renderWordListen(false);
-      });
-      return;
-    }
-    try{
-      const p = history && history[index] ? history[index] : null;
-      if(p && typeof speakChinese === 'function') speakChinese(p.zh);
-    }catch(e){}
-  }
-
-  function navNext(){
-    if(contentMode === 'word'){
-      stopAudio && stopAudio();
-      wordListenToken++;
-      wordListenStopped = true;
-      wordQuestionRevealed = false;
-      wordIndex = normalizeWordIndexSafe((wordIndex || 0) + 1);
-      savedWordIndex = wordIndex;
-      if(view === 'question') renderWordQuiz(false); else renderWordListen(false);
-      return;
-    }
-    try{ if(typeof nextQuestion === 'function') nextQuestion(true); }catch(e){}
-  }
-
-  function bindNav(){
-    const nav = ensureFixedNav();
-    if(nav.dataset.v39Bound === '1') return;
-    nav.dataset.v39Bound = '1';
-    nav.addEventListener('click', function(e){
-      const btn = e.target.closest('[data-fixed-nav]');
-      if(!btn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      const action = btn.getAttribute('data-fixed-nav');
-      if(action === 'prev') navPrev();
-      else if(action === 'replay') navReplay();
-      else if(action === 'next') navNext();
-      setTimeout(syncFixedNav, 0);
-    }, true);
-  }
-
-  // Restore/override entry points
-  const prevRenderPlaybackPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
-  window.renderPlaybackPanel = function(){
-    if(contentMode === 'word') return renderWordListen(false);
-    if(typeof prevRenderPlaybackPanel === 'function') return prevRenderPlaybackPanel.apply(this, arguments);
-  };
-  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
-
-  const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
-  window.renderQuestion = function(){
-    if(view === 'question' && contentMode === 'word') return renderWordQuiz(false);
-    if(typeof prevRenderQuestion === 'function') return prevRenderQuestion.apply(this, arguments);
-  };
-  try{ renderQuestion = window.renderQuestion; }catch(e){}
-
-  const prevStartOrResume = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
-  window.startOrResumePlayback = function(){
-    if(contentMode === 'word') return wordListenLoop();
-    if(typeof prevStartOrResume === 'function') return prevStartOrResume.apply(this, arguments);
-  };
-  try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
-
-  const prevStopManual = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
-  window.stopPlaybackManual = function(){
-    if(contentMode === 'word') return stopWordListen();
-    if(typeof prevStopManual === 'function') return prevStopManual.apply(this, arguments);
-  };
-  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
-
-  const prevSetAuto = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
-  if(typeof prevSetAuto === 'function'){
-    window.setAutoPlayback = function(action){
-      if(contentMode === 'word'){
-        if(action === 'stop') return stopWordListen();
-        if(action === 'random'){ view = 'random'; autoMode = 'random'; return wordListenLoop(); }
-        if(action === 'continuous' || action === 'play'){ view = 'continuous'; autoMode = 'continuous'; return wordListenLoop(); }
-      }
-      return prevSetAuto.apply(this, arguments);
-    };
-    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
-  }
-
-  const prevStartAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
-  if(typeof prevStartAuto === 'function'){
-    window.startAuto = function(){
-      if(contentMode === 'word') return wordListenLoop();
-      return prevStartAuto.apply(this, arguments);
-    };
-    try{ startAuto = window.startAuto; }catch(e){}
-  }
-
-  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
-  if(typeof prevRenderAuto === 'function'){
-    window.renderAuto = function(p){
-      if(contentMode === 'word') return renderWordListen(false);
-      return prevRenderAuto.apply(this, arguments);
-    };
-    try{ renderAuto = window.renderAuto; }catch(e){}
-  }
-
-  function apply(){
-    setVersion();
-    bindNav();
-    syncFixedNav();
-    try{
-      if(contentMode === 'word'){
-        if(view === 'question') renderWordQuiz(false);
-        else if(view === 'player') renderWordListen(false);
-      }
-    }catch(e){}
-  }
-
-  const prevUpdate = window.updateButtons;
-  if(typeof prevUpdate === 'function'){
-    window.updateButtons = function(){
-      const r = prevUpdate.apply(this, arguments);
-      apply();
-      return r;
-    };
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      apply();
-      setTimeout(apply, 0);
-      setTimeout(apply, 300);
-    }, { once:true });
-  }else{
-    apply();
-    setTimeout(apply, 0);
-    setTimeout(apply, 300);
-  }
-})();
-</script>
+<!-- removed by 2026-05-25-v68b-unified-listen-playback-engine-v1 old restore fixed nav / word listen controller -->
 
 
 
-<script>
-/* ===== 2026-05-24-v40-word-quiz-text-stop-preserve-v1: word quiz text prompt + stop preserves current card ===== */
-(function(){
-  'use strict';
-  const VERSION = "2026-05-24-v40-word-quiz-text-stop-preserve-v1";
-  let v40WordListenToken = 0;
-  let v40SavedWordIndex = null;
-  let v40LastSentence = null;
-  let v40LastSentenceIndex = 0;
 
-  function setVersion(){
-    try{
-      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
-      if(meta) meta.setAttribute('content', VERSION);
-      window.LINGOFLOW_APP_VERSION = VERSION;
-      document.body && document.body.setAttribute('data-lingoflow-final-version', VERSION);
-    }catch(e){}
-  }
-  function escSafe(v){
-    try{ return typeof esc === 'function' ? esc(v) : String(v ?? '').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
-    catch(e){ return String(v ?? ''); }
-  }
-  function catLabel(cat){
-    try{ return typeof categoryLabel === 'function' ? categoryLabel(cat) : ((window.categoryNames && categoryNames[cat]) || cat || ''); }
-    catch(e){ return cat || ''; }
-  }
-  function lvLabel(lv){
-    try{ return levelNames && levelNames[lv] ? levelNames[lv] : (lv || '初級'); }
-    catch(e){ return lv || '初級'; }
-  }
-  function normalizeWordIndexSafe(i){
-    try{ return typeof normalizeWordIndex === 'function' ? normalizeWordIndex(i) : Math.max(0, i || 0); }
-    catch(e){ return Math.max(0, i || 0); }
-  }
-  function currentWordSafe(){
-    try{ return typeof currentWord === 'function' ? currentWord() : null; }
-    catch(e){ return null; }
-  }
-  function wordCountSafe(){
-    try{ return typeof currentWordCount === 'function' ? currentWordCount() : 1; }
-    catch(e){ return 1; }
-  }
-  function counterText(){ return String((wordIndex || 0) + 1) + ' / ' + String(wordCountSafe()); }
-  function headerHtml(w, count){
-    const lv = (w && w.level) || 'beginner';
-    return '<div class="question-card-top quiz-card-top">' +
-      '<div class="quiz-meta-pills" aria-label="' + escSafe(catLabel(w && w.category)) + ' ' + escSafe(lvLabel(lv)) + '">' +
-        '<span class="quiz-meta-genre">' + escSafe(catLabel(w && w.category)) + '</span>' +
-        '<span class="quiz-meta-level">' + escSafe(lvLabel(lv)) + '</span>' +
-      '</div>' +
-      '<div class="counter">' + escSafe(count) + '</div>' +
-    '</div>';
-  }
-  function wordCard(w, opt){
-    opt = opt || {};
-    const zhVisible = !!opt.zhVisible;
-    const pyVisible = !!opt.pyVisible;
-    const jpVisible = !!opt.jpVisible;
-    const audio = !!opt.audio;
-    return '<div class="' + (opt.cardClass || 'quiz-word-card') + '">' +
-      '<div class="' + (opt.emojiClass || 'quiz-word-emoji') + '" aria-hidden="true">' + escSafe((w && w.emoji) || '🔤') + '</div>' +
-      '<div class="' + (opt.linesClass || 'quiz-word-lines') + '">' +
-        '<div class="word-zh' + (audio ? ' audio-active' : '') + (zhVisible ? '' : ' hidden-line') + '">' + escSafe(w && w.zh) + '</div>' +
-        '<div class="word-pinyin' + (audio ? ' audio-active' : '') + (pyVisible ? '' : ' hidden-line') + '">' + escSafe(w && w.pinyin) + '</div>' +
-        '<div class="word-jp' + (audio ? ' audio-active' : '') + (jpVisible ? '' : ' hidden-line') + '">' + escSafe(w && w.jp) + '</div>' +
-      '</div>' +
-    '</div>';
-  }
-  function renderWordListenV40(audio){
-    const w = currentWordSafe();
-    if(!w){ box.innerHTML = '<div class="error">この条件で表示できる単語データがありません。</div>'; return null; }
-    box.innerHTML = headerHtml(w, counterText()) + wordCard(w, {
-      cardClass:'listen-word-card', emojiClass:'listen-word-emoji', linesClass:'listen-word-lines',
-      zhVisible:true, pyVisible:true, jpVisible:true, audio:!!audio
-    });
-    return w;
-  }
-  function renderWordQuizV40(audio){
-    const w = currentWordSafe();
-    if(!w){ box.innerHTML = '<div class="error">この条件で出題できる単語データがありません。</div>'; return null; }
-    const revealed = !!wordQuestionRevealed;
-    const jpToZh = mode === 'speaking';
-    box.innerHTML = headerHtml(w, counterText()) + wordCard(w, {
-      cardClass:'quiz-word-card', emojiClass:'quiz-word-emoji', linesClass:'quiz-word-lines',
-      zhVisible: revealed || !jpToZh,
-      pyVisible: revealed || !jpToZh,
-      jpVisible: revealed || jpToZh,
-      audio:!!audio
-    });
-    return w;
-  }
-  function renderSentenceStoppedV40(){
-    let p = null;
-    try{ p = (history && history[index]) ? history[index] : v40LastSentence; }catch(e){ p = v40LastSentence; }
-    if(!p){
-      if(typeof renderPlaybackPanel === 'function') renderPlaybackPanel();
-      return;
-    }
-    v40LastSentence = p;
-    try{ v40LastSentenceIndex = Math.max(index || 0, 0); }catch(e){}
-    const total = (typeof currentListCount === 'function') ? currentListCount() : '';
-    const autoLabel = autoMode === 'random' || view === 'random' ? '順不同' : '連続';
-    let zh = '';
-    try{ zh = typeof renderChars === 'function' ? renderChars(p.zh) : escSafe(p.zh); }catch(e){ zh = escSafe(p.zh); }
-    box.innerHTML = '<div class="auto-card-top">' +
-      '<div class="quiz-meta-pills" aria-label="' + escSafe(catLabel(p.category)) + ' ' + escSafe(lvLabel(p.level || level)) + '">' +
-        '<span class="quiz-meta-genre">' + escSafe(catLabel(p.category)) + '</span>' +
-        '<span class="quiz-meta-level">' + escSafe(lvLabel(p.level || level)) + '</span>' +
-      '</div>' +
-      '<div class="counter">' + escSafe(String(v40LastSentenceIndex + 1) + (total ? ' / ' + total : '')) + '</div>' +
-    '</div>' +
-    '<div class="card-main"><div class="lines-wrap">' +
-      '<div class="line"><div class="zh">' + zh + '</div></div>' +
-      '<div class="line"><div class="list-pinyin">' + escSafe(p.pinyin) + '</div></div>' +
-      '<div class="line"><div class="list-jp">' + escSafe(p.jp) + '</div></div>' +
-    '</div></div>';
-  }
-  async function speakJa(text){
-    if(!text) return;
-    try{
-      if(typeof speakJapanese === 'function') return speakJapanese(text);
-      if(window.speechSynthesis && window.SpeechSynthesisUtterance){
-        return new Promise(function(resolve){
-          const u = new SpeechSynthesisUtterance(String(text));
-          u.lang = 'ja-JP';
-          u.onend = resolve; u.onerror = resolve;
-          speechSynthesis.speak(u);
-        });
-      }
-    }catch(e){}
-  }
-  async function speakWordZhJp(w, token){
-    if(!w) return;
-    try{
-      if(token !== v40WordListenToken) return;
-      if(typeof speakWordAudio === 'function') await speakWordAudio(w.zh);
-      else if(typeof speakChinese === 'function') await speakChinese(w.zh);
-      if(token !== v40WordListenToken) return;
-      if(typeof wait === 'function') await wait(360);
-      if(token !== v40WordListenToken) return;
-      await speakJa(w.jp);
-    }catch(e){}
-  }
-  async function wordLoopV40(){
-    if(contentMode !== 'word') return;
-    const token = ++v40WordListenToken;
-    if(v40SavedWordIndex !== null){ wordIndex = normalizeWordIndexSafe(v40SavedWordIndex); v40SavedWordIndex = null; }
-    view = autoMode === 'random' || view === 'random' ? 'random' : 'continuous';
-    autoMode = view === 'random' ? 'random' : 'continuous';
-    try{ updateButtons && updateButtons(); }catch(e){}
-    while(token === v40WordListenToken && contentMode === 'word' && (view === 'continuous' || view === 'random')){
-      const w = renderWordListenV40(true);
-      v40SavedWordIndex = wordIndex;
-      await speakWordZhJp(w, token);
-      if(token !== v40WordListenToken) break;
-      renderWordListenV40(false);
-      if(typeof wait === 'function') await wait(600);
-      if(token !== v40WordListenToken) break;
-      const count = Math.max(1, wordCountSafe());
-      if(view === 'random' || autoMode === 'random') wordIndex = Math.floor(Math.random() * count);
-      else wordIndex = normalizeWordIndexSafe((wordIndex || 0) + 1);
-      v40SavedWordIndex = wordIndex;
-    }
-  }
-  function stopWordV40(){
-    v40SavedWordIndex = normalizeWordIndexSafe(wordIndex || 0);
-    v40WordListenToken++;
-    try{ stopAudio && stopAudio(); }catch(e){}
-    view = 'player';
-    try{ updateButtons && updateButtons(); }catch(e){}
-    wordIndex = v40SavedWordIndex;
-    renderWordListenV40(false);
-    setTimeout(function(){ wordIndex = v40SavedWordIndex; renderWordListenV40(false); }, 0);
-  }
-  function stopSentenceV40(){
-    try{ if(typeof autoId !== 'undefined') autoId++; }catch(e){}
-    try{ stopAudio && stopAudio(); }catch(e){}
-    try{ v40LastSentence = (history && history[index]) ? history[index] : v40LastSentence; }catch(e){}
-    try{ v40LastSentenceIndex = Math.max(index || 0, 0); }catch(e){}
-    view = 'player';
-    try{ updateButtons && updateButtons(); }catch(e){}
-    renderSentenceStoppedV40();
-    setTimeout(renderSentenceStoppedV40, 0);
-  }
 
-  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
-  if(typeof prevRenderAuto === 'function'){
-    window.renderAuto = function(p){
-      if(p){ v40LastSentence = p; try{ v40LastSentenceIndex = Math.max(index || 0, 0); }catch(e){} }
-      return prevRenderAuto.apply(this, arguments);
-    };
-    try{ renderAuto = window.renderAuto; }catch(e){}
-  }
-  const prevRenderQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
-  window.renderQuestion = function(){
-    if(view === 'question' && contentMode === 'word') return renderWordQuizV40(false);
-    if(typeof prevRenderQuestion === 'function') return prevRenderQuestion.apply(this, arguments);
-  };
-  try{ renderQuestion = window.renderQuestion; }catch(e){}
-  const prevRenderPlaybackPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
-  window.renderPlaybackPanel = function(){
-    if(contentMode === 'word') return renderWordListenV40(false);
-    if(v40LastSentence && view === 'player') return renderSentenceStoppedV40();
-    if(typeof prevRenderPlaybackPanel === 'function') return prevRenderPlaybackPanel.apply(this, arguments);
-  };
-  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
-  const prevStartOrResume = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
-  window.startOrResumePlayback = function(){
-    if(contentMode === 'word') return wordLoopV40();
-    if(typeof prevStartOrResume === 'function') return prevStartOrResume.apply(this, arguments);
-  };
-  try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
-  const prevStopManual = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
-  window.stopPlaybackManual = function(){
-    if(contentMode === 'word') return stopWordV40();
-    if(view === 'continuous' || view === 'random' || view === 'player') return stopSentenceV40();
-    if(typeof prevStopManual === 'function') return prevStopManual.apply(this, arguments);
-  };
-  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
-  const prevSetAuto = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
-  if(typeof prevSetAuto === 'function'){
-    window.setAutoPlayback = function(action){
-      if(contentMode === 'word'){
-        if(action === 'stop') return stopWordV40();
-        if(action === 'random'){ view = 'random'; autoMode = 'random'; return wordLoopV40(); }
-        if(action === 'continuous' || action === 'play'){ view = 'continuous'; autoMode = 'continuous'; return wordLoopV40(); }
-      }
-      if(action === 'stop') return stopSentenceV40();
-      return prevSetAuto.apply(this, arguments);
-    };
-    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
-  }
-  const prevStartAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
-  if(typeof prevStartAuto === 'function'){
-    window.startAuto = function(){
-      if(contentMode === 'word') return wordLoopV40();
-      return prevStartAuto.apply(this, arguments);
-    };
-    try{ startAuto = window.startAuto; }catch(e){}
-  }
+<!-- removed by 2026-05-25-v68b-unified-listen-playback-engine-v1 old word quiz/listen nav controller -->
 
-  function prevWord(){
-    try{ stopAudio && stopAudio(); }catch(e){}
-    v40WordListenToken++;
-    wordQuestionRevealed = false;
-    wordIndex = normalizeWordIndexSafe((wordIndex || 0) - 1);
-    v40SavedWordIndex = wordIndex;
-    if(view === 'question') renderWordQuizV40(false); else renderWordListenV40(false);
-  }
-  function nextWord(){
-    try{ stopAudio && stopAudio(); }catch(e){}
-    v40WordListenToken++;
-    wordQuestionRevealed = false;
-    wordIndex = normalizeWordIndexSafe((wordIndex || 0) + 1);
-    v40SavedWordIndex = wordIndex;
-    if(view === 'question') renderWordQuizV40(false); else renderWordListenV40(false);
-  }
-  function replayWord(){
-    const token = ++v40WordListenToken;
-    const w = currentWordSafe();
-    wordQuestionRevealed = true;
-    if(view === 'question') renderWordQuizV40(true); else renderWordListenV40(true);
-    speakWordZhJp(w, token).finally(function(){
-      if(token !== v40WordListenToken) return;
-      if(view === 'question') renderWordQuizV40(false); else renderWordListenV40(false);
-    });
-  }
-  const nav = document.getElementById('fixedCardNav');
-  if(nav && nav.dataset.v40Bound !== '1'){
-    nav.dataset.v40Bound = '1';
-    nav.addEventListener('click', function(e){
-      const btn = e.target.closest('[data-fixed-nav]');
-      if(!btn || contentMode !== 'word') return;
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      const a = btn.getAttribute('data-fixed-nav');
-      if(a === 'prev') prevWord();
-      else if(a === 'next') nextWord();
-      else if(a === 'replay') replayWord();
-    }, true);
-  }
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('[data-player-control="stop"]');
-    if(!btn) return;
-    if(contentMode === 'word' || view === 'continuous' || view === 'random' || view === 'player'){
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      window.stopPlaybackManual();
-    }
-  }, true);
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('[data-qnav]');
-    if(!btn || view !== 'question' || contentMode !== 'word') return;
-    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-    const a = btn.getAttribute('data-qnav');
-    if(a === 'prev') prevWord();
-    else if(a === 'next') nextWord();
-    else if(a === 'replay') replayWord();
-  }, true);
-
-  const prevUpdate = window.updateButtons;
-  if(typeof prevUpdate === 'function'){
-    window.updateButtons = function(){
-      const r = prevUpdate.apply(this, arguments);
-      setVersion();
-      return r;
-    };
-  }
-  function apply(){
-    setVersion();
-    try{
-      if(view === 'question' && contentMode === 'word') renderWordQuizV40(false);
-      else if(view === 'player' && contentMode === 'word') renderWordListenV40(false);
-    }catch(e){}
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply, 0); }, {once:true});
-  else { apply(); setTimeout(apply, 0); }
-})();
-</script>
 
 
 <script>
@@ -10704,7 +9218,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
   const prevStopManual = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
   window.stopPlaybackManual = function(){
-    if(contentMode !== 'word' && (view === 'continuous' || view === 'random' || view === 'player')) return stopSentencePreserve();
+    if(contentMode !== 'word' && (view === 'continuous' || view === 'random' || view === 'player')) return window.stopPlaybackManual();
     if(typeof prevStopManual === 'function') return prevStopManual.apply(this, arguments);
   };
   try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
@@ -10712,7 +9226,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
   const prevSetAuto = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
   if(typeof prevSetAuto === 'function'){
     window.setAutoPlayback = function(action){
-      if(action === 'stop' && contentMode !== 'word') return stopSentencePreserve();
+      if(action === 'stop' && contentMode !== 'word') return window.stopPlaybackManual();
       return prevSetAuto.apply(this, arguments);
     };
     try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
@@ -10723,7 +9237,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
     if(!btn || contentMode === 'word') return;
     if(view === 'continuous' || view === 'random' || view === 'player'){
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      stopSentencePreserve();
+      window.stopPlaybackManual();
     }
   }, true);
 
@@ -10970,7 +9484,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
   const prevStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
   window.stopPlaybackManual = function(){
-    if(contentMode !== 'word' && (view === 'continuous' || view === 'random' || view === 'player')) return stopSentenceKeep();
+    if(contentMode !== 'word' && (view === 'continuous' || view === 'random' || view === 'player')) return window.stopPlaybackManual();
     if(typeof prevStop === 'function') return prevStop.apply(this, arguments);
   };
   try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
@@ -10980,7 +9494,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
     if(!runStop || contentMode === 'word') return;
     if(view === 'continuous' || view === 'random' || view === 'player'){
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      stopSentenceKeep();
+      window.stopPlaybackManual();
     }
   }, true);
 
@@ -11328,7 +9842,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
   const prevStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
   window.stopPlaybackManual = function(){
-    if(contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random')) return stopKeep();
+    if(contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random')) return window.stopPlaybackManual();
     if(typeof prevStop === 'function') return prevStop.apply(this, arguments);
   };
   try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
@@ -11349,7 +9863,7 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
     if(!b || contentMode === 'word') return;
     if(view === 'player' || view === 'continuous' || view === 'random'){
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      stopKeep();
+      window.stopPlaybackManual();
     }
   }, true);
 
@@ -12586,12 +11100,12 @@ body.has-fixed-card-nav .fixed-card-nav:not(.hidden-panel){
 
 
 <style>
-/* ===== 2026-05-24-v53-stable-controller-v1 =====
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
    Stable Controller patch: UIを変えず、state/render/audioの入口を一本化する。
 */
-body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .status,
-body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .player-desc,
-body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .player-title{
+body[data-lingoflow-final-version="2026-05-25-v68b-unified-listen-playback-engine-v1"] .status,
+body[data-lingoflow-final-version="2026-05-25-v68b-unified-listen-playback-engine-v1"] .player-desc,
+body[data-lingoflow-final-version="2026-05-25-v68b-unified-listen-playback-engine-v1"] .player-title{
   display:none !important;
 }
 .v53-sentence-card,
@@ -12599,26 +11113,77 @@ body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .player
 .v53-hidden-answer{visibility:hidden !important;}
 </style>
 
+
+
 <script>
-/* ===== 2026-05-24-v53-stable-controller-v1 =====
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   v40初期化ブロック削除後の最小ガード。
    目的:
-   - v52をベースに、UIを変えずに状態管理だけ安定化。
-   - renderCurrentState() / audioController / appState を唯一の入口にする。
-   - 聞く→文章の停止保持、pill維持、クイズ→単語のreveal/nav状態を再発防止。
+   - 聞く→文章の停止で 挨拶・初級へ戻る初期化経路を遮断。
+   - 既存のv52 controllerを優先し、末尾で大きな再実装はしない。
 */
 (function(){
   'use strict';
-  const VERSION = '2026-05-24-v53-stable-controller-v1';
-  const CAT = {all:'全部',greeting:'挨拶',cafe:'カフェ',restaurant:'食事',shopping:'買物',transport:'交通',hotel:'ホテル',tourism:'観光',daily:'日常',work:'仕事',emergency:'緊急'};
-  const LV = {all:'全部',beginner:'初級',intermediate:'中級',advanced:'上級'};
-  const LEVEL_ORDER = ['beginner','intermediate','advanced'];
-  let tapGuardAt = 0;
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  function cancelAudioOnly(){
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{
+      if(window.speechSynthesis){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
+      }
+    }catch(e){}
+    try{ if(typeof autoId !== 'undefined') autoId += 1000; }catch(e){}
+  }
+  // 停止ボタンは「音を止める」だけに寄せる。カード再初期化はしない。
+  document.addEventListener('click', function(e){
+    const btn = e.target && e.target.closest
+      ? e.target.closest('[data-player-control="stop"], [data-v15-toggle="run"][data-v15-value="stop"]')
+      : null;
+    if(!btn) return;
+    try{
+      if(typeof contentMode !== 'undefined' && contentMode !== 'word'){
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        cancelAudioOnly();
+        try{ if(typeof view !== 'undefined') view = 'player'; }catch(err){}
+        try{ if(typeof updateButtons === 'function') updateButtons(); }catch(err){}
+      }
+    }catch(err){}
+  }, true);
+  setVersion();
+})();
+</script>
 
-  const appState = window.LingoFlowStateV53 = window.LingoFlowStateV53 || {
-    view:'question', contentMode:'sentence', mode:'reading', autoMode:'continuous',
-    index:0, wordIndex:0, quizReveal:false, isPlaying:false, audioToken:0,
-    currentSentence:null, currentWord:null
-  };
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   対象:
+   - 聞く→文章: 停止後に再生すると停止表示中の文章ではなく次から始まる問題
+   - 聞く: 前 / もう一度 / 次 が反応しない問題
+
+   方針:
+   - renderAutoで「実際に表示した文章」と「その時点のindex」を保存する。
+   - 停止・再生直前に index を表示中文章へ戻す。
+   - fixedCardNav は clone で作り直し、古いlistenerを外してからv59で直接バインドする。
+*/
+(function(){
+  'use strict';
+
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+  let shownSentence = null;
+  let shownSentenceIndex = 0;
+  let navBound = false;
+  let replayToken = 0;
 
   function setVersion(){
     try{
@@ -12628,278 +11193,1771 @@ body[data-lingoflow-final-version="2026-05-24-v53-stable-controller-v1"] .player
       if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
     }catch(e){}
   }
-  function esc(v){ return String(v == null ? '' : v).replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-  function chars(v){ return String(v == null ? '' : v).split('').map(ch => '<span class="char">'+esc(ch)+'</span>').join(''); }
-  function boxEl(){ return (typeof box !== 'undefined' && box) ? box : document.getElementById('box'); }
-  function syncFromGlobals(){
-    try{ appState.view = view; }catch(e){}
-    try{ appState.contentMode = contentMode; }catch(e){}
-    try{ appState.mode = mode; }catch(e){}
-    try{ appState.autoMode = autoMode; }catch(e){}
-    try{ appState.index = Number(index || 0); }catch(e){}
-    try{ appState.wordIndex = Number(wordIndex || 0); }catch(e){}
-    try{ appState.quizReveal = !!wordQuestionRevealed; }catch(e){}
-  }
-  function commitToGlobals(){
-    try{ view = appState.view; }catch(e){}
-    try{ contentMode = appState.contentMode; }catch(e){}
-    try{ mode = appState.mode; }catch(e){}
-    try{ autoMode = appState.autoMode; }catch(e){}
-    try{ index = appState.index; }catch(e){}
-    try{ wordIndex = appState.wordIndex; }catch(e){}
-    try{ wordQuestionRevealed = appState.quizReveal; }catch(e){}
-  }
-  function allSentences(){
-    let rows = [];
+
+  function isSentenceListen(){
     try{
-      const lv = (typeof level !== 'undefined' ? level : 'all');
-      const cat = (typeof category !== 'undefined' ? category : 'all');
-      const sourceLevels = lv === 'all' ? LEVEL_ORDER : [lv];
-      sourceLevels.forEach(k => {
-        const arr = (DATA && DATA[k]) ? DATA[k] : [];
-        arr.forEach(p => { if(cat === 'all' || p.category === cat) rows.push(p); });
-      });
-      if(!rows.length && DATA){ LEVEL_ORDER.forEach(k => (DATA[k]||[]).forEach(p => rows.push(p))); }
+      return contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random');
+    }catch(e){ return false; }
+  }
+
+  function currentSentenceFromState(){
+    try{
+      if(history && typeof index !== 'undefined' && history[index]) return history[index];
     }catch(e){}
-    return rows;
+    return shownSentence;
   }
-  function norm(n, len){ len = len || 1; return ((Number(n)||0) % len + len) % len; }
-  function sentenceAt(n){ const rows = allSentences(); return rows.length ? rows[norm(n, rows.length)] : null; }
-  function wordRows(){
-    try{ if(typeof getWordList === 'function') return getWordList() || []; }catch(e){}
-    try{ return WORDS || []; }catch(e){ return []; }
+
+  function sameSentence(a,b){
+    return !!(a && b && a.zh === b.zh && a.jp === b.jp && a.category === b.category);
   }
-  function wordAt(n){ const rows = wordRows(); return rows.length ? rows[norm(n, rows.length)] : null; }
-  function catLabel(v){ return CAT[v] || v || '挨拶'; }
-  function lvLabel(v){ return LV[v] || v || '初級'; }
-  function cleanStatus(){
-    try{ document.querySelectorAll('.status,.player-desc,.player-title').forEach(el => el.remove()); }catch(e){}
+
+  function rememberSentence(p){
+    if(!p) return;
+    shownSentence = p;
+    try{
+      if(typeof index !== 'undefined' && index >= 0) shownSentenceIndex = index;
+    }catch(e){}
+    try{
+      if(Array.isArray(history)){
+        const pos = history.findIndex(function(x){ return sameSentence(x, p); });
+        if(pos >= 0) shownSentenceIndex = pos;
+      }
+    }catch(e){}
   }
-  function showFixedNav(){
+
+  function restoreIndexToShown(){
+    if(!shownSentence) return;
+    try{
+      if(!Array.isArray(history)) history = [];
+      let pos = history.findIndex(function(x){ return sameSentence(x, shownSentence); });
+      if(pos < 0){
+        pos = Math.max(0, Math.min(Number(shownSentenceIndex || 0), history.length));
+        history[pos] = shownSentence;
+      }
+      index = pos;
+      shownSentenceIndex = pos;
+    }catch(e){}
+  }
+
+  function stopAudioOnly(){
+    try{ if(typeof autoId !== 'undefined') autoId += 1000; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{
+      if(window.speechSynthesis){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
+      }
+    }catch(e){}
+  }
+
+  function renderShownStill(){
+    const p = shownSentence || currentSentenceFromState();
+    if(!p) return;
+    restoreIndexToShown();
+    try{
+      if(typeof renderAuto === 'function') renderAuto(p);
+    }catch(e){}
+  }
+
+  function sentenceList(){
+    try{
+      if(typeof getList === 'function'){
+        const list = getList();
+        if(Array.isArray(list) && list.length) return list;
+      }
+    }catch(e){}
+    try{
+      const out = [];
+      const cats = (typeof category !== 'undefined' && category && category !== 'all')
+        ? [category]
+        : Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; });
+      const levels = (typeof level !== 'undefined' && level && level !== 'all')
+        ? [level]
+        : ['beginner','intermediate','advanced'];
+      cats.forEach(function(cat){
+        levels.forEach(function(lv){
+          ((DATA && DATA[lv]) || []).forEach(function(p){
+            if(p && p.category === cat) out.push(p);
+          });
+        });
+      });
+      return out;
+    }catch(e){ return []; }
+  }
+
+  function moveSentence(delta){
+    stopAudioOnly();
+    restoreIndexToShown();
+
+    let list = sentenceList();
+    if(!list.length) return;
+
+    let pos = list.findIndex(function(x){ return sameSentence(x, shownSentence); });
+    if(pos < 0) pos = list.findIndex(function(x){ return sameSentence(x, currentSentenceFromState()); });
+    if(pos < 0) pos = 0;
+
+    const nextPos = (pos + delta + list.length) % list.length;
+    const p = list[nextPos];
+    shownSentence = p;
+
+    try{
+      if(!Array.isArray(history)) history = [];
+      let hpos = history.findIndex(function(x){ return sameSentence(x, p); });
+      if(hpos < 0){
+        history.push(p);
+        hpos = history.length - 1;
+      }
+      index = hpos;
+      shownSentenceIndex = hpos;
+      view = 'player';
+    }catch(e){}
+
+    try{ if(typeof renderAuto === 'function') renderAuto(p); }catch(e){}
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    try{ if(typeof renderAuto === 'function') renderAuto(p); }catch(e){}
+    ensureNav();
+  }
+
+  async function replaySentence(){
+    const p = shownSentence || currentSentenceFromState();
+    if(!p) return;
+    restoreIndexToShown();
+    stopAudioOnly();
+    const token = ++replayToken;
+    try{ if(typeof renderAuto === 'function') renderAuto(p); }catch(e){}
+    try{ if(typeof speakHighlight === 'function') await speakHighlight(p.zh); }catch(e){}
+    if(token !== replayToken) return;
+    try{ if(typeof wait === 'function') await wait(300); }catch(e){}
+    if(token !== replayToken) return;
+    try{ if(typeof speakJapanese === 'function') await speakJapanese(p.jp); }catch(e){}
+  }
+
+  function ensureNav(){
+    try{
+      let nav = document.getElementById('fixedCardNav');
+      if(!nav){
+        nav = document.createElement('div');
+        nav.id = 'fixedCardNav';
+        document.body.appendChild(nav);
+      }
+
+      if(nav.dataset.v59Bound !== '1'){
+        const clone = nav.cloneNode(false);
+        clone.id = 'fixedCardNav';
+        clone.className = ((nav.className || '') + ' fixed-card-nav').trim();
+        clone.setAttribute('aria-label','カード操作');
+        clone.innerHTML =
+          '<button type="button" data-fixed-nav="prev">前</button>' +
+          '<button type="button" data-fixed-nav="replay">もう一度</button>' +
+          '<button type="button" data-fixed-nav="next">次</button>';
+        clone.dataset.v59Bound = '1';
+        nav.parentNode.replaceChild(clone, nav);
+        nav = clone;
+
+        nav.addEventListener('click', function(e){
+          const btn = e.target.closest('[data-fixed-nav]');
+          if(!btn || !isSentenceListen()) return;
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+
+          const action = btn.getAttribute('data-fixed-nav');
+          if(action === 'prev') moveSentence(-1);
+          else if(action === 'next') moveSentence(1);
+          else replaySentence();
+        }, true);
+      }
+
+      const show = (function(){
+        try{ return view === 'question' || view === 'player' || view === 'continuous' || view === 'random'; }
+        catch(e){ return false; }
+      })();
+      nav.classList.toggle('hidden-panel', !show);
+      document.body.classList.toggle('has-fixed-card-nav', show);
+      if(show){
+        nav.style.display = 'grid';
+        nav.style.visibility = 'visible';
+        nav.style.opacity = '1';
+      }
+    }catch(e){}
+  }
+
+  function ensureNavSoon(){
+    ensureNav();
+    setTimeout(ensureNav, 0);
+    setTimeout(ensureNav, 100);
+    setTimeout(ensureNav, 300);
+  }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  if(typeof prevRenderAuto === 'function'){
+    window.renderAuto = function(p){
+      if(p && contentMode !== 'word') rememberSentence(p);
+      const r = prevRenderAuto.apply(this, arguments);
+      ensureNavSoon();
+      return r;
+    };
+    try{ renderAuto = window.renderAuto; }catch(e){}
+  }
+
+  const prevStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
+  window.stopPlaybackManual = function(){
+    if(isSentenceListen()){
+      rememberSentence(currentSentenceFromState());
+      restoreIndexToShown();
+      stopAudioOnly();
+      try{ view = 'player'; }catch(e){}
+      try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+      renderShownStill();
+      ensureNavSoon();
+      return;
+    }
+    if(typeof prevStop === 'function') return prevStop.apply(this, arguments);
+  };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+
+  const prevStartAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
+  if(typeof prevStartAuto === 'function'){
+    window.startAuto = function(){
+      if(contentMode !== 'word'){
+        restoreIndexToShown();
+      }
+      return prevStartAuto.apply(this, arguments);
+    };
+    try{ startAuto = window.startAuto; }catch(e){}
+  }
+
+  const prevStartResume = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
+  if(typeof prevStartResume === 'function'){
+    window.startOrResumePlayback = function(){
+      if(contentMode !== 'word'){
+        restoreIndexToShown();
+      }
+      return prevStartResume.apply(this, arguments);
+    };
+    try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
+  }
+
+  const prevSetAuto = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
+  if(typeof prevSetAuto === 'function'){
+    window.setAutoPlayback = function(action){
+      if(contentMode !== 'word'){
+        if(action === 'stop') return window.stopPlaybackManual();
+        if(action === 'play' || action === 'continuous' || action === 'random') restoreIndexToShown();
+      }
+      return prevSetAuto.apply(this, arguments);
+    };
+    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
+  }
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      ensureNavSoon();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  document.addEventListener('click', function(e){
+    const btn = e.target && e.target.closest
+      ? e.target.closest('[data-player-control="stop"], [data-v15-toggle="run"][data-v15-value="stop"]')
+      : null;
+    if(!btn || !isSentenceListen()) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    window.stopPlaybackManual();
+  }, true);
+
+  setVersion();
+  ensureNavSoon();
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setVersion(); ensureNavSoon(); }, {once:true});
+  }else{
+    setTimeout(function(){ setVersion(); ensureNavSoon(); }, 0);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   対象:
+   - 聞く → 文章 の 前 / もう一度 / 次 が反応しない問題
+
+   原因推定:
+   - fixedCardNav は表示されているが、古い document/nav capture listener が先にイベントを止め、
+     後段のv59 listenerへ届かない。
+
+   対策:
+   - documentより上流の window capture で [data-fixed-nav] を最優先捕捉。
+   - pointerdown / touchstart / click の全入口を押さえる。
+   - 二重発火は短時間debounceで防ぐ。
+   - 文章移動は DOM状態ではなく、現在の history[index] と getList()/DATA から決定。
+*/
+(function(){
+  'use strict';
+
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+  let navToken = 0;
+  let lastNavKey = '';
+  let lastNavAt = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function isSentenceListen(){
+    try{
+      return contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random');
+    }catch(e){ return false; }
+  }
+
+  function sameSentence(a,b){
+    return !!(a && b && a.zh === b.zh && a.jp === b.jp && a.category === b.category);
+  }
+
+  function currentSentence(){
+    try{
+      if(Array.isArray(history) && typeof index !== 'undefined' && history[index]) return history[index];
+    }catch(e){}
+    try{
+      const zh = document.querySelector('#box .zh');
+      const jp = document.querySelector('#box .jp');
+      if(zh && jp){
+        const zht = zh.textContent || '';
+        const jpt = jp.textContent || '';
+        const list = sentenceList();
+        return list.find(function(p){ return p && p.zh === zht && p.jp === jpt; }) || null;
+      }
+    }catch(e){}
+    return null;
+  }
+
+  function sentenceList(){
+    try{
+      if(typeof getList === 'function'){
+        const list = getList();
+        if(Array.isArray(list) && list.length) return list;
+      }
+    }catch(e){}
+
+    try{
+      const cats = (typeof category !== 'undefined' && category && category !== 'all')
+        ? [category]
+        : Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; });
+      const levels = (typeof level !== 'undefined' && level && level !== 'all')
+        ? [level]
+        : ['beginner','intermediate','advanced'];
+      const out = [];
+      cats.forEach(function(cat){
+        levels.forEach(function(lv){
+          ((DATA && DATA[lv]) || []).forEach(function(p){
+            if(p && p.category === cat) out.push(p);
+          });
+        });
+      });
+      return out;
+    }catch(e){ return []; }
+  }
+
+  function stopAudioOnly(){
+    navToken++;
+    try{ if(typeof autoId !== 'undefined') autoId += 1000; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{
+      if(window.speechSynthesis){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
+      }
+    }catch(e){}
+  }
+
+  function setCurrentSentence(p){
+    if(!p) return;
+    try{
+      if(!Array.isArray(history)) history = [];
+      let pos = history.findIndex(function(x){ return sameSentence(x,p); });
+      if(pos < 0){
+        history.push(p);
+        pos = history.length - 1;
+      }
+      index = pos;
+      step = 2;
+      view = 'player';
+    }catch(e){}
+    try{ if(typeof renderAuto === 'function') renderAuto(p); }catch(e){}
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    try{ if(typeof renderAuto === 'function') renderAuto(p); }catch(e){}
+    ensureNavVisible();
+  }
+
+  function move(delta){
+    stopAudioOnly();
+    const list = sentenceList();
+    if(!list.length) return;
+
+    const cur = currentSentence();
+    let pos = list.findIndex(function(p){ return sameSentence(p,cur); });
+
+    if(pos < 0){
+      try{
+        const hcur = Array.isArray(history) ? history[index] : null;
+        pos = list.findIndex(function(p){ return sameSentence(p,hcur); });
+      }catch(e){}
+    }
+    if(pos < 0) pos = 0;
+
+    const nextPos = (pos + delta + list.length) % list.length;
+    setCurrentSentence(list[nextPos]);
+  }
+
+  async function replay(){
+    const p = currentSentence();
+    if(!p) return;
+    stopAudioOnly();
+    const token = ++navToken;
+    setCurrentSentence(p);
+
+    try{ if(typeof speakHighlight === 'function') await speakHighlight(p.zh); }catch(e){}
+    if(token !== navToken) return;
+    try{ if(typeof wait === 'function') await wait(300); }catch(e){}
+    if(token !== navToken) return;
+    try{ if(typeof speakJapanese === 'function') await speakJapanese(p.jp); }catch(e){}
+  }
+
+  function ensureNavVisible(){
+    try{
+      let nav = document.getElementById('fixedCardNav');
+      if(!nav) return;
+      nav.classList.remove('hidden-panel');
+      document.body.classList.add('has-fixed-card-nav');
+      nav.style.display = 'grid';
+      nav.style.visibility = 'visible';
+      nav.style.opacity = '1';
+
+      nav.querySelectorAll('[data-fixed-nav]').forEach(function(btn){
+        btn.disabled = false;
+        btn.style.pointerEvents = 'auto';
+      });
+    }catch(e){}
+  }
+
+  function handleAction(action){
+    if(action === 'prev') move(-1);
+    else if(action === 'next') move(1);
+    else replay();
+  }
+
+  function interceptNav(e){
+    try{
+      const target = e.target;
+      if(!target || !target.closest) return;
+      const btn = target.closest('[data-fixed-nav]');
+      if(!btn) return;
+      if(!isSentenceListen()) return;
+
+      const action = btn.getAttribute('data-fixed-nav');
+      if(!action) return;
+
+      const now = Date.now();
+      const key = action + ':' + e.type;
+      // pointer/touch/clickの連続発火対策。
+      if(lastNavKey === action && now - lastNavAt < 220){
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return;
+      }
+      lastNavKey = action;
+      lastNavAt = now;
+
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      handleAction(action);
+    }catch(err){}
+  }
+
+  // window capture は document capture より先に通るため、古いlistenerに潰される前に処理する。
+  window.addEventListener('pointerdown', interceptNav, true);
+  window.addEventListener('touchstart', interceptNav, {capture:true, passive:false});
+  window.addEventListener('click', interceptNav, true);
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      if(isSentenceListen()) setTimeout(ensureNavVisible, 0);
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  setVersion();
+  ensureNavVisible();
+  setTimeout(ensureNavVisible, 0);
+  setTimeout(ensureNavVisible, 300);
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   対象:
+   - 聞く → 単語 の 前 / もう一度 / 次 が反応しない問題
+
+   方針:
+   - v60で成功した window capture 方式を単語にも適用。
+   - 古いlistenerより先に [data-fixed-nav] を捕捉。
+   - wordIndex を直接更新し、現在単語を再描画。
+   - もう一度は現在単語の 中国語→日本語 を再生。
+*/
+(function(){
+  'use strict';
+
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+  let wordNavToken = 0;
+  let lastWordNavAction = '';
+  let lastWordNavAt = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function isListenWord(){
+    try{
+      return contentMode === 'word' && (view === 'player' || view === 'continuous' || view === 'random');
+    }catch(e){ return false; }
+  }
+
+  function escV(v){
+    try{
+      if(typeof esc === 'function') return esc(v);
+    }catch(e){}
+    return String(v == null ? '' : v).replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+
+  function charsV(v){
+    try{
+      if(typeof renderChars === 'function') return renderChars(v);
+    }catch(e){}
+    return escV(v);
+  }
+
+  function catLabel(c){
+    try{
+      if(typeof categoryLabel === 'function') return categoryLabel(c);
+      if(typeof categoryNames !== 'undefined' && categoryNames && categoryNames[c]) return categoryNames[c];
+    }catch(e){}
+    const map = {
+      all:'全部', greeting:'挨拶', cafe:'カフェ', restaurant:'食事', shopping:'買物',
+      transport:'交通', hotel:'ホテル', tourism:'観光', daily:'日常', work:'仕事', emergency:'緊急'
+    };
+    return map[c] || c || '単語';
+  }
+
+  function levelLabel(lv){
+    try{
+      if(typeof levelNames !== 'undefined' && levelNames && levelNames[lv]) return levelNames[lv];
+    }catch(e){}
+    return lv === 'advanced' ? '上級' : lv === 'intermediate' ? '中級' : '初級';
+  }
+
+  function wordList(){
+    try{
+      if(typeof getWordList === 'function'){
+        const list = getWordList();
+        if(Array.isArray(list) && list.length) return list;
+      }
+    }catch(e){}
+    try{
+      if(Array.isArray(WORDS) && WORDS.length) return WORDS;
+    }catch(e){}
+    try{
+      if(Array.isArray(embeddedWords) && embeddedWords.length) return embeddedWords;
+    }catch(e){}
+    return [];
+  }
+
+  function normWordIndex(i){
+    const list = wordList();
+    const n = Math.max(1, list.length);
+    try{
+      if(typeof normalizeWordIndex === 'function') return normalizeWordIndex(i);
+    }catch(e){}
+    return ((Number(i) || 0) % n + n) % n;
+  }
+
+  function currentWordSafe(){
+    const list = wordList();
+    if(!list.length) return null;
+    try{
+      wordIndex = normWordIndex(typeof wordIndex !== 'undefined' ? wordIndex : 0);
+      return list[wordIndex];
+    }catch(e){
+      return list[0];
+    }
+  }
+
+  function stopAudioWord(){
+    wordNavToken++;
+    try{ if(typeof autoId !== 'undefined') autoId += 1000; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{
+      if(window.speechSynthesis){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
+      }
+    }catch(e){}
+  }
+
+  function renderWordCard(active){
+    const w = currentWordSafe();
+    const list = wordList();
+    const boxEl = (function(){
+      try{ if(typeof box !== 'undefined' && box) return box; }catch(e){}
+      return document.getElementById('box') || document.querySelector('.box');
+    })();
+    if(!boxEl || !w) return;
+
+    const idx = (function(){ try{ return Number(wordIndex || 0); }catch(e){ return 0; } })();
+    const lv = w.level || 'beginner';
+    const emoji = w.emoji || w.icon || '🔤';
+
+    boxEl.innerHTML =
+      '<div class="question-card-top quiz-card-top">' +
+        '<div class="quiz-meta-pills" aria-label="' + escV(catLabel(w.category)) + ' ' + escV(levelLabel(lv)) + '">' +
+          '<span class="quiz-meta-genre">' + escV(catLabel(w.category)) + '</span>' +
+          '<span class="quiz-meta-level">' + escV(levelLabel(lv)) + '</span>' +
+        '</div>' +
+        '<div class="counter">' + escV(String(idx + 1) + ' / ' + String(Math.max(1, list.length))) + '</div>' +
+      '</div>' +
+      '<div class="listen-word-card">' +
+        '<div class="listen-word-emoji" aria-hidden="true">' + escV(emoji) + '</div>' +
+        '<div class="listen-word-lines">' +
+          '<div class="word-zh' + (active ? ' audio-active' : '') + '">' + charsV(w.zh) + '</div>' +
+          '<div class="word-pinyin">' + escV(w.pinyin) + '</div>' +
+          '<div class="word-jp">' + escV(w.jp) + '</div>' +
+        '</div>' +
+      '</div>';
+
+    ensureNavVisible();
+  }
+
+  function ensureNavVisible(){
     try{
       const nav = document.getElementById('fixedCardNav');
       if(!nav) return;
-      const show = (appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random' || appState.view === 'question');
-      nav.classList.toggle('hidden-panel', !show);
-      document.body.classList.toggle('has-fixed-card-nav', show);
-      if(show){ nav.style.display='grid'; nav.style.visibility='visible'; nav.style.opacity='1'; }
+      nav.classList.remove('hidden-panel');
+      document.body.classList.add('has-fixed-card-nav');
+      nav.style.display = 'grid';
+      nav.style.visibility = 'visible';
+      nav.style.opacity = '1';
+      nav.querySelectorAll('[data-fixed-nav]').forEach(function(btn){
+        btn.disabled = false;
+        btn.style.pointerEvents = 'auto';
+      });
     }catch(e){}
   }
-  function sentenceHeader(p, countText){
-    const c = catLabel(p && p.category);
-    const l = lvLabel((p && p.level) || 'beginner');
-    return '<div class="question-card-top quiz-card-top">' +
-      '<div class="quiz-meta-pills" aria-label="'+esc(c)+' '+esc(l)+'">' +
-        '<span class="quiz-meta-genre">'+esc(c)+'</span>' +
-        '<span class="quiz-meta-level">'+esc(l)+'</span>' +
-      '</div>' +
-      '<div class="counter">'+esc(countText || '')+'</div>' +
-    '</div>';
-  }
-  function renderSentence(active){
-    syncFromGlobals();
-    const b = boxEl(); if(!b) return;
-    let p = appState.currentSentence || sentenceAt(appState.index) || sentenceAt(0);
-    if(!p){ b.innerHTML = '<div class="error">表示できる文章データがありません。</div>'; return; }
-    appState.currentSentence = p;
-    const rows = allSentences();
-    const n = rows.length || 1;
-    b.innerHTML = sentenceHeader(p, (norm(appState.index,n)+1)+' / '+n) +
-      '<div class="card-main v53-sentence-card"><div class="lines-wrap">' +
-        '<div class="line"><div class="zh'+(active?' audio-active':'')+'">'+chars(p.zh)+'</div></div>' +
-        '<div class="line"><div class="pinyin">'+esc(p.pinyin)+'</div></div>' +
-        '<div class="line"><div class="jp">'+esc(p.jp)+'</div></div>' +
-      '</div></div>';
-    cleanStatus(); showFixedNav();
-  }
-  function renderWordQuiz(){
-    syncFromGlobals();
-    const b = boxEl(); if(!b) return;
-    const rows = wordRows();
-    const n = rows.length || 1;
-    const w = wordAt(appState.wordIndex);
-    if(!w){ b.innerHTML = '<div class="error">表示できる単語データがありません。</div>'; return; }
-    appState.currentWord = w;
-    const revealed = !!appState.quizReveal;
-    const jpToZh = appState.mode === 'speaking';
-    let right = '';
-    if(jpToZh){
-      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-jp-v49 quiz-prompt-line-v49">'+esc(w.jp)+'</div></div>';
-      right += '<div class="quiz-answer-slot-v50"><div class="quiz-answer-block-v49 quiz-answer-block-v50'+(revealed?'':' is-hidden v53-hidden-answer')+'"><div class="quiz-word-zh-v49">'+chars(w.zh)+'</div><div class="quiz-word-pinyin-v49">'+esc(w.pinyin)+'</div></div></div>';
-    }else{
-      right += '<div class="quiz-prompt-slot-v50"><div class="quiz-word-zh-v49 quiz-prompt-line-v49">'+chars(w.zh)+'</div></div>';
-      right += '<div class="quiz-answer-slot-v50"><div class="quiz-answer-block-v49 quiz-answer-block-v50'+(revealed?'':' is-hidden v53-hidden-answer')+'"><div class="quiz-word-pinyin-v49">'+esc(w.pinyin)+'</div><div class="quiz-word-jp-v49">'+esc(w.jp)+'</div></div></div>';
-    }
-    b.innerHTML = '<div class="question-card-top quiz-card-top">' +
-      '<div class="quiz-meta-pills" aria-label="'+esc(catLabel(w.category || 'greeting'))+' '+esc(lvLabel(w.level || 'beginner'))+'">' +
-        '<span class="quiz-meta-genre">'+esc(catLabel(w.category || 'greeting'))+'</span>' +
-        '<span class="quiz-meta-level">'+esc(lvLabel(w.level || 'beginner'))+'</span>' +
-      '</div>' +
-      '<div class="counter">'+esc((norm(appState.wordIndex,n)+1)+' / '+n)+'</div>' +
-    '</div>' +
-    '<div class="quiz-word-card-v47 quiz-word-card-v48 quiz-word-card-v49 quiz-word-card-v50 quiz-word-card-v52 v53-word-quiz-card" role="button" tabindex="0" aria-label="単語クイズ">' +
-      '<div class="quiz-word-emoji-v47 quiz-word-emoji-v48 quiz-word-emoji-v49 quiz-word-emoji-v50" aria-hidden="true">'+esc(w.emoji || '🔤')+'</div>' +
-      '<div class="quiz-word-lines-v47 quiz-word-lines-v48 quiz-word-lines-v49 quiz-word-lines-v50">'+right+'</div>' +
-    '</div>';
-    cleanStatus(); showFixedNav();
-  }
-  function renderCurrentState(opts){
-    opts = opts || {};
-    setVersion(); syncFromGlobals();
-    if(appState.view === 'question' && appState.contentMode === 'word') return renderWordQuiz();
-    if((appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random') && appState.contentMode !== 'word') return renderSentence(!!opts.audioActive);
-    cleanStatus(); showFixedNav();
+
+  function moveWord(delta){
+    stopAudioWord();
+    try{
+      wordIndex = normWordIndex(Number(wordIndex || 0) + delta);
+      view = 'player';
+    }catch(e){}
+    renderWordCard(false);
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    renderWordCard(false);
   }
 
-  const audioController = window.LingoFlowAudioV53 = {
-    token:0,
-    stop(reason){
-      this.token++; appState.audioToken = this.token; appState.isPlaying = false;
-      try{ if(typeof autoId !== 'undefined') autoId++; }catch(e){}
-      try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
-      try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
-      if(reason !== 'silent') renderCurrentState({audioActive:false});
-    },
-    async zh(text){
-      try{ if(typeof speakHighlight === 'function') return await speakHighlight(text); }catch(e){}
-      try{ if(typeof speakWordAudio === 'function') return await speakWordAudio(text); }catch(e){}
-      try{ if(typeof speak === 'function') return await speak(text); }catch(e){}
-    },
-    async jp(text){
-      try{ if(typeof speakJapanese === 'function') return await speakJapanese(text); }catch(e){}
-    },
-    async sentenceLoop(){
-      const token = ++this.token; appState.audioToken = token; appState.isPlaying = true;
-      try{ appState.view = (appState.autoMode === 'random') ? 'random' : 'continuous'; commitToGlobals(); updateButtons && updateButtons(); }catch(e){}
-      while(token === this.token && appState.isPlaying){
-        const rows = allSentences(); if(!rows.length) break;
-        if(appState.autoMode === 'random') appState.index = Math.floor(Math.random()*rows.length);
-        appState.currentSentence = sentenceAt(appState.index);
-        commitToGlobals(); renderSentence(true);
-        await this.zh(appState.currentSentence.zh);
-        if(token !== this.token || !appState.isPlaying) break;
-        await new Promise(r=>setTimeout(r,420));
-        await this.jp(appState.currentSentence.jp);
-        if(token !== this.token || !appState.isPlaying) break;
-        await new Promise(r=>setTimeout(r,700));
-        if(appState.autoMode !== 'random') appState.index = norm(appState.index + 1, rows.length);
-      }
-      if(token === this.token){ appState.isPlaying = false; appState.view='player'; commitToGlobals(); renderSentence(false); }
-    },
-    async revealWord(){
-      const w = appState.currentWord || wordAt(appState.wordIndex); if(!w) return;
-      const token = ++this.token; appState.audioToken = token;
-      appState.quizReveal = true; commitToGlobals(); renderWordQuiz();
-      await this.zh(w.zh);
-      if(token === this.token) renderWordQuiz();
-    }
-  };
+  async function replayWord(){
+    const w = currentWordSafe();
+    if(!w) return;
+    stopAudioWord();
+    const token = ++wordNavToken;
+    try{ view = 'player'; }catch(e){}
+    renderWordCard(true);
 
-  function startManaged(){
-    syncFromGlobals();
-    if(appState.contentMode === 'word'){
-      try{ if(typeof startOrResumeWordPlayback === 'function') return startOrResumeWordPlayback(); }catch(e){}
-      return;
-    }
-    audioController.stop('silent');
-    audioController.sentenceLoop();
-  }
-  function stopManaged(){
-    syncFromGlobals();
-    if(appState.contentMode !== 'word' && (appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random')){
-      appState.view = 'player'; commitToGlobals();
-      audioController.stop('stop'); renderSentence(false); return;
-    }
-    audioController.stop('stop');
-  }
-  function moveSentence(delta){
-    syncFromGlobals(); audioController.stop('silent');
-    const rows = allSentences(); appState.index = norm(appState.index + delta, rows.length || 1);
-    appState.currentSentence = sentenceAt(appState.index); appState.view = 'player'; appState.isPlaying = false;
-    commitToGlobals(); try{ updateButtons && updateButtons(); }catch(e){} renderSentence(false);
-  }
-  function moveWordQuiz(delta){
-    syncFromGlobals(); audioController.stop('silent');
-    const rows = wordRows(); appState.wordIndex = norm(appState.wordIndex + delta, rows.length || 1); appState.quizReveal = false;
-    commitToGlobals(); renderWordQuiz();
-  }
-  function replayCurrent(){
-    syncFromGlobals();
-    if(appState.view === 'question' && appState.contentMode === 'word') return audioController.revealWord();
-    if((appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random') && appState.contentMode !== 'word'){
-      const p = appState.currentSentence || sentenceAt(appState.index); if(!p) return;
-      audioController.stop('silent');
-      (async function(){ const token = ++audioController.token; renderSentence(true); await audioController.zh(p.zh); if(token===audioController.token) await audioController.jp(p.jp); if(token===audioController.token) renderSentence(false); })();
-    }
+    try{
+      if(typeof speakWordAudio === 'function') await speakWordAudio(w.zh);
+      else if(typeof speakHighlight === 'function') await speakHighlight(w.zh);
+      else if(typeof speakChinese === 'function') await speakChinese(w.zh);
+    }catch(e){}
+
+    if(token !== wordNavToken) return;
+    try{ if(typeof wait === 'function') await wait(300); }catch(e){}
+    if(token !== wordNavToken) return;
+
+    try{
+      if(typeof speakJapanese === 'function') await speakJapanese(w.jp);
+    }catch(e){}
+
+    if(token === wordNavToken) renderWordCard(false);
   }
 
-  const oldStart = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
-  window.startOrResumePlayback = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return startManaged(); if(typeof oldStart === 'function') return oldStart.apply(this, arguments); };
-  try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
-  const oldStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
-  window.stopPlaybackManual = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return stopManaged(); if(typeof oldStop === 'function') return oldStop.apply(this, arguments); };
-  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
-  const oldAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
-  window.startAuto = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return audioController.sentenceLoop(); if(typeof oldAuto === 'function') return oldAuto.apply(this, arguments); };
-  try{ startAuto = window.startAuto; }catch(e){}
-  const oldRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
-  window.renderAuto = function(p){ syncFromGlobals(); if(appState.contentMode !== 'word'){ if(p){ appState.currentSentence = p; } return renderSentence(true); } if(typeof oldRenderAuto === 'function') return oldRenderAuto.apply(this, arguments); };
-  try{ renderAuto = window.renderAuto; }catch(e){}
-  const oldPanel = window.renderPlaybackPanel || (typeof renderPlaybackPanel !== 'undefined' ? renderPlaybackPanel : null);
-  window.renderPlaybackPanel = function(){ syncFromGlobals(); if(appState.contentMode !== 'word') return renderSentence(false); if(typeof oldPanel === 'function') return oldPanel.apply(this, arguments); };
-  try{ renderPlaybackPanel = window.renderPlaybackPanel; }catch(e){}
-  const oldQuestion = window.renderQuestion || (typeof renderQuestion !== 'undefined' ? renderQuestion : null);
-  window.renderQuestion = function(){ syncFromGlobals(); if(appState.contentMode === 'word' && appState.view === 'question') return renderWordQuiz(); if(typeof oldQuestion === 'function') return oldQuestion.apply(this, arguments); };
-  try{ renderQuestion = window.renderQuestion; window.renderWordQuestion = renderWordQuiz; renderWordQuestion = renderWordQuiz; }catch(e){}
+  function handleAction(action){
+    if(action === 'prev') moveWord(-1);
+    else if(action === 'next') moveWord(1);
+    else replayWord();
+  }
 
-  document.addEventListener('click', function(e){
-    const t = e.target && e.target.closest ? e.target.closest('[data-v15-toggle], [data-player-control], [data-fixed-nav]') : null;
-    if(!t) return;
-    syncFromGlobals();
-    const group = t.getAttribute('data-v15-toggle');
-    const value = t.getAttribute('data-v15-value');
-    const control = t.getAttribute('data-player-control');
-    const nav = t.getAttribute('data-fixed-nav');
-    if(group === 'run' || control === 'play' || control === 'stop'){
-      if(appState.contentMode !== 'word'){
-        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-        if(value === 'play' || control === 'play') startManaged(); else stopManaged();
-      }
-      return;
-    }
-    if(nav){
-      if(appState.view === 'question' && appState.contentMode === 'word'){
-        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-        if(nav === 'prev') moveWordQuiz(-1); else if(nav === 'next') moveWordQuiz(1); else audioController.revealWord();
+  function interceptWordNav(e){
+    try{
+      const target = e.target;
+      if(!target || !target.closest) return;
+      const btn = target.closest('[data-fixed-nav]');
+      if(!btn) return;
+      if(!isListenWord()) return;
+
+      const action = btn.getAttribute('data-fixed-nav');
+      if(!action) return;
+
+      const now = Date.now();
+      if(lastWordNavAction === action && now - lastWordNavAt < 220){
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
         return;
       }
-      if((appState.view === 'player' || appState.view === 'continuous' || appState.view === 'random') && appState.contentMode !== 'word'){
-        e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-        if(nav === 'prev') moveSentence(-1); else if(nav === 'next') moveSentence(1); else replayCurrent();
+      lastWordNavAction = action;
+      lastWordNavAt = now;
+
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      handleAction(action);
+    }catch(err){}
+  }
+
+  // documentより上流で捕捉。v60文章ナビと同じ成功パターン。
+  window.addEventListener('pointerdown', interceptWordNav, true);
+  window.addEventListener('touchstart', interceptWordNav, {capture:true, passive:false});
+  window.addEventListener('click', interceptWordNav, true);
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      if(isListenWord()) setTimeout(ensureNavVisible, 0);
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  if(typeof prevRenderAuto === 'function'){
+    window.renderAuto = function(p){
+      if(isListenWord()) return renderWordCard(false);
+      return prevRenderAuto.apply(this, arguments);
+    };
+    try{ renderAuto = window.renderAuto; }catch(e){}
+  }
+
+  setVersion();
+  if(isListenWord()) ensureNavVisible();
+  setTimeout(function(){ if(isListenWord()) ensureNavVisible(); }, 0);
+  setTimeout(function(){ if(isListenWord()) ensureNavVisible(); }, 300);
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   対象:
+   - クイズ → 文章 の 前 / もう一度 / 次 が反応しない問題
+
+   方針:
+   - v60/v61で成功した window capture 方式をクイズ文章にも適用。
+   - 対象は view === 'question' && contentMode !== 'word' のみ。
+   - [data-qnav] と [data-fixed-nav] の両方を最上流で捕捉。
+   - 古いlistenerに潰される前に処理する。
+*/
+(function(){
+  'use strict';
+
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+  let quizNavToken = 0;
+  let lastAction = '';
+  let lastAt = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function isQuizSentence(){
+    try{
+      return view === 'question' && contentMode !== 'word';
+    }catch(e){ return false; }
+  }
+
+  function stopQuizAudio(){
+    quizNavToken++;
+    try{ if(typeof autoId !== 'undefined') autoId += 1000; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{
+      if(window.speechSynthesis){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
       }
+    }catch(e){}
+  }
+
+  function currentQuestion(){
+    try{
+      if(Array.isArray(history) && typeof index !== 'undefined' && history[index]) return history[index];
+    }catch(e){}
+    return null;
+  }
+
+  function renderQuestionSafe(options){
+    try{
+      if(typeof renderQuestion === 'function') return renderQuestion(options || {});
+    }catch(e){}
+  }
+
+  function prevQuiz(){
+    stopQuizAudio();
+    try{
+      if(typeof index === 'undefined') return;
+      if(index > 0) index -= 1;
+      step = 0;
+    }catch(e){}
+    renderQuestionSafe({ suppressAutoSpeak: true });
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    renderQuestionSafe({ suppressAutoSpeak: true });
+  }
+
+  function nextQuiz(){
+    stopQuizAudio();
+    try{
+      step = 0;
+      if(typeof nextQuestion === 'function') return nextQuestion(false);
+    }catch(e){}
+
+    // fallback
+    try{
+      if(Array.isArray(history) && typeof index !== 'undefined' && index < history.length - 1){
+        index += 1;
+        return renderQuestionSafe({ suppressAutoSpeak: true });
+      }
+      if(typeof pick === 'function'){
+        const p = pick();
+        if(p){
+          if(!Array.isArray(history)) history = [];
+          history.push(p);
+          index = history.length - 1;
+          return renderQuestionSafe({ suppressAutoSpeak: true });
+        }
+      }
+    }catch(e){}
+  }
+
+  async function replayQuiz(){
+    const p = currentQuestion();
+    if(!p) return;
+    stopQuizAudio();
+    const token = ++quizNavToken;
+
+    try{ step = 2; }catch(e){}
+    renderQuestionSafe({ suppressAutoSpeak: true });
+
+    try{
+      if(typeof speakHighlight === 'function') await speakHighlight(p.zh);
+      else if(typeof speakChinese === 'function') await speakChinese(p.zh);
+    }catch(e){}
+
+    if(token !== quizNavToken) return;
+  }
+
+  function handleAction(action){
+    if(action === 'prev') prevQuiz();
+    else if(action === 'next') nextQuiz();
+    else replayQuiz();
+  }
+
+  function interceptQuizNav(e){
+    try{
+      const target = e.target;
+      if(!target || !target.closest) return;
+
+      const btn = target.closest('[data-qnav], [data-fixed-nav]');
+      if(!btn) return;
+      if(!isQuizSentence()) return;
+
+      const action = btn.getAttribute('data-qnav') || btn.getAttribute('data-fixed-nav');
+      if(!action) return;
+
+      const now = Date.now();
+      if(lastAction === action && now - lastAt < 220){
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return;
+      }
+      lastAction = action;
+      lastAt = now;
+
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      handleAction(action);
+    }catch(err){}
+  }
+
+  // window capture は document/nav の古いlistenerより先に通る。
+  window.addEventListener('pointerdown', interceptQuizNav, true);
+  window.addEventListener('touchstart', interceptQuizNav, {capture:true, passive:false});
+  window.addEventListener('click', interceptQuizNav, true);
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  setVersion();
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   cleanup controller marker:
+   - Old duplicate listener/nav controllers removed.
+   - v60/v61/v62 window-capture controllers remain as current stable event layer.
+   - renderQuestion/renderAuto/stopPlaybackManual/startAuto/updateButtons full consolidation is deferred to v63b,
+     because deleting render/audio functions without browser regression testing is high risk.
+*/
+(function(){
+  'use strict';
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+  setVersion();
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setVersion, {once:true});
+  else setTimeout(setVersion, 0);
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   対象:
+   1) 聞く→単語: 停止後に再生すると別の単語へ飛ぶ
+   2) 聞く→文章: 初期表示/開始が 仕事/中級 から始まる
+
+   方針:
+   - 停止時点の wordIndex / sentence を保存し、再生直前に復元する。
+   - 聞く→文章の初期開始は filter default が全部/全部でも、表示開始は 挨拶/初級 の先頭へ正規化する。
+   - v60/v61/v62の成功済みnav層は触らない。
+*/
+(function(){
+  'use strict';
+
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+
+  let savedWordIndexV64 = null;
+  let savedSentenceV64 = null;
+  let savedSentenceIndexV64 = 0;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function isListenWord(){
+    try{ return contentMode === 'word' && (view === 'player' || view === 'continuous' || view === 'random'); }
+    catch(e){ return false; }
+  }
+
+  function isListenSentence(){
+    try{ return contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random'); }
+    catch(e){ return false; }
+  }
+
+  function sameSentence(a,b){
+    return !!(a && b && a.zh === b.zh && a.jp === b.jp && a.category === b.category);
+  }
+
+  function sentenceList(){
+    try{
+      if(typeof getList === 'function'){
+        const list = getList();
+        if(Array.isArray(list) && list.length) return list;
+      }
+    }catch(e){}
+
+    try{
+      const cats = (typeof category !== 'undefined' && category && category !== 'all')
+        ? [category]
+        : Object.keys(categoryNames || {}).filter(function(c){ return c !== 'all'; });
+      const levels = (typeof level !== 'undefined' && level && level !== 'all')
+        ? [level]
+        : ['beginner','intermediate','advanced'];
+      const out = [];
+      cats.forEach(function(cat){
+        levels.forEach(function(lv){
+          ((DATA && DATA[lv]) || []).forEach(function(p){
+            if(p && p.category === cat) out.push(Object.assign({}, p, {level: lv}));
+          });
+        });
+      });
+      return out;
+    }catch(e){ return []; }
+  }
+
+  function firstGreetingBeginnerSentence(){
+    try{
+      const rows = (DATA && DATA.beginner) ? DATA.beginner : [];
+      const p = rows.find(function(x){ return x && x.category === 'greeting'; }) || rows[0] || null;
+      return p ? Object.assign({}, p, {level:'beginner'}) : null;
+    }catch(e){ return null; }
+  }
+
+  function currentSentence(){
+    try{ if(Array.isArray(history) && typeof index !== 'undefined' && history[index]) return history[index]; }catch(e){}
+    return savedSentenceV64;
+  }
+
+  function rememberSentence(p){
+    if(!p) return;
+    savedSentenceV64 = p;
+    try{ savedSentenceIndexV64 = Number(index || 0); }catch(e){}
+  }
+
+  function setSentenceAsCurrent(p){
+    if(!p) return;
+    try{
+      if(!Array.isArray(history)) history = [];
+      let pos = history.findIndex(function(x){ return sameSentence(x,p); });
+      if(pos < 0){
+        history.push(p);
+        pos = history.length - 1;
+      }
+      index = pos;
+      step = 2;
+      savedSentenceIndexV64 = pos;
+      savedSentenceV64 = p;
+    }catch(e){}
+  }
+
+  function normalizeInitialSentenceIfNeeded(){
+    try{
+      if(contentMode === 'word') return;
+      if(!(view === 'player' || view === 'continuous' || view === 'random')) return;
+
+      const cur = currentSentence();
+      const shouldReset =
+        !cur ||
+        (
+          typeof category !== 'undefined' && category === 'all' &&
+          typeof level !== 'undefined' && level === 'all' &&
+          cur.category === 'work'
+        );
+
+      if(!shouldReset) return;
+
+      const first = firstGreetingBeginnerSentence();
+      if(!first) return;
+      setSentenceAsCurrent(first);
+      if(view === 'player' && typeof renderAuto === 'function') renderAuto(first);
+    }catch(e){}
+  }
+
+  function wordList(){
+    try{
+      if(typeof getWordList === 'function'){
+        const list = getWordList();
+        if(Array.isArray(list) && list.length) return list;
+      }
+    }catch(e){}
+    try{ if(Array.isArray(WORDS) && WORDS.length) return WORDS; }catch(e){}
+    return [];
+  }
+
+  function normWordIndex(i){
+    try{ if(typeof normalizeWordIndex === 'function') return normalizeWordIndex(i); }catch(e){}
+    const n = Math.max(1, wordList().length);
+    return ((Number(i) || 0) % n + n) % n;
+  }
+
+  function rememberWord(){
+    try{
+      if(contentMode === 'word') savedWordIndexV64 = normWordIndex(wordIndex || 0);
+    }catch(e){}
+  }
+
+  function restoreWord(){
+    try{
+      if(contentMode === 'word' && savedWordIndexV64 !== null){
+        wordIndex = normWordIndex(savedWordIndexV64);
+      }
+    }catch(e){}
+  }
+
+  function stopAudioOnly(){
+    try{ if(typeof autoId !== 'undefined') autoId += 1000; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{
+      if(window.speechSynthesis){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
+      }
+    }catch(e){}
+  }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  if(typeof prevRenderAuto === 'function'){
+    window.renderAuto = function(p){
+      if(p && contentMode !== 'word') rememberSentence(p);
+      return prevRenderAuto.apply(this, arguments);
+    };
+    try{ renderAuto = window.renderAuto; }catch(e){}
+  }
+
+  const prevStop = window.stopPlaybackManual || (typeof stopPlaybackManual !== 'undefined' ? stopPlaybackManual : null);
+  window.stopPlaybackManual = function(){
+    if(isListenWord()){
+      rememberWord();
+      stopAudioOnly();
+      try{ view = 'player'; }catch(e){}
+      try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+      restoreWord();
+      try{ if(typeof renderAuto === 'function') renderAuto(); }catch(e){}
+      return;
+    }
+
+    if(isListenSentence()){
+      rememberSentence(currentSentence());
+      stopAudioOnly();
+      try{ view = 'player'; }catch(e){}
+      try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+      const p = savedSentenceV64 || currentSentence();
+      if(p){
+        setSentenceAsCurrent(p);
+        try{ if(typeof renderAuto === 'function') renderAuto(p); }catch(e){}
+      }
+      return;
+    }
+
+    if(typeof prevStop === 'function') return prevStop.apply(this, arguments);
+  };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+
+  const prevStartAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
+  if(typeof prevStartAuto === 'function'){
+    window.startAuto = function(){
+      if(contentMode === 'word'){
+        restoreWord();
+      }else{
+        if(savedSentenceV64) setSentenceAsCurrent(savedSentenceV64);
+        else normalizeInitialSentenceIfNeeded();
+      }
+      return prevStartAuto.apply(this, arguments);
+    };
+    try{ startAuto = window.startAuto; }catch(e){}
+  }
+
+  const prevStartResume = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
+  if(typeof prevStartResume === 'function'){
+    window.startOrResumePlayback = function(){
+      if(contentMode === 'word'){
+        restoreWord();
+      }else{
+        if(savedSentenceV64) setSentenceAsCurrent(savedSentenceV64);
+        else normalizeInitialSentenceIfNeeded();
+      }
+      return prevStartResume.apply(this, arguments);
+    };
+    try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
+  }
+
+  const prevSetAuto = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
+  if(typeof prevSetAuto === 'function'){
+    window.setAutoPlayback = function(action){
+      if(action === 'stop') return window.stopPlaybackManual();
+      if(action === 'play' || action === 'continuous' || action === 'random'){
+        if(contentMode === 'word') restoreWord();
+        else {
+          if(savedSentenceV64) setSentenceAsCurrent(savedSentenceV64);
+          else normalizeInitialSentenceIfNeeded();
+        }
+      }
+      return prevSetAuto.apply(this, arguments);
+    };
+    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
+  }
+
+  document.addEventListener('click', function(e){
+    const btn = e.target && e.target.closest
+      ? e.target.closest('[data-player-control="stop"], [data-v15-toggle="run"][data-v15-value="stop"]')
+      : null;
+    if(!btn) return;
+
+    if(isListenWord() || isListenSentence()){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      window.stopPlaybackManual();
     }
   }, true);
 
-  document.addEventListener('click', function(e){
-    syncFromGlobals();
-    if(!(appState.view === 'question' && appState.contentMode === 'word')) return;
-    if(e.target.closest('[data-fixed-nav], [data-v15-toggle], [data-player-control], .view-tabs, #v12MetaSelectBar, select, button')) return;
-    if(!e.target.closest('.v53-word-quiz-card, .quiz-word-card-v52, #box, .box')) return;
-    const now = Date.now(); if(now - tapGuardAt < 250) return; tapGuardAt = now;
-    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-    if(appState.quizReveal) moveWordQuiz(1); else audioController.revealWord();
-  }, true);
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
 
   function apply(){
-    setVersion(); syncFromGlobals();
-    if(!appState.currentSentence) appState.currentSentence = sentenceAt(appState.index) || sentenceAt(0);
-    if(!appState.currentWord) appState.currentWord = wordAt(appState.wordIndex) || wordAt(0);
-    commitToGlobals(); renderCurrentState({audioActive:false});
-    setTimeout(function(){ setVersion(); cleanStatus(); showFixedNav(); }, 60);
+    setVersion();
+    normalizeInitialSentenceIfNeeded();
   }
-  window.renderCurrentState = renderCurrentState;
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply, {once:true});
-  else apply();
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      apply();
+      setTimeout(apply, 0);
+      setTimeout(apply, 300);
+    }, {once:true});
+  }else{
+    apply();
+    setTimeout(apply, 0);
+    setTimeout(apply, 300);
+  }
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   目的:
+   - v66の改悪で壊れた再生ボタン横取りを廃止。
+   - 再生ボタン本来のクリック処理は止めない。
+   - 聞く→文章で autoMode が勝手に random/順不同へ戻る状態だけを補正する。
+   - 停止後再生は v64 の保存位置復元に任せる。
+*/
+(function(){
+  'use strict';
+
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function isSentenceListenContext(){
+    try{
+      return contentMode !== 'word' && (view === 'player' || view === 'continuous' || view === 'random');
+    }catch(e){ return false; }
+  }
+
+  function isExplicitRandomAction(action){
+    return action === 'random' || action === '順不同';
+  }
+
+  function keepSentenceContinuousUnlessExplicitRandom(action){
+    try{
+      if(!isSentenceListenContext()) return;
+      if(isExplicitRandomAction(action)) return;
+
+      // 再生ボタンや連続ボタン時のみ random 残留を解除。
+      if(action === 'play' || action === 'continuous' || action === null || action === undefined){
+        if(autoMode === 'random') autoMode = 'continuous';
+        if(view === 'random') view = 'continuous';
+      }
+    }catch(e){}
+  }
+
+  function readActionFromButton(btn){
+    if(!btn) return null;
+    return (
+      btn.getAttribute('data-player-control') ||
+      btn.getAttribute('data-v15-value') ||
+      btn.getAttribute('data-order-mode') ||
+      btn.getAttribute('data-auto-mode') ||
+      btn.textContent ||
+      null
+    );
+  }
+
+  // 再生ボタン本来の処理を壊さず、状態だけ先に補正する。
+  document.addEventListener('click', function(e){
+    try{
+      const btn = e.target && e.target.closest
+        ? e.target.closest('[data-player-control], [data-v15-toggle="run"], [data-v15-toggle="order"], [data-order-mode], [data-auto-mode]')
+        : null;
+      const action = readActionFromButton(btn);
+      keepSentenceContinuousUnlessExplicitRandom(action);
+    }catch(err){}
+  }, true);
+
+  const prevSetAuto = window.setAutoPlayback || (typeof setAutoPlayback !== 'undefined' ? setAutoPlayback : null);
+  if(typeof prevSetAuto === 'function'){
+    window.setAutoPlayback = function(action){
+      keepSentenceContinuousUnlessExplicitRandom(action);
+      return prevSetAuto.apply(this, arguments);
+    };
+    try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
+  }
+
+  const prevStartAuto = window.startAuto || (typeof startAuto !== 'undefined' ? startAuto : null);
+  if(typeof prevStartAuto === 'function'){
+    window.startAuto = function(){
+      keepSentenceContinuousUnlessExplicitRandom('play');
+      return prevStartAuto.apply(this, arguments);
+    };
+    try{ startAuto = window.startAuto; }catch(e){}
+  }
+
+  const prevStartResume = window.startOrResumePlayback || (typeof startOrResumePlayback !== 'undefined' ? startOrResumePlayback : null);
+  if(typeof prevStartResume === 'function'){
+    window.startOrResumePlayback = function(){
+      keepSentenceContinuousUnlessExplicitRandom('play');
+      return prevStartResume.apply(this, arguments);
+    };
+    try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
+  }
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  setVersion();
+})();
+</script>
+
+
+<script>
+/* ===== 2026-05-25-v68b-unified-listen-playback-engine-v1 =====
+   根本原因:
+   1) 聞く→文章の連続再生が内部で ランダム選択関数を使うため、連続でもランダム的に進む。
+   2) 聞く→単語の停止後再生が、古い startAuto / startOrResume / setAutoPlayback のどれかを通り、
+      wordIndex 復元より文章側の開始処理が勝つことがある。
+
+   根本対策:
+   - 聞くモードの startAuto / startOrResumePlayback / stopPlaybackManual / setAutoPlayback を
+     v68で一本化。
+   - 文章 continuous は ランダム選択禁止。カテゴリ順 × 初級→中級→上級の順序リストだけで進む。
+   - 単語 continuous は wordIndex を保存・復元して同じ単語から再開。
+   - random は setAutoPlayback('random') または autoMode==='random' の時だけ許可。
+   - クリックイベントは横取りしない。既存UIのクリック経路から呼ばれる関数だけを安定化。
+*/
+(function(){
+  'use strict';
+
+  const VERSION = '2026-05-25-v68b-unified-listen-playback-engine-v1';
+
+  let listenToken = 0;
+  let pausedContentMode = null;
+  let pausedSentence = null;
+  let pausedSentencePos = 0;
+  let pausedWordIndex = 0;
+  let explicitRandom = false;
+
+  function setVersion(){
+    try{
+      const meta = document.querySelector('meta[name="lingoflow-app-version"]');
+      if(meta) meta.setAttribute('content', VERSION);
+      window.LINGOFLOW_APP_VERSION = VERSION;
+      if(document.body) document.body.setAttribute('data-lingoflow-final-version', VERSION);
+    }catch(e){}
+  }
+
+  function isListenView(){
+    try{ return view === 'player' || view === 'continuous' || view === 'random'; }
+    catch(e){ return false; }
+  }
+
+  function isWordMode(){
+    try{ return contentMode === 'word'; }catch(e){ return false; }
+  }
+
+  function sameSentence(a,b){
+    return !!(a && b && a.zh === b.zh && a.jp === b.jp && a.category === b.category);
+  }
+
+  function categoryOrder(){
+    return ['greeting','cafe','restaurant','shopping','transport','hotel','tourism','daily','work','emergency'];
+  }
+
+  function selectedCategories(){
+    try{
+      if(typeof category !== 'undefined' && category && category !== 'all') return [category];
+    }catch(e){}
+    return categoryOrder();
+  }
+
+  function selectedLevels(){
+    try{
+      if(typeof level !== 'undefined' && level && level !== 'all') return [level];
+    }catch(e){}
+    return ['beginner','intermediate','advanced'];
+  }
+
+  function sentenceListOrdered(){
+    const out = [];
+    try{
+      selectedCategories().forEach(function(cat){
+        selectedLevels().forEach(function(lv){
+          ((DATA && DATA[lv]) || []).forEach(function(p){
+            if(p && p.category === cat) out.push(Object.assign({}, p, {level: lv}));
+          });
+        });
+      });
+    }catch(e){}
+    return out;
+  }
+
+  function firstGreetingBeginner(){
+    try{
+      const rows = (DATA && DATA.beginner) ? DATA.beginner : [];
+      const p = rows.find(function(x){ return x && x.category === 'greeting'; }) || rows[0] || null;
+      return p ? Object.assign({}, p, {level:'beginner'}) : null;
+    }catch(e){ return null; }
+  }
+
+  function currentSentence(){
+    try{ if(Array.isArray(history) && typeof index !== 'undefined' && history[index]) return history[index]; }catch(e){}
+    return pausedSentence;
+  }
+
+  function setSentenceCurrent(p){
+    if(!p) return false;
+    try{
+      if(!Array.isArray(history)) history = [];
+      let hpos = history.findIndex(function(x){ return sameSentence(x,p); });
+      if(hpos < 0){
+        history.push(p);
+        hpos = history.length - 1;
+      }
+      index = hpos;
+      step = 2;
+      pausedSentence = p;
+
+      const list = sentenceListOrdered();
+      const pos = list.findIndex(function(x){ return sameSentence(x,p); });
+      pausedSentencePos = pos >= 0 ? pos : Math.max(0, pausedSentencePos || 0);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function renderSentenceStill(p, active){
+    if(!p) return;
+    setSentenceCurrent(p);
+    try{ if(typeof renderAuto === 'function') renderAuto(p); }catch(e){}
+  }
+
+  function wordList(){
+    try{
+      if(typeof getWordList === 'function'){
+        const list = getWordList();
+        if(Array.isArray(list) && list.length) return list;
+      }
+    }catch(e){}
+    try{ if(Array.isArray(WORDS) && WORDS.length) return WORDS; }catch(e){}
+    return [];
+  }
+
+  function normWord(i){
+    try{ if(typeof normalizeWordIndex === 'function') return normalizeWordIndex(i); }catch(e){}
+    const n = Math.max(1, wordList().length);
+    return ((Number(i)||0) % n + n) % n;
+  }
+
+  function currentWordSafe(){
+    const list = wordList();
+    if(!list.length) return null;
+    try{ wordIndex = normWord(wordIndex || 0); }catch(e){}
+    try{ return list[wordIndex]; }catch(e){ return list[0]; }
+  }
+
+  function renderWordStill(){
+    try{
+      wordIndex = normWord(pausedWordIndex);
+      if(typeof renderAuto === 'function') renderAuto();
+      else if(typeof renderWord === 'function') renderWord();
+    }catch(e){}
+  }
+
+  function stopAudioOnly(){
+    listenToken++;
+    try{ if(typeof autoId !== 'undefined') autoId += 1000; }catch(e){}
+    try{ if(typeof stopAudio === 'function') stopAudio(); }catch(e){}
+    try{
+      if(window.speechSynthesis){
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
+      }
+    }catch(e){}
+  }
+
+  function savePause(){
+    try{ pausedContentMode = contentMode; }catch(e){}
+    if(isWordMode()){
+      try{ pausedWordIndex = normWord(wordIndex || 0); }catch(e){ pausedWordIndex = 0; }
+      return;
+    }
+    const p = currentSentence();
+    if(p) setSentenceCurrent(p);
+  }
+
+  function prepareSentenceStart(){
+    const list = sentenceListOrdered();
+    if(!list.length) return null;
+
+    if(pausedContentMode !== 'word' && pausedSentence){
+      let pos = list.findIndex(function(x){ return sameSentence(x, pausedSentence); });
+      if(pos < 0) pos = Math.max(0, Math.min(pausedSentencePos || 0, list.length - 1));
+      pausedSentencePos = pos;
+      const p = list[pos] || pausedSentence;
+      setSentenceCurrent(p);
+      return p;
+    }
+
+    const first = firstGreetingBeginner() || list[0];
+    pausedSentencePos = Math.max(0, list.findIndex(function(x){ return sameSentence(x, first); }));
+    setSentenceCurrent(first);
+    return first;
+  }
+
+  async function speakSentenceOnce(p, token){
+    if(!p) return false;
+    renderSentenceStill(p, true);
+    try{ if(typeof speakHighlight === 'function') await speakHighlight(p.zh); }catch(e){}
+    if(token !== listenToken) return false;
+    try{ if(typeof wait === 'function') await wait(550); }catch(e){}
+    if(token !== listenToken) return false;
+    try{ if(typeof speakJapanese === 'function') await speakJapanese(p.jp); }catch(e){}
+    if(token !== listenToken) return false;
+    try{ if(typeof wait === 'function') await wait(900); }catch(e){}
+    return token === listenToken;
+  }
+
+  async function sentenceLoop(){
+    const token = ++listenToken;
+    try{ contentMode = 'sentence'; }catch(e){}
+    try{ view = explicitRandom ? 'random' : 'continuous'; }catch(e){}
+    try{ autoMode = explicitRandom ? 'random' : 'continuous'; }catch(e){}
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+
+    let list = sentenceListOrdered();
+    if(!list.length) return;
+
+    let p = prepareSentenceStart();
+    while(token === listenToken){
+      list = sentenceListOrdered();
+      if(!list.length) break;
+
+      if(explicitRandom){
+        pausedSentencePos = Math.floor(Math.random() * list.length);
+        p = list[pausedSentencePos];
+        setSentenceCurrent(p);
+      }else{
+        let pos = list.findIndex(function(x){ return sameSentence(x, pausedSentence); });
+        if(pos < 0) pos = Math.max(0, Math.min(pausedSentencePos || 0, list.length - 1));
+        pausedSentencePos = pos;
+        p = list[pausedSentencePos];
+        setSentenceCurrent(p);
+      }
+
+      const ok = await speakSentenceOnce(p, token);
+      if(!ok) break;
+      if(token !== listenToken) break;
+      if(view !== 'continuous' && view !== 'random') break;
+
+      if(!explicitRandom){
+        pausedSentencePos = (pausedSentencePos + 1) % list.length;
+        pausedSentence = list[pausedSentencePos];
+        setSentenceCurrent(pausedSentence);
+      }
+    }
+  }
+
+  async function speakWordOnce(w, token){
+    if(!w) return false;
+    try{
+      if(typeof renderAuto === 'function') renderAuto();
+      else if(typeof renderWord === 'function') renderWord();
+    }catch(e){}
+    try{
+      if(typeof speakWordAudio === 'function') await speakWordAudio(w.zh);
+      else if(typeof speakHighlight === 'function') await speakHighlight(w.zh);
+      else if(typeof speakChinese === 'function') await speakChinese(w.zh);
+    }catch(e){}
+    if(token !== listenToken) return false;
+    try{ if(typeof wait === 'function') await wait(500); }catch(e){}
+    if(token !== listenToken) return false;
+    try{ if(typeof speakJapanese === 'function') await speakJapanese(w.jp); }catch(e){}
+    if(token !== listenToken) return false;
+    try{ if(typeof wait === 'function') await wait(700); }catch(e){}
+    return token === listenToken;
+  }
+
+  async function wordLoop(){
+    const token = ++listenToken;
+    try{ contentMode = 'word'; }catch(e){}
+    try{ view = explicitRandom ? 'random' : 'continuous'; }catch(e){}
+    try{ autoMode = explicitRandom ? 'random' : 'continuous'; }catch(e){}
+    try{ wordIndex = normWord(pausedWordIndex); }catch(e){}
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+
+    while(token === listenToken){
+      const list = wordList();
+      if(!list.length) break;
+
+      if(explicitRandom){
+        wordIndex = Math.floor(Math.random() * list.length);
+      }else{
+        wordIndex = normWord(wordIndex || 0);
+      }
+
+      pausedWordIndex = normWord(wordIndex);
+      const w = currentWordSafe();
+      const ok = await speakWordOnce(w, token);
+      if(!ok) break;
+      if(token !== listenToken) break;
+      if(view !== 'continuous' && view !== 'random') break;
+
+      if(!explicitRandom){
+        wordIndex = normWord(Number(wordIndex || 0) + 1);
+        pausedWordIndex = wordIndex;
+      }
+    }
+  }
+
+  const prevRenderAuto = window.renderAuto || (typeof renderAuto !== 'undefined' ? renderAuto : null);
+  if(typeof prevRenderAuto === 'function'){
+    window.renderAuto = function(p){
+      try{
+        if(isWordMode()) {
+          pausedContentMode = 'word';
+          pausedWordIndex = normWord(wordIndex || 0);
+        } else if(p) {
+          pausedContentMode = 'sentence';
+          setSentenceCurrent(p);
+        }
+      }catch(e){}
+      return prevRenderAuto.apply(this, arguments);
+    };
+    try{ renderAuto = window.renderAuto; }catch(e){}
+  }
+
+  window.stopPlaybackManual = function(){
+    savePause();
+    stopAudioOnly();
+    try{ view = 'player'; }catch(e){}
+    try{ if(typeof updateButtons === 'function') updateButtons(); }catch(e){}
+    if(pausedContentMode === 'word') renderWordStill();
+    else renderSentenceStill(pausedSentence || currentSentence(), false);
+  };
+  try{ stopPlaybackManual = window.stopPlaybackManual; }catch(e){}
+
+  window.startAuto = function(){
+    if(typeof audioEnabled !== 'undefined' && !audioEnabled) return;
+    if(isWordMode() || pausedContentMode === 'word') return wordLoop();
+    return sentenceLoop();
+  };
+  try{ startAuto = window.startAuto; }catch(e){}
+
+  window.startOrResumePlayback = function(){
+    if(typeof audioEnabled !== 'undefined' && !audioEnabled) return;
+    try{ if(pausedContentMode === 'word') contentMode = 'word'; }catch(e){}
+    return window.startAuto();
+  };
+  try{ startOrResumePlayback = window.startOrResumePlayback; }catch(e){}
+
+  window.setAutoPlayback = function(action){
+    if(action === 'stop') return window.stopPlaybackManual();
+
+    explicitRandom = action === 'random';
+    try{ autoMode = explicitRandom ? 'random' : 'continuous'; }catch(e){}
+    try{ view = explicitRandom ? 'random' : 'continuous'; }catch(e){}
+
+    return window.startAuto();
+  };
+  try{ setAutoPlayback = window.setAutoPlayback; }catch(e){}
+
+  const prevSwitchContent = window.switchContentMode || (typeof switchContentMode !== 'undefined' ? switchContentMode : null);
+  if(typeof prevSwitchContent === 'function'){
+    window.switchContentMode = function(next){
+      if(next === 'word'){
+        pausedContentMode = 'word';
+        try{ pausedWordIndex = normWord(wordIndex || 0); }catch(e){}
+      }else if(next === 'sentence'){
+        pausedContentMode = 'sentence';
+      }
+      return prevSwitchContent.apply(this, arguments);
+    };
+    try{ switchContentMode = window.switchContentMode; }catch(e){}
+  }
+
+  const prevUpdate = window.updateButtons || (typeof updateButtons !== 'undefined' ? updateButtons : null);
+  if(typeof prevUpdate === 'function'){
+    window.updateButtons = function(){
+      const r = prevUpdate.apply(this, arguments);
+      setVersion();
+      return r;
+    };
+    try{ updateButtons = window.updateButtons; }catch(e){}
+  }
+
+  setVersion();
 })();
 </script>
 
