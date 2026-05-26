@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "image": "images/coffee.svg",
+    "zh": "咖啡",
+    "pinyin": "kā fēi",
+    "ja": "コーヒー",
+    "sentence_zh": "今天想喝咖啡。",
+    "sentence_pinyin": "jīn tiān xiǎng hē kā fēi",
+    "sentence_ja": "今日はコーヒーが飲みたい。",
+    "audio_word": "",
+    "audio_sentence": "",
+    "theme": "朝 / カフェ"
+  },
+  {
+    "id": 2,
+    "image": "images/rain.svg",
+    "zh": "下雨",
+    "pinyin": "xià yǔ",
+    "ja": "雨が降る",
+    "sentence_zh": "今天一直下雨。",
+    "sentence_pinyin": "jīn tiān yì zhí xià yǔ",
+    "sentence_ja": "今日はずっと雨です。",
+    "audio_word": "",
+    "audio_sentence": "",
+    "theme": "雨の日"
+  },
+  {
+    "id": 3,
+    "image": "images/mrt.svg",
+    "zh": "捷運",
+    "pinyin": "jié yùn",
+    "ja": "MRT",
+    "sentence_zh": "我每天坐捷運上班。",
+    "sentence_pinyin": "wǒ měi tiān zuò jié yùn shàng bān",
+    "sentence_ja": "毎日MRTで通勤します。",
+    "audio_word": "",
+    "audio_sentence": "",
+    "theme": "移動 / MRT"
+  },
+  {
+    "id": 4,
+    "image": "images/night.svg",
+    "zh": "晚安",
+    "pinyin": "wǎn ān",
+    "ja": "おやすみ",
+    "sentence_zh": "今天辛苦了，晚安。",
+    "sentence_pinyin": "jīn tiān xīn kǔ le, wǎn ān",
+    "sentence_ja": "今日はお疲れさま、おやすみ。",
+    "audio_word": "",
+    "audio_sentence": "",
+    "theme": "夜"
+  },
+  {
+    "id": 5,
+    "image": "images/tea.svg",
+    "zh": "奶茶",
+    "pinyin": "nǎi chá",
+    "ja": "ミルクティー",
+    "sentence_zh": "我喜歡喝奶茶。",
+    "sentence_pinyin": "wǒ xǐ huān hē nǎi chá",
+    "sentence_ja": "ミルクティーを飲むのが好きです。",
+    "audio_word": "",
+    "audio_sentence": "",
+    "theme": "午後の休憩"
+  }
+]

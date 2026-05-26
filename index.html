@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LingoFlow prototype v1</title>
+  <meta name="description" content="台湾華語が、静かに流れる場所。">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="app" aria-live="polite">
+    <section class="card" id="card">
+      <div class="image-area">
+        <img id="cardImage" alt="">
+      </div>
+
+      <div class="text-area">
+        <div class="word-block">
+          <div id="wordZh" class="word-zh"></div>
+          <div id="wordPinyin" class="word-pinyin"></div>
+          <div id="wordJa" class="word-ja"></div>
+        </div>
+
+        <div class="sentence-block">
+          <div id="sentenceZh" class="sentence-zh"></div>
+          <div id="sentencePinyin" class="sentence-pinyin"></div>
+          <div id="sentenceJa" class="sentence-ja"></div>
+        </div>
+      </div>
+    </section>
+
+    <button id="playButton" class="play-button" type="button" aria-label="再生">▶︎</button>
+    <p id="statusText" class="status-text">押すと静かに始まります</p>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
