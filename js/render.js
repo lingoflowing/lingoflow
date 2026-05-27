@@ -30,11 +30,11 @@ export async function fadeToCard(card) {
   if (!card || state.isTransitioning) return;
   state.isTransitioning = true;
   els.card.classList.add("is-fading");
-  await wait(560);
+  await wait(640);
   renderCard(card);
   await wait(90);
   els.card.classList.remove("is-fading");
-  await wait(360);
+  await wait(420);
   state.isTransitioning = false;
 }
 
