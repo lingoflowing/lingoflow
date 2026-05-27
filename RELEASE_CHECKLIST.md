@@ -1,4 +1,4 @@
-# RELEASE CHECKLIST - LingoFlow ambient v0.17
+# RELEASE CHECKLIST - LingoFlow ambient v0.18
 
 ## Permanent upload-status countermeasure
 
@@ -6,7 +6,7 @@ This package is not considered releasable unless all checks below pass before th
 
 - [x] Folder exists
 - [x] Required files exist
-- [x] `index.html` contains `v0.17 ambient`
+- [x] `index.html` contains `v0.18 ambient`
 - [x] Zip created from the verified folder
 - [x] `unzip -t` passes
 - [x] Manifest with SHA-256 generated

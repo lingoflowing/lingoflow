@@ -1,8 +1,8 @@
-# LingoFlow ambient v0.17
+# LingoFlow ambient v0.18
 
 台湾華語 ambient player prototype.
 
-## v0.17 focus
+## v0.18 focus
 
 - visual tone unification
 - Taiwan daily atmosphere tuning
