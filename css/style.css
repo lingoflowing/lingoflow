@@ -1,15 +1,15 @@
-/* LingoFlow ambient v0.9
+/* LingoFlow ambient v0.10
    base / layout / card / type / control / responsive only
-   v0.9: iPhone SE overlap fix - mobile play button is in normal layout, not fixed overlay.
+   v0.10: quieter tempo, softer fade, warmer ambient tone.
 */
 
 :root {
-  --bg: #f5f5f2;
-  --card: rgba(255, 255, 255, 0.84);
-  --ink: #2b2b2b;
-  --muted: #77777d;
+  --bg: #f6f4ef;
+  --card: rgba(255, 255, 255, 0.78);
+  --ink: #30302d;
+  --muted: #81817b;
   --soft: #ecefed;
-  --shadow: 0 24px 60px rgba(37, 43, 48, 0.08);
+  --shadow: 0 22px 58px rgba(41, 38, 32, 0.07);
   --radius: 32px;
 }
 
@@ -53,12 +53,13 @@ body {
   border-radius: var(--radius);
   background: var(--card);
   box-shadow: var(--shadow);
-  transition: opacity 240ms ease, filter 240ms ease;
+  transition: opacity 420ms ease, filter 420ms ease, transform 420ms ease;
 }
 
 .card.is-fading {
-  opacity: 0.18;
-  filter: blur(1px);
+  opacity: 0.08;
+  filter: blur(1.5px);
+  transform: scale(0.995);
 }
 
 .scene {
@@ -70,7 +71,7 @@ body {
   overflow: hidden;
   background:
     radial-gradient(circle at 24% 20%, rgba(255,255,255,.9), transparent 22%),
-    linear-gradient(145deg, #f8f9f8, #eef2f1);
+    linear-gradient(145deg, #fbfaf6, #eff1ed);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.9);
 }
 
@@ -89,7 +90,7 @@ body {
   font-size: clamp(82px, 12vw, 138px);
   line-height: 1;
   transform: translateY(2px);
-  filter: grayscale(0.12) saturate(0.88);
+  filter: grayscale(0.18) saturate(0.82) opacity(.92);
 }
 
 .content {
@@ -101,8 +102,8 @@ body {
   margin: 0;
   font-size: clamp(42px, 6.2vw, 72px);
   line-height: 1.05;
-  font-weight: 600;
-  letter-spacing: -0.04em;
+  font-weight: 560;
+  letter-spacing: -0.035em;
 }
 
 .word p,
@@ -132,8 +133,8 @@ body {
 #sentenceZh {
   font-size: clamp(24px, 3.2vw, 34px);
   line-height: 1.35;
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-weight: 560;
+  letter-spacing: -0.02em;
 }
 
 .sentence {
@@ -150,9 +151,9 @@ body {
   height: 58px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.72);
-  background: rgba(255,255,255,.68);
-  color: #34363a;
-  box-shadow: 0 12px 34px rgba(37, 43, 48, 0.10);
+  background: rgba(255,255,255,.56);
+  color: #3b3b37;
+  box-shadow: 0 10px 30px rgba(41, 38, 32, 0.08);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   font-size: 21px;

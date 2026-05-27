@@ -1,40 +1,30 @@
-# LingoFlow ambient v0.8
+# LingoFlow ambient v0.10
 
 ## 方針
 
 - 1画面
 - 1ボタン
 - 固定順
-- 単語 → 間 → 例文 → 余白 → 次
+- 単語 → 間 → 例文 → 静かな余白 → 次
 - タブ離脱・スリープ復帰で勝手に再開しない
 - iPhone SE 横スクロールなし
 - BGMなし
 
+## v0.10 変更点
+
+- fade を 240ms から 420ms へ変更
+- 単語後の間を 1.2秒へ変更
+- 例文後の余白を 3.5秒へ変更
+- 背景と文字を少し暖かく、柔らかく調整
+- 再生ボタンの主張をさらに弱める
+
 ## 更新確認
 
-右下に `v0.9 ambient` が表示されれば反映成功。
+右下に `v0.10 ambient` が表示されれば反映成功。
 
 ## GitHub更新
 
 1. このフォルダの中身を既存repoへ上書き
-2. GitHub Desktopで Summary に `ambient v0.8`
-3. Commit to main
-4. Push origin
-5. Cloudflare反映後に Ctrl + Shift + R
-
-## 注意
-
-ブラウザの音声は Web Speech API を使用。
-実際の声質は端末・ブラウザに依存します。
-
-
-## v0.8
-- 再生ボタンが日本語例文に重ならないよう、下部余白と小画面時の高さ設計を修正。
-- fixedボタン用の安全領域を確保。
-
-
-## v0.9
-
-- iPhone SE overlap fix: mobile play button is no longer fixed overlay.
-- The play button is placed after the card in normal document flow, so it cannot cover the Japanese sentence translation.
-- Mobile card height and typography were tightened to preserve one-screen ambient layout.
+2. GitHub DesktopでCommit
+3. Push origin
+4. Cloudflare反映後に強制更新

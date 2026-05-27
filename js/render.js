@@ -28,11 +28,11 @@ export async function fadeToCard(card) {
   if (!card || state.isTransitioning) return;
   state.isTransitioning = true;
   els.card.classList.add("is-fading");
-  await wait(240);
+  await wait(420);
   renderCard(card);
-  await wait(60);
+  await wait(90);
   els.card.classList.remove("is-fading");
-  await wait(180);
+  await wait(260);
   state.isTransitioning = false;
 }
 
