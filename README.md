@@ -1,4 +1,4 @@
-# LingoFlow ambient v0.7
+# LingoFlow ambient v0.8
 
 ## 方針
 
@@ -12,12 +12,12 @@
 
 ## 更新確認
 
-右下に `v0.7 ambient` が表示されれば反映成功。
+右下に `v0.8 ambient` が表示されれば反映成功。
 
 ## GitHub更新
 
 1. このフォルダの中身を既存repoへ上書き
-2. GitHub Desktopで Summary に `ambient v0.7`
+2. GitHub Desktopで Summary に `ambient v0.8`
 3. Commit to main
 4. Push origin
 5. Cloudflare反映後に Ctrl + Shift + R
@@ -26,3 +26,8 @@
 
 ブラウザの音声は Web Speech API を使用。
 実際の声質は端末・ブラウザに依存します。
+
+
+## v0.8
+- 再生ボタンが日本語例文に重ならないよう、下部余白と小画面時の高さ設計を修正。
+- fixedボタン用の安全領域を確保。
