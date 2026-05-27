@@ -1,388 +1,114 @@
-/* LingoFlow ambient v0.19
-   base / layout / card / type / control / responsive only
-   v0.19: ambient density tuning, quieter typography, softer UI boundary, verified package flow. v0.19: status-safe release packaging, visual consistency, breathing silence.
 
-*/
-
-:root {
-  --bg: #f0e9de;
-  --card: rgba(255, 255, 255, 0.27);
-  --ink: #2f2b27;
-  --muted: #b7b0a6;
-  --soft: #ecefed;
-  --shadow: 0 18px 58px rgba(41, 38, 32, 0.010);
-  --radius: 32px;
+:root{
+  --bg:#f5f1ea;
+  --card:#f7f3ec;
+  --text:#4a3d31;
+  --muted:#8b7b6b;
 }
 
-* {
-  box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-html,
-body {
-  width: 100%;
-  min-height: 100%;
-  margin: 0;
-  overflow-x: hidden;
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(to bottom,#f7f3ec,#f2ede5);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
-  background:
-    radial-gradient(circle at 18% 20%, rgba(255,255,255,.95), transparent 34%),
-    radial-gradient(circle at 82% 88%, rgba(224, 207, 179, .30), transparent 38%),
-    linear-gradient(180deg, #f8f4eb 0%, var(--bg) 100%);
-  color: var(--ink);
+.scene{
+  width:min(1200px,100%);
+  background:rgba(255,255,255,0.45);
+  border-radius:36px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:1.2fr 0.8fr;
+  backdrop-filter:blur(12px);
+  box-shadow:0 24px 80px rgba(60,40,20,0.08);
 }
 
-.app {
-  position: relative;
-  min-height: 100svh;
-  width: 100%;
-  display: grid;
-  place-items: center;
-  padding: max(18px, env(safe-area-inset-top)) 18px max(112px, calc(env(safe-area-inset-bottom) + 92px));
+.visual img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
 
-.card {
-  width: min(920px, 100%);
-  min-height: min(520px, calc(100svh - 154px));
-  display: grid;
-  grid-template-columns: minmax(260px, 1fr) minmax(280px, 0.92fr);
-  gap: clamp(26px, 5vw, 64px);
-  align-items: center;
-  padding: clamp(28px, 5vw, 58px);
-  border-radius: var(--radius);
-  background: var(--card);
-  border: 1px solid rgba(255,255,255,.075);
-  box-shadow: var(--shadow);
-  transition: opacity 760ms ease, filter 760ms ease, transform 760ms ease;
+.content{
+  padding:72px 56px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:20px;
 }
 
-.card.is-fading {
-  opacity: 0.035;
-  filter: blur(3.2px);
-  transform: scale(0.995);
+.meta{
+  font-size:14px;
+  color:var(--muted);
+  letter-spacing:.12em;
 }
 
-.scene {
-  position: relative;
-  min-height: clamp(260px, 42vw, 410px);
-  border-radius: 30px;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 24% 18%, rgba(255,255,255,.66), transparent 24%),
-    linear-gradient(145deg, #fbf8ef, #e9e4d8);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.38);
+h1{
+  margin:0;
+  font-size:88px;
+  font-weight:600;
 }
 
-.scene::before,
-.scene::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
+.pinyin{
+  font-size:34px;
+  color:#66584a;
 }
 
-.scene::before {
-  width: 72%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgba(255,255,255,.46);
-  filter: blur(28px);
-  transform: translate(-16%, -12%);
+.ja{
+  font-size:22px;
+  color:#7f7165;
 }
 
-.scene::after {
-  inset: 13%;
-  border-radius: 24px;
-  opacity: .62;
+.play{
+  margin-top:36px;
+  border:none;
+  background:rgba(255,255,255,0.4);
+  color:var(--text);
+  border-radius:999px;
+  padding:20px 28px;
+  font-size:24px;
 }
 
-.scene[data-scene="coffee"] {
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255,255,255,.82), transparent 20%),
-    linear-gradient(145deg, #faf6ee, #e8dfcf);
-}
-.scene[data-scene="coffee"]::after {
-  background:
-    linear-gradient(90deg, transparent 0 44%, rgba(126,92,58,.16) 44% 46%, transparent 46% 100%),
-    radial-gradient(ellipse at 52% 57%, rgba(124,86,56,.18), transparent 31%),
-    linear-gradient(180deg, rgba(255,255,255,.28), transparent);
+.version{
+  margin-top:80px;
+  font-size:14px;
+  color:#9a8d81;
 }
 
-.scene[data-scene="rain"] {
-  background:
-    radial-gradient(circle at 24% 18%, rgba(255,255,255,.75), transparent 22%),
-    linear-gradient(145deg, #f3f5f2, #dfe7e6);
-}
-.scene[data-scene="rain"]::after {
-  background:
-    repeating-linear-gradient(105deg, rgba(105,122,128,.12) 0 2px, transparent 2px 18px),
-    linear-gradient(180deg, rgba(255,255,255,.45), transparent);
-}
-
-.scene[data-scene="mrt"] {
-  background:
-    radial-gradient(circle at 28% 20%, rgba(255,255,255,.78), transparent 24%),
-    linear-gradient(145deg, #f6f3ea, #e2e5df);
-}
-.scene[data-scene="mrt"]::after {
-  background:
-    linear-gradient(180deg, transparent 0 44%, rgba(80,93,94,.12) 44% 47%, transparent 47% 100%),
-    linear-gradient(90deg, rgba(255,255,255,.28) 0 44%, rgba(85,95,96,.12) 44% 47%, transparent 47% 100%),
-    radial-gradient(ellipse at 70% 36%, rgba(255,255,255,.45), transparent 23%);
-}
-
-.scene[data-scene="night"] {
-  background:
-    radial-gradient(circle at 72% 22%, rgba(255,255,255,.68), transparent 12%),
-    linear-gradient(145deg, #edece8, #d9ddd8);
-}
-.scene[data-scene="night"]::after {
-  background:
-    radial-gradient(circle at 72% 28%, rgba(255,255,255,.5), transparent 10%),
-    linear-gradient(180deg, transparent 0 64%, rgba(79,78,70,.10) 64% 66%, transparent 66% 100%);
-}
-
-.scene[data-scene="store"] {
-  background:
-    radial-gradient(circle at 22% 18%, rgba(255,255,255,.78), transparent 22%),
-    linear-gradient(145deg, #faf6ee, #e7e4da);
-}
-.scene[data-scene="store"]::after {
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.35) 0 20%, transparent 20% 100%),
-    repeating-linear-gradient(90deg, rgba(104,112,103,.11) 0 2px, transparent 2px 34px);
-}
-
-.scene[data-scene="tea"] {
-  background:
-    radial-gradient(circle at 28% 18%, rgba(255,255,255,.8), transparent 23%),
-    linear-gradient(145deg, #f6f4ea, #dfe6d9);
-}
-.scene[data-scene="tea"]::after {
-  background:
-    radial-gradient(ellipse at 50% 60%, rgba(99,124,94,.17), transparent 29%),
-    radial-gradient(ellipse at 56% 42%, rgba(255,255,255,.42), transparent 17%);
-}
-
-.scene-icon {
-  position: relative;
-  z-index: 1;
-  font-size: clamp(64px, 9vw, 104px);
-  line-height: 1;
-  transform: translateY(2px);
-  color: rgba(52,51,47,.125);
-  filter: blur(.05px);
-  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-weight: 400;
-}
-
-.content {
-  display: grid;
-  gap: clamp(36px, 5.2vw, 66px);
-}
-
-.word h1 {
-  margin: 0;
-  font-size: clamp(41px, 5.8vw, 68px);
-  line-height: 1.05;
-  font-weight: 480;
-  letter-spacing: -0.035em;
-}
-
-.word p,
-.sentence p {
-  margin: 0;
-}
-
-.word p {
-  margin-top: 12px;
-}
-
-#wordPinyin,
-#sentencePinyin {
-  color: var(--muted);
-  font-size: clamp(17px, 2.05vw, 23px);
-  line-height: 1.45;
-  letter-spacing: .01em;
-}
-
-#wordJa,
-#sentenceJa {
-  color: #928d83;
-  font-size: clamp(13px, 1.45vw, 17px);
-  line-height: 1.6;
-}
-
-#sentenceZh {
-  font-size: clamp(22px, 2.8vw, 30px);
-  line-height: 1.35;
-  font-weight: 480;
-  letter-spacing: -0.02em;
-}
-
-.sentence {
-  display: grid;
-  gap: 10px;
-}
-
-.play-button {
-  position: fixed;
-  left: 50%;
-  bottom: max(24px, calc(env(safe-area-inset-bottom) + 18px));
-  transform: translateX(-50%);
-  width: 58px;
-  height: 58px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.54);
-  background: rgba(255,255,255,.26);
-  color: rgba(59,59,55,.58);
-  box-shadow: 0 7px 20px rgba(41, 38, 32, 0.024);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  font-size: 21px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.play-button:active {
-  transform: translateX(-50%) scale(.96);
-}
-
-.status {
-  position: fixed;
-  left: 18px;
-  bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px));
-  font-size: 11px;
-  color: rgba(43, 43, 43, .38);
-  letter-spacing: .05em;
-}
-
-.version {
-  position: fixed;
-  right: 18px;
-  bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px));
-  font-size: 11px;
-  color: rgba(43, 43, 43, .34);
-  letter-spacing: .04em;
-  user-select: none;
-}
-
-@media (max-width: 720px) {
-  .app {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    gap: 12px;
-    min-height: 100svh;
-    padding: max(10px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom));
+@media (max-width: 700px){
+  body{
+    padding:12px;
   }
 
-  .card {
-    width: 100%;
-    min-height: 0;
-    max-height: calc(100svh - 92px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    grid-template-columns: 1fr;
-    gap: 17px;
-    padding: 19px 20px 21px;
-    border-radius: 30px;
-    overflow: hidden;
+  .scene{
+    grid-template-columns:1fr;
+    border-radius:28px;
   }
 
-  .scene {
-    min-height: clamp(168px, 34svh, 248px);
-    border-radius: 26px;
+  .content{
+    padding:32px 28px 48px;
   }
 
-  .scene-icon {
-    font-size: clamp(58px, 19vw, 88px);
+  h1{
+    font-size:64px;
   }
 
-  .content {
-    gap: 18px;
+  .pinyin{
+    font-size:28px;
   }
 
-  .word h1 {
-    font-size: clamp(36px, 13vw, 52px);
-  }
-
-  #wordPinyin,
-  #sentencePinyin {
-    font-size: clamp(15px, 4.7vw, 19px);
-    line-height: 1.35;
-  }
-
-  #wordJa,
-  #sentenceJa {
-    font-size: clamp(13px, 4vw, 16px);
-    line-height: 1.45;
-  }
-
-  #sentenceZh {
-    font-size: clamp(20px, 6.2vw, 26px);
-    line-height: 1.28;
-  }
-
-  .sentence {
-    gap: 7px;
-  }
-
-  .play-button {
-    position: static;
-    flex: 0 0 auto;
-    align-self: center;
-    transform: none;
-    width: 54px;
-    height: 54px;
-    margin: 0 0 2px;
-  }
-
-  .play-button:active {
-    transform: scale(.96);
-  }
-
-  .status {
-    display: none;
-  }
-}
-
-@media (max-width: 360px) {
-  .app {
-    gap: 10px;
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .card {
-    max-height: calc(100svh - 84px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    padding: 16px 16px 18px;
-    gap: 14px;
-  }
-
-  .scene {
-    min-height: clamp(145px, 30svh, 205px);
-  }
-
-  .content {
-    gap: 14px;
-  }
-
-  .word p {
-    margin-top: 6px;
-  }
-
-  .play-button {
-    width: 52px;
-    height: 52px;
-  }
-
-  .version {
-    right: 10px;
-    bottom: max(6px, env(safe-area-inset-bottom));
-    font-size: 10px;
+  .play{
+    width:100%;
   }
 }
