@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "scene": "☕",
+    "scene": "光",
     "zh": "咖啡",
     "pinyin": "kā fēi",
     "ja": "コーヒー",
@@ -12,7 +12,7 @@
   },
   {
     "id": 2,
-    "scene": "雨",
+    "scene": "窗",
     "zh": "下雨",
     "pinyin": "xià yǔ",
     "ja": "雨が降る",
@@ -23,7 +23,7 @@
   },
   {
     "id": 3,
-    "scene": "捷",
+    "scene": "路",
     "zh": "捷運",
     "pinyin": "jié yùn",
     "ja": "MRT",
@@ -34,7 +34,7 @@
   },
   {
     "id": 4,
-    "scene": "月",
+    "scene": "夜",
     "zh": "晚安",
     "pinyin": "wǎn ān",
     "ja": "おやすみ",
@@ -45,7 +45,7 @@
   },
   {
     "id": 5,
-    "scene": "店",
+    "scene": "灯",
     "zh": "便利商店",
     "pinyin": "biàn lì shāng diàn",
     "ja": "コンビニ",
