@@ -1,13 +1,8 @@
-LingoFlow ambient v0.21
-Fix:
-- Prevented duplicated UI/text by cropping the generated concept image to the left scenic area only.
-- HTML text remains the single source of UI text.
-- iPhone SE responsive layout preserved.
-
-Required files:
-- index.html
-- css/style.css
-- images/ambient_scene.png
-
-Version string:
-- v0.21 ambient
+LingoFlow ambient v0.22
+5-scene ambient sequence prototype
+Scenes:
+- Morning Window
+- MRT
+- Rain Cafe
+- Night Store
+- Taiwan Tea

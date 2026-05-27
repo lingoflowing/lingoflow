@@ -2,31 +2,24 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>LingoFlow ambient v0.21</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LingoFlow ambient v0.22</title>
 <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-<main class="app">
-  <section class="scene">
-    <div class="visual">
-      <img src="./images/ambient_scene.png" alt="Taiwan ambient">
-      <div class="caption">静かに、ことばと呼吸する</div>
-    </div>
-
+<div class="app">
+  <div class="scene">
+    <div class="visual"><img id="img"></div>
     <div class="content">
-      <div class="meta">今日のひとこと</div>
-
-      <h1>早安</h1>
-
-      <div class="pinyin">zǎo ān</div>
-      <div class="ja">おはよう</div>
-
-      <button class="play">再生する ▶</button>
-
-      <div class="version">v0.21 ambient</div>
+      <div class="meta">LingoFlow ambient sequence</div>
+      <div id="zh" class="zh"></div>
+      <div id="py" class="py"></div>
+      <div id="ja" class="ja"></div>
+      <button id="nextBtn">静かに次へ ▶</button>
+      <div class="version">v0.22 ambient</div>
     </div>
-  </section>
-</main>
+  </div>
+</div>
+<script src="./js/app.js"></script>
 </body>
 </html>
