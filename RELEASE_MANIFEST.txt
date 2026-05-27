@@ -1,19 +1,13 @@
-LingoFlow ambient v0.19
-Generated: 2026-05-27T13:41:49Z
-Package: lingoflow_ambient_v0_19.zip
-Version string required: v0.19 ambient
-Status fix: previous v0.19 link lacked a real sandbox-backed file; this package is regenerated and verified.
+LingoFlow ambient v0.21
+Fix:
+- Prevented duplicated UI/text by cropping the generated concept image to the left scenic area only.
+- HTML text remains the single source of UI text.
+- iPhone SE responsive layout preserved.
 
-Files:
-README.md
-RELEASE_CHECKLIST.md
-RELEASE_MANIFEST.txt
-css/style.css
-data.json
-index.html
-js/app.js
-js/audio.js
-js/player.js
-js/render.js
-js/state.js
-js/timer.js
+Required files:
+- index.html
+- css/style.css
+- images/ambient_scene.png
+
+Version string:
+- v0.21 ambient

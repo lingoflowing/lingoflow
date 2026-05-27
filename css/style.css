@@ -1,7 +1,7 @@
 
 :root{
   --bg:#f5f1ea;
-  --card:#f7f3ec;
+  --paper:#fbf8f2;
   --text:#4a3d31;
   --muted:#8b7b6b;
 }
@@ -10,105 +10,190 @@
   box-sizing:border-box;
 }
 
-body{
+html,body{
   margin:0;
+  min-height:100%;
+}
+
+body{
   min-height:100vh;
-  background:linear-gradient(to bottom,#f7f3ec,#f2ede5);
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255,255,255,.65), transparent 34%),
+    linear-gradient(to bottom,#f7f3ec,#f1ebe2);
   font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
   color:var(--text);
   display:flex;
   align-items:center;
   justify-content:center;
   padding:24px;
+  overflow-x:hidden;
+}
+
+.app{
+  width:min(1180px,100%);
 }
 
 .scene{
-  width:min(1200px,100%);
-  background:rgba(255,255,255,0.45);
+  width:100%;
+  min-height:720px;
+  background:rgba(255,255,255,.44);
   border-radius:36px;
   overflow:hidden;
   display:grid;
-  grid-template-columns:1.2fr 0.8fr;
-  backdrop-filter:blur(12px);
-  box-shadow:0 24px 80px rgba(60,40,20,0.08);
+  grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);
+  box-shadow:0 26px 90px rgba(58,39,24,.08);
+}
+
+/* IMPORTANT:
+   The source visual is a concept image that already contains UI text on the right.
+   To avoid double UI, use only the left scenic portion as the visual.
+*/
+.visual{
+  position:relative;
+  overflow:hidden;
+  min-height:720px;
+  background:#efe8dc;
 }
 
 .visual img{
-  width:100%;
+  position:absolute;
+  inset:0 auto 0 0;
   height:100%;
+  width:185%;
+  max-width:none;
   object-fit:cover;
+  object-position:left center;
   display:block;
 }
 
+.visual::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to right, rgba(0,0,0,.02), transparent 52%, rgba(247,243,236,.72) 100%),
+    linear-gradient(to top, rgba(58,39,24,.16), transparent 28%);
+  pointer-events:none;
+}
+
+.caption{
+  position:absolute;
+  left:34px;
+  bottom:30px;
+  z-index:2;
+  color:rgba(255,255,255,.86);
+  font-size:14px;
+  letter-spacing:.14em;
+  text-shadow:0 1px 10px rgba(0,0,0,.22);
+}
+
 .content{
-  padding:72px 56px;
+  background:rgba(251,248,242,.86);
+  padding:74px 58px 54px;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  gap:20px;
+  position:relative;
 }
 
 .meta{
   font-size:14px;
   color:var(--muted);
-  letter-spacing:.12em;
+  letter-spacing:.16em;
+  margin-bottom:28px;
 }
 
 h1{
-  margin:0;
-  font-size:88px;
-  font-weight:600;
+  margin:0 0 20px;
+  font-size:82px;
+  line-height:1.02;
+  font-weight:560;
+  letter-spacing:.02em;
 }
 
 .pinyin{
-  font-size:34px;
+  font-size:31px;
   color:#66584a;
+  letter-spacing:.04em;
+  margin-bottom:14px;
 }
 
 .ja{
-  font-size:22px;
+  font-size:21px;
   color:#7f7165;
+  margin-bottom:56px;
 }
 
 .play{
-  margin-top:36px;
+  width:min(360px,100%);
   border:none;
-  background:rgba(255,255,255,0.4);
+  background:rgba(255,255,255,.52);
   color:var(--text);
   border-radius:999px;
-  padding:20px 28px;
-  font-size:24px;
+  padding:19px 28px;
+  font-size:22px;
+  letter-spacing:.06em;
+  box-shadow:inset 0 0 0 1px rgba(80,60,40,.04);
 }
 
 .version{
-  margin-top:80px;
-  font-size:14px;
-  color:#9a8d81;
+  position:absolute;
+  left:58px;
+  bottom:44px;
+  font-size:13px;
+  color:#a09489;
+  letter-spacing:.04em;
 }
 
-@media (max-width: 700px){
+@media (max-width: 760px){
   body{
     padding:12px;
+    align-items:flex-start;
   }
 
   .scene{
+    min-height:0;
     grid-template-columns:1fr;
     border-radius:28px;
   }
 
+  .visual{
+    min-height:46vh;
+  }
+
+  .visual img{
+    width:160%;
+  }
+
   .content{
-    padding:32px 28px 48px;
+    padding:34px 28px 68px;
+    min-height:46vh;
+  }
+
+  .meta{
+    margin-bottom:20px;
   }
 
   h1{
-    font-size:64px;
+    font-size:58px;
   }
 
   .pinyin{
-    font-size:28px;
+    font-size:25px;
+  }
+
+  .ja{
+    font-size:18px;
+    margin-bottom:32px;
   }
 
   .play{
     width:100%;
+    font-size:20px;
+  }
+
+  .version{
+    left:28px;
+    bottom:26px;
   }
 }
