@@ -1,54 +1,101 @@
-const el = {
-  card: document.getElementById('card'),
-  image: document.getElementById('cardImage'),
-  wordZh: document.getElementById('wordZh'),
-  wordPinyin: document.getElementById('wordPinyin'),
-  wordJa: document.getElementById('wordJa'),
-  sentenceZh: document.getElementById('sentenceZh'),
-  sentencePinyin: document.getElementById('sentencePinyin'),
-  sentenceJa: document.getElementById('sentenceJa'),
-  playButton: document.getElementById('playButton'),
-  statusText: document.getElementById('statusText'),
+// LingoFlow v55 render.js
+// Purpose: keep DOM rendering and hidden-state control out of app.js.
+// Important: do not rely on CSS :empty. Always toggle .is-hidden from JS.
+
+const $ = (id) => document.getElementById(id);
+
+const elements = {
+  app: $('app'),
+  card: $('card'),
+  cardImage: $('cardImage'),
+  wordBlock: $('wordBlock'),
+  wordZh: $('wordZh'),
+  wordPinyin: $('wordPinyin'),
+  wordJa: $('wordJa'),
+  sentenceBlock: $('sentenceBlock'),
+  sentenceZh: $('sentenceZh'),
+  sentencePinyin: $('sentencePinyin'),
+  sentenceJa: $('sentenceJa'),
+  playButton: $('playButton'),
+  statusText: $('statusText'),
 };
 
-export function renderCard(card) {
-  if (!card) {
-    setStatus('カードを読み込めませんでした');
-    return;
+function clean(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function setText(el, value) {
+  if (!el) return;
+  el.textContent = clean(value);
+}
+
+function setHidden(el, shouldHide) {
+  if (!el) return;
+  el.classList.toggle('is-hidden', Boolean(shouldHide));
+  el.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
+}
+
+function hasAnyText(values) {
+  return values.some((value) => clean(value).length > 0);
+}
+
+export function renderWord(word = {}) {
+  const zh = clean(word.zh);
+  const pinyin = clean(word.pinyin);
+  const ja = clean(word.ja);
+
+  setText(elements.wordZh, zh);
+  setText(elements.wordPinyin, pinyin);
+  setText(elements.wordJa, ja);
+
+  setHidden(elements.wordBlock, !hasAnyText([zh, pinyin, ja]));
+}
+
+export function renderSentence(sentence = {}) {
+  const zh = clean(sentence.zh);
+  const pinyin = clean(sentence.pinyin);
+  const ja = clean(sentence.ja);
+
+  setText(elements.sentenceZh, zh);
+  setText(elements.sentencePinyin, pinyin);
+  setText(elements.sentenceJa, ja);
+
+  setHidden(elements.sentenceBlock, !hasAnyText([zh, pinyin, ja]));
+}
+
+export function renderCard(card = {}) {
+  renderWord(card.word || {});
+  renderSentence(card.sentence || {});
+
+  if (elements.cardImage) {
+    const imageSrc = clean(card.image);
+    elements.cardImage.src = imageSrc;
+    elements.cardImage.alt = clean(card.imageAlt || '');
+    setHidden(elements.cardImage, !imageSrc);
   }
-
-  el.image.src = card.image || '';
-  el.image.alt = card.ja || card.zh || '';
-  el.wordZh.textContent = card.zh || '';
-  el.wordPinyin.textContent = card.pinyin || '';
-  el.wordJa.textContent = card.ja || '';
-  el.sentenceZh.textContent = card.sentence_zh || '';
-  el.sentencePinyin.textContent = card.sentence_pinyin || '';
-  el.sentenceJa.textContent = card.sentence_ja || '';
 }
 
-export function setPlayingUI(isPlaying) {
-  el.playButton.textContent = isPlaying ? 'Ⅱ' : '▶︎';
-  el.playButton.setAttribute('aria-label', isPlaying ? '停止' : '再生');
-  el.playButton.classList.toggle('is-playing', isPlaying);
-  setStatus(isPlaying ? '静かに再生中' : '停止中');
+export function renderMode(mode) {
+  if (!elements.app) return;
+  elements.app.dataset.mode = clean(mode);
 }
 
-export function setStatus(text) {
-  el.statusText.textContent = text || '';
+export function renderPlaying(isPlaying) {
+  if (elements.playButton) {
+    elements.playButton.textContent = isPlaying ? '■' : '▶︎';
+    elements.playButton.setAttribute('aria-label', isPlaying ? '停止' : '再生');
+  }
+  if (elements.app) {
+    elements.app.classList.toggle('is-playing', Boolean(isPlaying));
+  }
 }
 
-export function bindPlayButton(handler) {
-  el.playButton.addEventListener('click', handler);
+export function renderStatus(message) {
+  setText(elements.statusText, message);
 }
 
-export async function fadeCard(callback) {
-  el.card.classList.add('is-fading');
-  await wait(420);
-  callback();
-  el.card.classList.remove('is-fading');
+export function clearContent() {
+  renderCard({ word: {}, sentence: {}, image: '' });
 }
 
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+export { elements };

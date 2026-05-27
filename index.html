@@ -7,7 +7,7 @@
   <meta name="description" content="台湾華語が、静かに流れる場所。">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* ===== v54 iPhone SE compact height patch ===== */
+    /* ===== v55 iPhone SE compact height patch / JS hidden control ===== */
     * {
       box-sizing: border-box;
     }
@@ -93,9 +93,8 @@
       line-height: 1.22;
     }
 
-    .sentence-block:empty,
-    .word-block:empty {
-      display: none;
+    .is-hidden {
+      display: none !important;
     }
 
     .play-button {
@@ -175,13 +174,13 @@
       </div>
 
       <div class="text-area">
-        <div class="word-block">
+        <div id="wordBlock" class="word-block is-hidden">
           <div id="wordZh" class="word-zh"></div>
           <div id="wordPinyin" class="word-pinyin"></div>
           <div id="wordJa" class="word-ja"></div>
         </div>
 
-        <div class="sentence-block">
+        <div id="sentenceBlock" class="sentence-block is-hidden">
           <div id="sentenceZh" class="sentence-zh"></div>
           <div id="sentencePinyin" class="sentence-pinyin"></div>
           <div id="sentenceJa" class="sentence-ja"></div>
