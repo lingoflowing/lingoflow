@@ -1,8 +1,16 @@
-LingoFlow ambient v0.22
-5-scene ambient sequence prototype
-Scenes:
-- Morning Window
-- MRT
-- Rain Cafe
-- Night Store
-- Taiwan Tea
+LingoFlow ambient v0.23
+
+Fix:
+- Removed dependency on image files for scene visuals.
+- Replaced broken placeholder images with CSS-based ambient scene rendering.
+- This prevents image corruption, missing image paths, and low-quality generated placeholder artifacts.
+
+Included:
+- index.html
+- css/style.css
+- js/app.js
+- data.json
+- RELEASE_MANIFEST.txt
+
+Version:
+- v0.23 ambient

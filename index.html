@@ -2,24 +2,32 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LingoFlow ambient v0.22</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LingoFlow ambient v0.23</title>
 <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-<div class="app">
-  <div class="scene">
-    <div class="visual"><img id="img"></div>
+<main class="app">
+  <section class="scene" id="scene">
+    <div class="visual" id="visual">
+      <div class="visual-layer glow"></div>
+      <div class="visual-layer window"></div>
+      <div class="visual-layer line line-a"></div>
+      <div class="visual-layer line line-b"></div>
+      <div class="visual-layer table"></div>
+      <div class="visual-label" id="label"></div>
+    </div>
+
     <div class="content">
       <div class="meta">LingoFlow ambient sequence</div>
-      <div id="zh" class="zh"></div>
-      <div id="py" class="py"></div>
-      <div id="ja" class="ja"></div>
-      <button id="nextBtn">静かに次へ ▶</button>
-      <div class="version">v0.22 ambient</div>
+      <div class="zh" id="zh"></div>
+      <div class="pinyin" id="pinyin"></div>
+      <div class="ja" id="ja"></div>
+      <button class="play" id="nextBtn" type="button">静かに次へ</button>
+      <div class="version">v0.23 ambient</div>
     </div>
-  </div>
-</div>
+  </section>
+</main>
 <script src="./js/app.js"></script>
 </body>
 </html>
