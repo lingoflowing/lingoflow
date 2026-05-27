@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>LingoFlow ambient v0.8</title>
+  <meta name="description" content="台湾華語が、静かに流れる場所。">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <main class="app" aria-label="LingoFlow ambient player">
+    <section id="card" class="card" aria-live="polite">
+      <div class="scene" id="scene" aria-hidden="true">
+        <div id="sceneIcon" class="scene-icon"></div>
+      </div>
+
+      <div class="content">
+        <section class="word">
+          <h1 id="wordZh">咖啡</h1>
+          <p id="wordPinyin">kā fēi</p>
+          <p id="wordJa">コーヒー</p>
+        </section>
+
+        <section class="sentence">
+          <p id="sentenceZh">今天想喝咖啡。</p>
+          <p id="sentencePinyin">jīn tiān xiǎng hē kā fēi</p>
+          <p id="sentenceJa">今日はコーヒーが飲みたい。</p>
+        </section>
+      </div>
+    </section>
+
+    <button id="playButton" class="play-button" type="button" aria-label="再生">▶</button>
+    <div id="status" class="status" aria-hidden="true">停止中</div>
+    <div class="version">v0.8 ambient</div>
+  </main>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
