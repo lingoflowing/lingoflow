@@ -1,18 +1,33 @@
 export const state = {
-  isPlaying: false,
-  userStarted: false,
-  currentIndex: 0,
+  status: "STOPPED",
+  currentIndex: 2,
   cards: [],
   timerId: null,
-  activeAudio: null,
-  runId: 0
+  userStarted: false,
+  voicesReady: false,
 };
 
-export function currentCard() {
-  return state.cards[state.currentIndex];
+export function isPlaying() {
+  return state.status === "PLAYING";
 }
 
-export function nextCard() {
-  if (!state.cards.length) return;
-  state.currentIndex = (state.currentIndex + 1) % state.cards.length;
+export function setStatus(status) {
+  state.status = status;
+}
+
+export function clearTimer() {
+  if (state.timerId) {
+    clearTimeout(state.timerId);
+    state.timerId = null;
+  }
+}
+
+export function wait(ms) {
+  clearTimer();
+  return new Promise((resolve) => {
+    state.timerId = setTimeout(() => {
+      state.timerId = null;
+      resolve();
+    }, ms);
+  });
 }

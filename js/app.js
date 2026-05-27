@@ -1,73 +1,42 @@
-import { state, currentCard, nextCard } from "./state.js";
-import { renderCard, renderButton, showError } from "./render.js";
-import { playAudio, stopAudio } from "./audio.js";
-import { clearTimer } from "./timer.js";
-import { wait } from "./timer.js";
-
-const playButton = document.getElementById("playButton");
+import { state } from "./state.js";
+import { renderCard, renderButton } from "./render.js";
+import { toggle, safetyStop } from "./player.js";
 
 async function loadCards() {
-  const res = await fetch("./data.json?v=0.5", { cache: "no-store" });
-  if (!res.ok) throw new Error("data.json 読み込み失敗");
-  state.cards = await res.json();
-  renderCard();
+  const response = await fetch("./data.json?v=0.6", { cache: "no-store" });
+  if (!response.ok) throw new Error("data.json load failed");
+  state.cards = await response.json();
 }
 
-function stop() {
-  state.isPlaying = false;
-  state.runId += 1;
-  clearTimer();
-  stopAudio();
-  renderButton();
-}
+async function init() {
+  try {
+    await loadCards();
+    renderCard();
+    renderButton();
+  } catch (error) {
+    console.error(error);
+    document.getElementById("wordZh").textContent = "LingoFlow";
+    document.getElementById("wordPinyin").textContent = "";
+    document.getElementById("wordJa").textContent = "データを読み込めませんでした。";
+    document.getElementById("sentenceZh").textContent = "";
+    document.getElementById("sentencePinyin").textContent = "";
+    document.getElementById("sentenceJa").textContent = "";
+  }
 
-async function start() {
-  if (!state.cards.length) return;
-  state.userStarted = true;
-  state.isPlaying = true;
-  state.runId += 1;
-  renderButton();
+  document.getElementById("playButton").addEventListener("click", toggle);
 
-  const runId = state.runId;
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) safetyStop();
+  });
 
-  while (state.isPlaying && state.runId === runId) {
-    const card = currentCard();
-    renderCard({ fade: true });
+  window.addEventListener("pagehide", safetyStop);
+  window.addEventListener("blur", safetyStop);
 
-    await wait(800, runId);
-    if (!state.isPlaying || state.runId !== runId) break;
-
-    await playAudio(card.audio_word);
-    if (!state.isPlaying || state.runId !== runId) break;
-
-    await wait(1000, runId);
-    if (!state.isPlaying || state.runId !== runId) break;
-
-    await playAudio(card.audio_sentence);
-    if (!state.isPlaying || state.runId !== runId) break;
-
-    await wait(3200, runId);
-    if (!state.isPlaying || state.runId !== runId) break;
-
-    nextCard();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      state.voicesReady = true;
+    };
   }
 }
 
-playButton.addEventListener("click", () => {
-  if (state.isPlaying) {
-    stop();
-  } else {
-    start();
-  }
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) stop();
-});
-
-window.addEventListener("pagehide", stop);
-window.addEventListener("blur", stop);
-
-loadCards().catch(() => {
-  showError("静かに読み込めませんでした");
-});
+init();

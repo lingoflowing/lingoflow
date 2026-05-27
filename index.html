@@ -3,35 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>LingoFlow ambient v0.5</title>
-  <link rel="stylesheet" href="./css/style.css?v=0.5">
+  <title>LingoFlow ambient v0.6</title>
+  <meta name="description" content="台湾華語が、静かに流れる場所。">
+  <link rel="stylesheet" href="./css/style.css?v=0.6">
 </head>
 <body>
-  <main class="app" aria-label="LingoFlow">
-    <section class="ambient-card" id="card">
-      <div class="visual" id="visual" aria-hidden="true">
-        <span id="visualIcon">☕</span>
+  <main class="app" aria-label="LingoFlow ambient player">
+    <section id="card" class="card is-visible">
+      <div class="scene" aria-hidden="true">
+        <div id="sceneArt" class="scene-art scene-mrt"></div>
       </div>
 
-      <section class="copy">
+      <div class="copy">
         <div class="word">
-          <div class="zh" id="wordZh">読み込み中</div>
-          <div class="pinyin" id="wordPinyin"></div>
-          <div class="ja" id="wordJa"></div>
+          <div id="wordZh" class="word-zh">捷運</div>
+          <div id="wordPinyin" class="word-pinyin">jié yùn</div>
+          <div id="wordJa" class="word-ja">MRT</div>
         </div>
 
         <div class="sentence">
-          <div class="sentence-zh" id="sentenceZh"></div>
-          <div class="sentence-pinyin" id="sentencePinyin"></div>
-          <div class="sentence-ja" id="sentenceJa"></div>
+          <div id="sentenceZh" class="sentence-zh">我每天坐捷運上班。</div>
+          <div id="sentencePinyin" class="sentence-pinyin">wǒ měi tiān zuò jié yùn shàng bān</div>
+          <div id="sentenceJa" class="sentence-ja">毎日MRTで通勤します。</div>
         </div>
-      </section>
+      </div>
     </section>
 
-    <button class="play-button" id="playButton" type="button" aria-label="再生">▶</button>
-    <div class="build">v0.5 ambient</div>
+    <button id="playButton" class="play-button" type="button" aria-label="再生">▶</button>
+    <div class="version" aria-hidden="true">v0.6 ambient</div>
   </main>
 
-  <script type="module" src="./js/app.js?v=0.5"></script>
+  <script type="module" src="./js/app.js?v=0.6"></script>
 </body>
 </html>

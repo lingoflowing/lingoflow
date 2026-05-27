@@ -1,23 +1,23 @@
-import { state, currentCard } from "./state.js";
+import { state } from "./state.js";
 
 const els = {
   card: document.getElementById("card"),
-  visualIcon: document.getElementById("visualIcon"),
+  sceneArt: document.getElementById("sceneArt"),
   wordZh: document.getElementById("wordZh"),
   wordPinyin: document.getElementById("wordPinyin"),
   wordJa: document.getElementById("wordJa"),
   sentenceZh: document.getElementById("sentenceZh"),
   sentencePinyin: document.getElementById("sentencePinyin"),
   sentenceJa: document.getElementById("sentenceJa"),
-  playButton: document.getElementById("playButton")
+  playButton: document.getElementById("playButton"),
 };
 
 export function renderCard({ fade = false } = {}) {
-  const card = currentCard();
+  const card = state.cards[state.currentIndex];
   if (!card) return;
 
   const apply = () => {
-    els.visualIcon.textContent = card.icon || "流";
+    els.sceneArt.className = `scene-art ${card.scene || "scene-coffee"}`;
     els.wordZh.textContent = card.zh;
     els.wordPinyin.textContent = card.pinyin;
     els.wordJa.textContent = card.ja;
@@ -32,22 +32,13 @@ export function renderCard({ fade = false } = {}) {
   }
 
   els.card.classList.add("is-fading");
-  window.setTimeout(() => {
+  setTimeout(() => {
     apply();
     els.card.classList.remove("is-fading");
-  }, 150);
+  }, 240);
 }
 
 export function renderButton() {
-  els.playButton.textContent = state.isPlaying ? "■" : "▶";
-  els.playButton.setAttribute("aria-label", state.isPlaying ? "停止" : "再生");
-}
-
-export function showError(message) {
-  els.wordZh.textContent = message;
-  els.wordPinyin.textContent = "";
-  els.wordJa.textContent = "";
-  els.sentenceZh.textContent = "";
-  els.sentencePinyin.textContent = "";
-  els.sentenceJa.textContent = "";
+  els.playButton.textContent = state.status === "PLAYING" ? "Ⅱ" : "▶";
+  els.playButton.setAttribute("aria-label", state.status === "PLAYING" ? "停止" : "再生");
 }
