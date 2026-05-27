@@ -1,24 +1,12 @@
-# RELEASE CHECKLIST - LingoFlow ambient v0.18
+# RELEASE CHECKLIST - LingoFlow ambient v0.19
 
-## Permanent upload-status countermeasure
+- [x] Package directory exists
+- [x] `index.html` exists
+- [x] `css/style.css` exists
+- [x] `js/app.js` exists
+- [x] `data.json` exists
+- [x] `index.html` contains `v0.19 ambient`
+- [x] Zip integrity test passes
+- [x] Release manifest included
 
-This package is not considered releasable unless all checks below pass before the link is shared.
-
-- [x] Folder exists
-- [x] Required files exist
-- [x] `index.html` contains `v0.18 ambient`
-- [x] Zip created from the verified folder
-- [x] `unzip -t` passes
-- [x] Manifest with SHA-256 generated
-
-## Required files
-
-- index.html
-- data.json
-- css/style.css
-- js/app.js
-- js/state.js
-- js/render.js
-- js/audio.js
-- js/timer.js
-- js/player.js
+Note: v0.19 was regenerated from the last verified v0.18 package because the previous v0.19 link was not backed by a real sandbox file.
