@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "icon": "☕",
+    "zh": "咖啡",
+    "pinyin": "kā fēi",
+    "ja": "コーヒー",
+    "sentence_zh": "今天想喝咖啡。",
+    "sentence_pinyin": "jīn tiān xiǎng hē kā fēi",
+    "sentence_ja": "今日はコーヒーが飲みたい。",
+    "audio_word": "./audio/word/coffee.mp3",
+    "audio_sentence": "./audio/sentence/coffee_sentence.mp3"
+  },
+  {
+    "id": 2,
+    "icon": "🌧️",
+    "zh": "下雨",
+    "pinyin": "xià yǔ",
+    "ja": "雨が降る",
+    "sentence_zh": "今天一直下雨。",
+    "sentence_pinyin": "jīn tiān yì zhí xià yǔ",
+    "sentence_ja": "今日はずっと雨です。",
+    "audio_word": "./audio/word/rain.mp3",
+    "audio_sentence": "./audio/sentence/rain_sentence.mp3"
+  },
+  {
+    "id": 3,
+    "icon": "🚇",
+    "zh": "捷運",
+    "pinyin": "jié yùn",
+    "ja": "MRT",
+    "sentence_zh": "我每天坐捷運上班。",
+    "sentence_pinyin": "wǒ měi tiān zuò jié yùn shàng bān",
+    "sentence_ja": "毎日MRTで通勤します。",
+    "audio_word": "./audio/word/mrt.mp3",
+    "audio_sentence": "./audio/sentence/mrt_sentence.mp3"
+  },
+  {
+    "id": 4,
+    "icon": "🌙",
+    "zh": "晚安",
+    "pinyin": "wǎn ān",
+    "ja": "おやすみ",
+    "sentence_zh": "今天辛苦了，晚安。",
+    "sentence_pinyin": "jīn tiān xīn kǔ le, wǎn ān",
+    "sentence_ja": "今日はお疲れさま、おやすみ。",
+    "audio_word": "./audio/word/goodnight.mp3",
+    "audio_sentence": "./audio/sentence/goodnight_sentence.mp3"
+  },
+  {
+    "id": 5,
+    "icon": "🏪",
+    "zh": "便利商店",
+    "pinyin": "biàn lì shāng diàn",
+    "ja": "コンビニ",
+    "sentence_zh": "我想去便利商店。",
+    "sentence_pinyin": "wǒ xiǎng qù biàn lì shāng diàn",
+    "sentence_ja": "コンビニへ行きたい。",
+    "audio_word": "./audio/word/store.mp3",
+    "audio_sentence": "./audio/sentence/store_sentence.mp3"
+  }
+]
