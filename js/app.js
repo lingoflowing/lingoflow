@@ -1,63 +1,51 @@
 
-const state = {
-  currentIndex: 0,
-  cards: [],
-  timer: null
-};
-
-const $ = (id) => document.getElementById(id);
+let current = 0;
+let cards = [];
+let timer = null;
 
 async function init(){
-  const res = await fetch("./data.json");
-  state.cards = await res.json();
+  const res = await fetch('./data.json');
+  cards = await res.json();
+
   render();
 
-  $("nextBtn").addEventListener("click", () => {
-    stopTimer();
+  document.getElementById('nextBtn').addEventListener('click', () => {
     next();
-    startTimer();
+    restartTimer();
   });
 
-  document.addEventListener("visibilitychange", () => {
+  document.addEventListener('visibilitychange', () => {
     if(document.hidden){
-      stopTimer();
+      clearTimeout(timer);
     }else{
-      startTimer();
+      restartTimer();
     }
   });
 
-  startTimer();
+  restartTimer();
 }
 
 function render(){
-  const card = state.cards[state.currentIndex];
-  const visual = $("visual");
+  const c = cards[current];
 
-  visual.className = "visual " + card.scene;
-  $("label").textContent = card.label;
-  $("zh").textContent = card.zh;
-  $("pinyin").textContent = card.pinyin;
-  $("ja").textContent = card.ja;
+  document.getElementById('sceneImage').src = c.image;
+  document.getElementById('sceneLabel').textContent = c.scene;
+  document.getElementById('zh').textContent = c.zh;
+  document.getElementById('pinyin').textContent = c.pinyin;
+  document.getElementById('ja').textContent = c.ja;
 }
 
 function next(){
-  state.currentIndex = (state.currentIndex + 1) % state.cards.length;
+  current = (current + 1) % cards.length;
   render();
 }
 
-function startTimer(){
-  stopTimer();
-  state.timer = setTimeout(() => {
+function restartTimer(){
+  clearTimeout(timer);
+  timer = setTimeout(() => {
     next();
-    startTimer();
+    restartTimer();
   }, 9500);
-}
-
-function stopTimer(){
-  if(state.timer){
-    clearTimeout(state.timer);
-    state.timer = null;
-  }
 }
 
 init();

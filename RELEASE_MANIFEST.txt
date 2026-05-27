@@ -1,16 +1,10 @@
-LingoFlow ambient v0.23
+LingoFlow ambient v0.24
 
-Fix:
-- Removed dependency on image files for scene visuals.
-- Replaced broken placeholder images with CSS-based ambient scene rendering.
-- This prevents image corruption, missing image paths, and low-quality generated placeholder artifacts.
+Real ambient scenes:
+- 朝
+- MRT
+- 雨
+- 夜
+- 茶
 
-Included:
-- index.html
-- css/style.css
-- js/app.js
-- data.json
-- RELEASE_MANIFEST.txt
-
-Version:
-- v0.23 ambient
+Using generated cinematic images.

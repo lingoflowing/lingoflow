@@ -1,40 +1,35 @@
 [
   {
-    "id": 1,
-    "scene": "morning",
-    "label": "朝の窓",
+    "scene": "朝",
+    "image": "./images/morning.png",
     "zh": "今天早上很安靜。",
     "pinyin": "jīn tiān zǎo shàng hěn ān jìng",
     "ja": "今朝はとても静かです。"
   },
   {
-    "id": 2,
-    "scene": "mrt",
-    "label": "MRT",
+    "scene": "MRT",
+    "image": "./images/mrt.png",
     "zh": "今天捷運有點擠。",
     "pinyin": "jīn tiān jié yùn yǒu diǎn jǐ",
     "ja": "今日はMRTが少し混んでいます。"
   },
   {
-    "id": 3,
-    "scene": "rain",
-    "label": "雨のカフェ",
+    "scene": "雨",
+    "image": "./images/rain.png",
     "zh": "外面一直在下雨。",
     "pinyin": "wài miàn yì zhí zài xià yǔ",
     "ja": "外はずっと雨です。"
   },
   {
-    "id": 4,
-    "scene": "night",
-    "label": "夜のコンビニ",
+    "scene": "夜",
+    "image": "./images/night.png",
     "zh": "我想買個飲料。",
     "pinyin": "wǒ xiǎng mǎi gè yǐn liào",
     "ja": "飲み物を買いたい。"
   },
   {
-    "id": 5,
-    "scene": "tea",
-    "label": "台湾茶",
+    "scene": "茶",
+    "image": "./images/tea.png",
     "zh": "先喝杯茶吧。",
     "pinyin": "xiān hē bēi chá ba",
     "ja": "まずお茶を飲もう。"
