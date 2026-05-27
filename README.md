@@ -1,16 +1,28 @@
-# LingoFlow ambient v0.6
+# LingoFlow ambient v0.7
 
-## 目的
-「台湾華語が、静かに流れる場所。」を最小構成で確認するプロトタイプ。
+## 方針
 
-## 変更点 v0.6
-- 背景を少し暖色寄りに調整
-- 黒を弱めて硬さを軽減
-- 中国語の太さを少し控えめに
-- CSSイラストを「情報」より「空気」寄りに調整
-- ボタンを半透明で静かな操作点に変更
-- 右下に v0.6 ambient 表示
+- 1画面
+- 1ボタン
+- 固定順
+- 単語 → 間 → 例文 → 余白 → 次
+- タブ離脱・スリープ復帰で勝手に再開しない
+- iPhone SE 横スクロールなし
+- BGMなし
+
+## 更新確認
+
+右下に `v0.7 ambient` が表示されれば反映成功。
+
+## GitHub更新
+
+1. このフォルダの中身を既存repoへ上書き
+2. GitHub Desktopで Summary に `ambient v0.7`
+3. Commit to main
+4. Push origin
+5. Cloudflare反映後に Ctrl + Shift + R
 
 ## 注意
-音声はブラウザの SpeechSynthesis を使う簡易プロトタイプです。
-本番では /audio 配下の mp3 に置き換える想定です。
+
+ブラウザの音声は Web Speech API を使用。
+実際の声質は端末・ブラウザに依存します。

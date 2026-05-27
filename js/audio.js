@@ -1,56 +1,42 @@
-import { isPlaying } from "./state.js";
+import { state } from "./state.js";
 
-let currentUtterance = null;
-
-function pickVoice() {
-  const voices = window.speechSynthesis?.getVoices?.() || [];
-  return (
-    voices.find(v => v.lang === "zh-TW") ||
-    voices.find(v => v.lang && v.lang.toLowerCase().startsWith("zh")) ||
-    null
-  );
-}
-
-export function stopAudio() {
-  if ("speechSynthesis" in window) {
+export function stopSpeech() {
+  try {
     window.speechSynthesis.cancel();
-  }
-  currentUtterance = null;
+  } catch (_) {}
+  state.speechToken += 1;
 }
 
 export function speak(text) {
-  stopAudio();
-
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (!("speechSynthesis" in window) || !text) {
       resolve();
       return;
     }
 
+    const token = state.speechToken;
     const utterance = new SpeechSynthesisUtterance(text);
-    const voice = pickVoice();
-    if (voice) utterance.voice = voice;
-    utterance.lang = voice?.lang || "zh-TW";
-    utterance.rate = 0.82;
+    utterance.lang = "zh-TW";
+    utterance.rate = 0.86;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
 
-    currentUtterance = utterance;
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve();
 
-    utterance.onend = () => {
-      currentUtterance = null;
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    } catch (_) {
       resolve();
-    };
-    utterance.onerror = () => {
-      currentUtterance = null;
-      resolve();
-    };
-
-    if (!isPlaying()) {
-      resolve();
-      return;
     }
 
-    window.speechSynthesis.speak(utterance);
+    const guard = setInterval(() => {
+      if (state.speechToken !== token || state.mode !== "PLAYING") {
+        clearInterval(guard);
+        try { window.speechSynthesis.cancel(); } catch (_) {}
+        resolve();
+      }
+    }, 120);
   });
 }

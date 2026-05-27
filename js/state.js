@@ -1,33 +1,18 @@
 export const state = {
-  status: "STOPPED",
-  currentIndex: 2,
+  mode: "STOPPED",
+  userStarted: false,
+  currentIndex: 0,
   cards: [],
   timerId: null,
-  userStarted: false,
-  voicesReady: false,
+  speechToken: 0,
+  isTransitioning: false
 };
 
-export function isPlaying() {
-  return state.status === "PLAYING";
-}
-
-export function setStatus(status) {
-  state.status = status;
-}
-
-export function clearTimer() {
+export function resetRuntime() {
   if (state.timerId) {
     clearTimeout(state.timerId);
     state.timerId = null;
   }
-}
-
-export function wait(ms) {
-  clearTimer();
-  return new Promise((resolve) => {
-    state.timerId = setTimeout(() => {
-      state.timerId = null;
-      resolve();
-    }, ms);
-  });
+  state.speechToken += 1;
+  state.isTransitioning = false;
 }

@@ -1,42 +1,67 @@
-import { state } from "./state.js";
-import { renderCard, renderButton } from "./render.js";
-import { toggle, safetyStop } from "./player.js";
+import { state, resetRuntime } from "./state.js";
+import { renderCard, setPlayingUi, setStatus } from "./render.js";
+import { startLoop, stopLoop } from "./player.js";
 
 async function loadCards() {
-  const response = await fetch("./data.json?v=0.6", { cache: "no-store" });
+  const response = await fetch("./data.json", { cache: "no-store" });
   if (!response.ok) throw new Error("data.json load failed");
-  state.cards = await response.json();
+  return await response.json();
+}
+
+function hardStop(reason = "停止中") {
+  state.mode = "STOPPED";
+  resetRuntime();
+  stopLoop();
+  setPlayingUi(false);
+  setStatus(reason);
 }
 
 async function init() {
   try {
-    await loadCards();
-    renderCard();
-    renderButton();
+    state.cards = await loadCards();
   } catch (error) {
-    console.error(error);
-    document.getElementById("wordZh").textContent = "LingoFlow";
-    document.getElementById("wordPinyin").textContent = "";
-    document.getElementById("wordJa").textContent = "データを読み込めませんでした。";
-    document.getElementById("sentenceZh").textContent = "";
-    document.getElementById("sentencePinyin").textContent = "";
-    document.getElementById("sentenceJa").textContent = "";
+    console.warn(error);
+    state.cards = [];
+    setStatus("data error");
+    return;
   }
 
-  document.getElementById("playButton").addEventListener("click", toggle);
+  if (!state.cards.length) {
+    setStatus("no data");
+    return;
+  }
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) safetyStop();
+  renderCard(state.cards[state.currentIndex]);
+
+  const button = document.getElementById("playButton");
+
+  button.addEventListener("click", async () => {
+    if (state.mode === "PLAYING") {
+      hardStop("停止中");
+      return;
+    }
+
+    state.userStarted = true;
+    state.mode = "PLAYING";
+    setPlayingUi(true);
+    setStatus("再生中");
+    startLoop();
   });
 
-  window.addEventListener("pagehide", safetyStop);
-  window.addEventListener("blur", safetyStop);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      hardStop("安全停止");
+    }
+  });
 
-  if ("speechSynthesis" in window) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      state.voicesReady = true;
-    };
-  }
+  window.addEventListener("pagehide", () => {
+    hardStop("安全停止");
+  });
+
+  window.addEventListener("blur", () => {
+    // sleep / app switch safety: never auto-resume
+    if (state.mode === "PLAYING") hardStop("安全停止");
+  });
 }
 
 init();

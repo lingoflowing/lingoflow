@@ -1,8 +1,7 @@
 [
   {
     "id": 1,
-    "theme": "カフェ",
-    "scene": "scene-coffee",
+    "scene": "☕",
     "zh": "咖啡",
     "pinyin": "kā fēi",
     "ja": "コーヒー",
@@ -12,8 +11,7 @@
   },
   {
     "id": 2,
-    "theme": "雨",
-    "scene": "scene-rain",
+    "scene": "🌧️",
     "zh": "下雨",
     "pinyin": "xià yǔ",
     "ja": "雨が降る",
@@ -23,8 +21,7 @@
   },
   {
     "id": 3,
-    "theme": "MRT",
-    "scene": "scene-mrt",
+    "scene": "🚇",
     "zh": "捷運",
     "pinyin": "jié yùn",
     "ja": "MRT",
@@ -34,8 +31,7 @@
   },
   {
     "id": 4,
-    "theme": "夜",
-    "scene": "scene-night",
+    "scene": "🌙",
     "zh": "晚安",
     "pinyin": "wǎn ān",
     "ja": "おやすみ",
@@ -45,13 +41,22 @@
   },
   {
     "id": 5,
-    "theme": "ゆっくり",
-    "scene": "scene-coffee",
-    "zh": "慢慢來",
-    "pinyin": "màn màn lái",
-    "ja": "ゆっくりね",
-    "sentence_zh": "沒關係，慢慢來。",
-    "sentence_pinyin": "méi guān xì，màn màn lái",
-    "sentence_ja": "大丈夫、ゆっくりでいいよ。"
+    "scene": "🏪",
+    "zh": "便利商店",
+    "pinyin": "biàn lì shāng diàn",
+    "ja": "コンビニ",
+    "sentence_zh": "我想去便利商店。",
+    "sentence_pinyin": "wǒ xiǎng qù biàn lì shāng diàn",
+    "sentence_ja": "コンビニへ行きたい。"
+  },
+  {
+    "id": 6,
+    "scene": "🍵",
+    "zh": "奶茶",
+    "pinyin": "nǎi chá",
+    "ja": "ミルクティー",
+    "sentence_zh": "我喜歡喝奶茶。",
+    "sentence_pinyin": "wǒ xǐ huān hē nǎi chá",
+    "sentence_ja": "ミルクティーを飲むのが好きです。"
   }
 ]

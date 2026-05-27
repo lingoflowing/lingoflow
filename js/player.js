@@ -1,65 +1,56 @@
-import { state, setStatus, isPlaying, wait, clearTimer } from "./state.js";
-import { renderCard, renderButton } from "./render.js";
-import { speak, stopAudio } from "./audio.js";
+import { state, resetRuntime } from "./state.js";
+import { fadeToCard } from "./render.js";
+import { speak, stopSpeech } from "./audio.js";
+import { wait, clearTimer } from "./timer.js";
 
 const TIMING = {
   beforeWord: 800,
   afterWord: 1000,
-  afterSentence: 3000,
+  afterSentence: 3200
 };
 
-let playToken = 0;
+let loopRunning = false;
 
-export function stop() {
-  playToken += 1;
-  setStatus("STOPPED");
+export function stopLoop() {
+  loopRunning = false;
   clearTimer();
-  stopAudio();
-  renderButton();
+  stopSpeech();
 }
 
-export async function play() {
-  if (isPlaying()) return;
+export async function startLoop() {
+  if (loopRunning) return;
+  loopRunning = true;
+  resetRuntime();
 
-  state.userStarted = true;
-  setStatus("PLAYING");
-  renderButton();
-
-  const token = ++playToken;
-
-  while (isPlaying() && token === playToken) {
+  while (state.mode === "PLAYING" && state.cards.length) {
     const card = state.cards[state.currentIndex];
-    renderCard();
 
-    await wait(TIMING.beforeWord);
-    if (!isPlaying() || token !== playToken) break;
+    await waitIfPlaying(TIMING.beforeWord);
+    if (!isPlaying()) break;
 
     await speak(card.zh);
-    if (!isPlaying() || token !== playToken) break;
+    if (!isPlaying()) break;
 
-    await wait(TIMING.afterWord);
-    if (!isPlaying() || token !== playToken) break;
+    await waitIfPlaying(TIMING.afterWord);
+    if (!isPlaying()) break;
 
     await speak(card.sentence_zh);
-    if (!isPlaying() || token !== playToken) break;
+    if (!isPlaying()) break;
 
-    await wait(TIMING.afterSentence);
-    if (!isPlaying() || token !== playToken) break;
+    await waitIfPlaying(TIMING.afterSentence);
+    if (!isPlaying()) break;
 
     state.currentIndex = (state.currentIndex + 1) % state.cards.length;
-    renderCard({ fade: true });
-    await wait(260);
+    await fadeToCard(state.cards[state.currentIndex]);
   }
+
+  stopLoop();
 }
 
-export function toggle() {
-  if (isPlaying()) {
-    stop();
-  } else {
-    play();
-  }
+function isPlaying() {
+  return state.mode === "PLAYING";
 }
 
-export function safetyStop() {
-  if (isPlaying()) stop();
+async function waitIfPlaying(ms) {
+  await wait(ms);
 }
