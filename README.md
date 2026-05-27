@@ -1,4 +1,4 @@
-# LingoFlow ambient v0.15
+# LingoFlow ambient v0.16
 
 ## 方針
 
@@ -10,7 +10,7 @@
 - iPhone SE 横スクロールなし
 - BGMなし
 
-## v0.15 変更点
+## v0.16 変更点
 
 - アプリ感をさらに削減
 - button をさらに ambient 化
@@ -19,4 +19,4 @@
 - silence / breathing 感をさらに強化
 - typography 微調整
 - 例文後の余韻を 5.8秒へ延長
-- 右下 version 表示: v0.15 ambient
+- 右下 version 表示: v0.16 ambient

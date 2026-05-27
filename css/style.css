@@ -1,13 +1,13 @@
-/* LingoFlow ambient v0.15
+/* LingoFlow ambient v0.16
    base / layout / card / type / control / responsive only
-   v0.15: less app feeling, quieter button, softer scene density, stronger breathing silence.
+   v0.16: ambient density tuning, quieter typography, softer UI boundary, verified package flow.
 */
 
 :root {
-  --bg: #f1eadf;
-  --card: rgba(255, 255, 255, 0.30);
-  --ink: #302d29;
-  --muted: #bab4aa;
+  --bg: #f0e9de;
+  --card: rgba(255, 255, 255, 0.27);
+  --ink: #2f2b27;
+  --muted: #b7b0a6;
   --soft: #ecefed;
   --shadow: 0 18px 58px rgba(41, 38, 32, 0.010);
   --radius: 32px;
@@ -53,7 +53,7 @@ body {
   padding: clamp(28px, 5vw, 58px);
   border-radius: var(--radius);
   background: var(--card);
-  border: 1px solid rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.075);
   box-shadow: var(--shadow);
   transition: opacity 760ms ease, filter 760ms ease, transform 760ms ease;
 }
@@ -237,9 +237,9 @@ body {
   height: 58px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.54);
-  background: rgba(255,255,255,.30);
-  color: rgba(59,59,55,.66);
-  box-shadow: 0 8px 24px rgba(41, 38, 32, 0.032);
+  background: rgba(255,255,255,.26);
+  color: rgba(59,59,55,.58);
+  box-shadow: 0 7px 20px rgba(41, 38, 32, 0.024);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   font-size: 21px;
