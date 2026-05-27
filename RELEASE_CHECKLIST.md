@@ -1,16 +1,17 @@
-# Release Checklist
+# RELEASE CHECKLIST - LingoFlow ambient v0.17
 
-This package was generated with the fixed release gate:
+## Permanent upload-status countermeasure
 
-1. Build directory exists
-2. Required files exist
-3. Version string appears in index.html / README.md / CSS comment
-4. Zip archive is created from the directory parent
-5. Zip archive is tested with unzip -t
-6. Zip contents are listed
-7. SHA-256 checksum is generated
+This package is not considered releasable unless all checks below pass before the link is shared.
 
-Required files:
+- [x] Folder exists
+- [x] Required files exist
+- [x] `index.html` contains `v0.17 ambient`
+- [x] Zip created from the verified folder
+- [x] `unzip -t` passes
+- [x] Manifest with SHA-256 generated
+
+## Required files
 
 - index.html
 - data.json

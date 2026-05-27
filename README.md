@@ -1,22 +1,16 @@
-# LingoFlow ambient v0.16
+# LingoFlow ambient v0.17
 
-## 方針
+台湾華語 ambient player prototype.
 
-- 1画面
-- 1ボタン
-- 固定順
-- 単語 → 間 → 例文 → 長い静かな余白 → 次
-- タブ離脱・スリープ復帰で勝手に再開しない
-- iPhone SE 横スクロールなし
-- BGMなし
+## v0.17 focus
 
-## v0.16 変更点
+- visual tone unification
+- Taiwan daily atmosphere tuning
+- silence quality tuning
+- quieter button presence
+- typography final tuning direction
+- upload-status recurrence prevention via release manifest
 
-- アプリ感をさらに削減
-- button をさらに ambient 化
-- card境界とshadowをさらに薄く
-- 情景を台湾の日常空気寄りへ調整
-- silence / breathing 感をさらに強化
-- typography 微調整
-- 例文後の余韻を 5.8秒へ延長
-- 右下 version 表示: v0.16 ambient
+## Release verification
+
+This package includes `RELEASE_CHECKLIST.md` and `RELEASE_MANIFEST.txt`.
