@@ -1,15 +1,15 @@
-/* LingoFlow ambient v0.11
+/* LingoFlow ambient v0.12
    base / layout / card / type / control / responsive only
-   v0.11: scene quality, softer reading weight, quieter visual tone.
+   v0.12: deeper ambient background, softer card boundary, quieter text, longer after-sentence silence.
 */
 
 :root {
-  --bg: #f5f2eb;
-  --card: rgba(255, 255, 255, 0.72);
-  --ink: #34332f;
-  --muted: #929087;
+  --bg: #f4efe6;
+  --card: rgba(255, 255, 255, 0.60);
+  --ink: #33312d;
+  --muted: #9b988f;
   --soft: #ecefed;
-  --shadow: 0 26px 68px rgba(41, 38, 32, 0.055);
+  --shadow: 0 22px 58px rgba(41, 38, 32, 0.038);
   --radius: 32px;
 }
 
@@ -29,7 +29,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
   background:
     radial-gradient(circle at 18% 20%, rgba(255,255,255,.95), transparent 34%),
-    linear-gradient(180deg, #f7f7f4 0%, var(--bg) 100%);
+    radial-gradient(circle at 82% 88%, rgba(232, 218, 196, .34), transparent 36%),
+    linear-gradient(180deg, #f8f6ef 0%, var(--bg) 100%);
   color: var(--ink);
 }
 
@@ -52,13 +53,14 @@ body {
   padding: clamp(28px, 5vw, 58px);
   border-radius: var(--radius);
   background: var(--card);
+  border: 1px solid rgba(255,255,255,.50);
   box-shadow: var(--shadow);
-  transition: opacity 480ms ease, filter 480ms ease, transform 480ms ease;
+  transition: opacity 560ms ease, filter 560ms ease, transform 560ms ease;
 }
 
 .card.is-fading {
-  opacity: 0.06;
-  filter: blur(1.8px);
+  opacity: 0.04;
+  filter: blur(2px);
   transform: scale(0.995);
 }
 
@@ -71,8 +73,8 @@ body {
   overflow: hidden;
   background:
     radial-gradient(circle at 24% 18%, rgba(255,255,255,.72), transparent 24%),
-    linear-gradient(145deg, #fbfaf4, #ecefe9);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.86);
+    linear-gradient(145deg, #fbf8ee, #ede9de);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.58);
 }
 
 .scene::before,
