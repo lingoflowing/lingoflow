@@ -1,4 +1,4 @@
-# LingoFlow ambient v0.14
+# LingoFlow ambient v0.15
 
 ## 方針
 
@@ -10,12 +10,13 @@
 - iPhone SE 横スクロールなし
 - BGMなし
 
-## v0.14 変更点
+## v0.15 変更点
 
-- 情景表示を icon 感から ambient scene 感へさらに調整
-- card感をさらに減らす
-- shadow / border / contrast を弱める
-- 中国語を自然な主役へ調整
-- ピンイン・日本語をさらに控えめに
-- 例文後の余韻を 4.8秒へ延長
-- 右下 version 表示: v0.14 ambient
+- アプリ感をさらに削減
+- button をさらに ambient 化
+- card境界とshadowをさらに薄く
+- 情景を台湾の日常空気寄りへ調整
+- silence / breathing 感をさらに強化
+- typography 微調整
+- 例文後の余韻を 5.8秒へ延長
+- 右下 version 表示: v0.15 ambient

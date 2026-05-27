@@ -6,7 +6,7 @@ import { wait, clearTimer } from "./timer.js";
 const TIMING = {
   beforeWord: 800,
   afterWord: 1200,
-  afterSentence: 5400
+  afterSentence: 5800
 };
 
 let loopRunning = false;
