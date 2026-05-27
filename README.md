@@ -1,4 +1,4 @@
-# LingoFlow ambient v0.10
+# LingoFlow ambient v0.11
 
 ## 方針
 
@@ -10,7 +10,7 @@
 - iPhone SE 横スクロールなし
 - BGMなし
 
-## v0.10 変更点
+## v0.11 変更点
 
 - fade を 240ms から 420ms へ変更
 - 単語後の間を 1.2秒へ変更
@@ -20,7 +20,7 @@
 
 ## 更新確認
 
-右下に `v0.10 ambient` が表示されれば反映成功。
+右下に `v0.11 ambient` が表示されれば反映成功。
 
 ## GitHub更新
 
@@ -28,3 +28,10 @@
 2. GitHub DesktopでCommit
 3. Push origin
 4. Cloudflare反映後に強制更新
+
+
+## v0.11
+- 情景表示を emoji icon 感から ambient scene 感へ調整
+- 日本語・ピンインを少し控えめにして、読む圧を軽減
+- fade をさらに柔らかく調整
+- v0.9 以降の iPhone SE ボタン安全配置は維持

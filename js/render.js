@@ -2,6 +2,7 @@ import { state } from "./state.js";
 
 const els = {
   card: document.getElementById("card"),
+  scene: document.getElementById("scene"),
   sceneIcon: document.getElementById("sceneIcon"),
   wordZh: document.getElementById("wordZh"),
   wordPinyin: document.getElementById("wordPinyin"),
@@ -15,7 +16,8 @@ const els = {
 
 export function renderCard(card) {
   if (!card) return;
-  els.sceneIcon.textContent = card.scene || "◌";
+  els.scene.dataset.scene = card.scene_type || "default";
+  els.sceneIcon.textContent = card.scene || "";
   els.wordZh.textContent = card.zh;
   els.wordPinyin.textContent = card.pinyin;
   els.wordJa.textContent = card.ja;
@@ -28,11 +30,11 @@ export async function fadeToCard(card) {
   if (!card || state.isTransitioning) return;
   state.isTransitioning = true;
   els.card.classList.add("is-fading");
-  await wait(420);
+  await wait(480);
   renderCard(card);
   await wait(90);
   els.card.classList.remove("is-fading");
-  await wait(260);
+  await wait(300);
   state.isTransitioning = false;
 }
 

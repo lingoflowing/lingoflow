@@ -7,56 +7,62 @@
     "ja": "コーヒー",
     "sentence_zh": "今天想喝咖啡。",
     "sentence_pinyin": "jīn tiān xiǎng hē kā fēi",
-    "sentence_ja": "今日はコーヒーが飲みたい。"
+    "sentence_ja": "今日はコーヒーが飲みたい。",
+    "scene_type": "coffee"
   },
   {
     "id": 2,
-    "scene": "🌧️",
+    "scene": "雨",
     "zh": "下雨",
     "pinyin": "xià yǔ",
     "ja": "雨が降る",
     "sentence_zh": "今天一直下雨。",
     "sentence_pinyin": "jīn tiān yì zhí xià yǔ",
-    "sentence_ja": "今日はずっと雨です。"
+    "sentence_ja": "今日はずっと雨です。",
+    "scene_type": "rain"
   },
   {
     "id": 3,
-    "scene": "🚇",
+    "scene": "捷",
     "zh": "捷運",
     "pinyin": "jié yùn",
     "ja": "MRT",
     "sentence_zh": "我每天坐捷運上班。",
     "sentence_pinyin": "wǒ měi tiān zuò jié yùn shàng bān",
-    "sentence_ja": "毎日MRTで通勤します。"
+    "sentence_ja": "毎日MRTで通勤します。",
+    "scene_type": "mrt"
   },
   {
     "id": 4,
-    "scene": "🌙",
+    "scene": "月",
     "zh": "晚安",
     "pinyin": "wǎn ān",
     "ja": "おやすみ",
     "sentence_zh": "今天辛苦了，晚安。",
     "sentence_pinyin": "jīn tiān xīn kǔ le，wǎn ān",
-    "sentence_ja": "今日はお疲れさま、おやすみ。"
+    "sentence_ja": "今日はお疲れさま、おやすみ。",
+    "scene_type": "night"
   },
   {
     "id": 5,
-    "scene": "🏪",
+    "scene": "店",
     "zh": "便利商店",
     "pinyin": "biàn lì shāng diàn",
     "ja": "コンビニ",
     "sentence_zh": "我想去便利商店。",
     "sentence_pinyin": "wǒ xiǎng qù biàn lì shāng diàn",
-    "sentence_ja": "コンビニへ行きたい。"
+    "sentence_ja": "コンビニへ行きたい。",
+    "scene_type": "store"
   },
   {
     "id": 6,
-    "scene": "🍵",
+    "scene": "茶",
     "zh": "奶茶",
     "pinyin": "nǎi chá",
     "ja": "ミルクティー",
     "sentence_zh": "我喜歡喝奶茶。",
     "sentence_pinyin": "wǒ xǐ huān hē nǎi chá",
-    "sentence_ja": "ミルクティーを飲むのが好きです。"
+    "sentence_ja": "ミルクティーを飲むのが好きです。",
+    "scene_type": "tea"
   }
 ]
