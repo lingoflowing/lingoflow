@@ -1,82 +1,121 @@
-import { state, setCards, getCurrentCard, goNextCard } from './state.js';
-import { renderCard, setPlayingUI, bindPlayButton, setStatus, fadeCard } from './render.js';
-import { startBgm, stopAllAudio, playCardAudio } from './audio.js';
-import { waitControlled, stopTimers } from './timer.js';
+// LingoFlow v55.1 app.js
+// Minimal stable app: state, event, and audio. Rendering is delegated to render.js.
 
-const TIMING = {
-  afterRender: 800,
-  afterSentence: 3200,
+import { renderCard, renderPlaying, renderStatus, elements } from './render.js';
+
+const cards = [
+  {
+    type: 'word',
+    zh: '你好',
+    pinyin: 'nǐ hǎo',
+    ja: 'こんにちは',
+  },
+  {
+    type: 'sentence',
+    zh: '我想喝一杯咖啡。',
+    pinyin: 'wǒ xiǎng hē yì bēi kā fēi',
+    ja: '私はコーヒーを一杯飲みたいです。',
+  },
+];
+
+const state = {
+  index: 0,
+  isPlaying: false,
+  utterance: null,
 };
 
-async function init() {
-  try {
-    const res = await fetch('data.json', { cache: 'no-store' });
-    const cards = await res.json();
-    setCards(cards);
-    renderCard(getCurrentCard());
-    setPlayingUI(false);
-    bindPlayButton(togglePlay);
-    attachSafetyEvents();
-  } catch (error) {
-    console.error(error);
-    setStatus('読み込みに失敗しました');
+function currentCardPayload() {
+  const item = cards[state.index] || cards[0];
+  if (item.type === 'sentence') {
+    return {
+      word: {},
+      sentence: { zh: item.zh, pinyin: item.pinyin, ja: item.ja },
+      image: '',
+    };
   }
+  return {
+    word: { zh: item.zh, pinyin: item.pinyin, ja: item.ja },
+    sentence: {},
+    image: '',
+  };
 }
 
-function togglePlay() {
-  if (state.isPlaying) {
-    stop();
-  } else {
-    start();
+function renderCurrent() {
+  renderCard(currentCardPayload());
+}
+
+function stopAudio(message = '停止しました') {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
   }
-}
-
-function start() {
-  if (state.isPlaying) return;
-  state.userStarted = true;
-  state.isPlaying = true;
-  setPlayingUI(true);
-  startBgm();
-  runLoop();
-}
-
-function stop() {
+  state.utterance = null;
   state.isPlaying = false;
-  stopTimers();
-  stopAllAudio();
-  setPlayingUI(false);
+  renderPlaying(false);
+  renderStatus(message);
 }
 
-async function runLoop() {
-  while (state.isPlaying) {
-    const card = getCurrentCard();
-    renderCard(card);
-    await waitControlled(TIMING.afterRender);
-    if (!state.isPlaying) break;
+function playCurrent() {
+  stopAudio('');
+  const item = cards[state.index] || cards[0];
 
-    await playCardAudio(card);
-    if (!state.isPlaying) break;
+  state.isPlaying = true;
+  renderPlaying(true);
+  renderStatus('再生中');
 
-    await waitControlled(TIMING.afterSentence);
-    if (!state.isPlaying) break;
+  if (!('speechSynthesis' in window)) {
+    renderStatus('このブラウザでは音声再生に対応していません');
+    state.isPlaying = false;
+    renderPlaying(false);
+    return;
+  }
 
-    await fadeCard(() => {
-      goNextCard();
-      renderCard(getCurrentCard());
-    });
+  const utterance = new SpeechSynthesisUtterance(item.zh);
+  utterance.lang = 'zh-TW';
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+  state.utterance = utterance;
+
+  utterance.onend = () => {
+    state.index = (state.index + 1) % cards.length;
+    state.isPlaying = false;
+    state.utterance = null;
+    renderPlaying(false);
+    renderCurrent();
+    renderStatus('押すと静かに始まります');
+  };
+
+  utterance.onerror = () => {
+    state.isPlaying = false;
+    state.utterance = null;
+    renderPlaying(false);
+    renderStatus('音声を停止しました');
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function togglePlayback() {
+  if (state.isPlaying) {
+    stopAudio('停止しました');
+    return;
+  }
+  playCurrent();
+}
+
+function handleVisibilityChange() {
+  if (document.hidden) {
+    stopAudio('停止しました');
   }
 }
 
-function attachSafetyEvents() {
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stop();
-  });
+function init() {
+  renderCurrent();
+  renderPlaying(false);
+  renderStatus('押すと静かに始まります');
 
-  window.addEventListener('pagehide', stop);
-  window.addEventListener('blur', () => {
-    // PC操作中の誤停止を避けるため、blurでは止めない。
-    // iOSのタブ離脱・ページ破棄は visibilitychange/pagehide で止める。
-  });
+  elements.playButton.addEventListener('click', togglePlayback);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('pagehide', () => stopAudio('停止しました'));
 }
 
 init();
