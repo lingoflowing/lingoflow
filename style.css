@@ -61,22 +61,22 @@ body{overflow-x:hidden}
 
 
 .play-stop-icon{
-  width:30px;
-  height:30px;
+  width:42px;
+  height:42px;
   display:grid;
   place-items:center;
 }
 
 .play-stop-icon svg{
   grid-area:1/1;
-  width:30px;
-  height:30px;
+  width:42px;
+  height:42px;
   display:block;
   fill:currentColor;
 }
 
 .icon-play{
-  transform:translateX(1.6px);
+  transform:translateX(2px);
 }
 
 .icon-stop{
@@ -95,16 +95,16 @@ body{overflow-x:hidden}
 @media (orientation:portrait) and (max-width:700px){
   .play-stop-icon,
   .play-stop-icon svg{
-    width:27px;
-    height:27px;
+    width:36px;
+    height:36px;
   }
 }
 
 @media (max-height:720px){
   .play-stop-icon,
   .play-stop-icon svg{
-    width:26px;
-    height:26px;
+    width:34px;
+    height:34px;
   }
 }
 
