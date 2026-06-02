@@ -49,6 +49,7 @@ const cards = [
 const state = {
   currentIndex: 0,
   isPlaying: false,
+  currentTimerId: null,
   currentUtterance: null,
   voices: []
 };
@@ -74,6 +75,21 @@ function renderCard() {
   elements.sentenceZh.textContent = card.sentenceZh;
   elements.sentencePinyin.textContent = card.sentencePinyin;
   elements.sentenceJa.textContent = card.sentenceJa;
+}
+
+function clearCurrentTimer() {
+  if (state.currentTimerId !== null) {
+    window.clearTimeout(state.currentTimerId);
+    state.currentTimerId = null;
+  }
+}
+
+function setManagedTimeout(callback, delay) {
+  clearCurrentTimer();
+  state.currentTimerId = window.setTimeout(() => {
+    state.currentTimerId = null;
+    callback();
+  }, delay);
 }
 
 function loadVoices() {
@@ -124,6 +140,8 @@ function speakChinese(text, onEnd) {
 
 function stopPlayback() {
   state.isPlaying = false;
+  clearCurrentTimer();
+
   elements.playButton.textContent = "▶︎";
   elements.playButton.setAttribute("aria-label", "再生");
 
@@ -134,6 +152,11 @@ function stopPlayback() {
   state.currentUtterance = null;
 }
 
+function moveToNextCard() {
+  state.currentIndex = (state.currentIndex + 1) % cards.length;
+  renderCard();
+}
+
 function playCurrentCard() {
   if (!state.isPlaying) return;
 
@@ -142,18 +165,25 @@ function playCurrentCard() {
   speakChinese(card.zh, () => {
     if (!state.isPlaying) return;
 
-    window.setTimeout(() => {
+    setManagedTimeout(() => {
       if (!state.isPlaying) return;
 
       speakChinese(card.sentenceZh, () => {
         if (!state.isPlaying) return;
-        stopPlayback();
+
+        setManagedTimeout(() => {
+          if (!state.isPlaying) return;
+          moveToNextCard();
+          playCurrentCard();
+        }, 1400);
       });
     }, 700);
   });
 }
 
 function startPlayback() {
+  if (state.isPlaying) return;
+
   state.isPlaying = true;
   elements.playButton.textContent = "■";
   elements.playButton.setAttribute("aria-label", "停止");
