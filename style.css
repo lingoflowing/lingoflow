@@ -1,13 +1,4 @@
 
-body{margin:0;background:#f6f3ed;font-family:sans-serif}
-.app{max-width:520px;margin:auto;padding:20px;text-align:center}
-.photo{width:100%;border-radius:20px;display:block}
-#btn{
-margin:24px auto;
-width:120px;height:56px;
-border-radius:28px;
-border:none;
-background:#d7a75a;
-color:white;
-font-size:20px;
-}
+body{margin:0;background:#f6f3ed}
+.app{max-width:520px;margin:auto;padding:20px}
+.photo{width:100%;display:block;border-radius:20px}
