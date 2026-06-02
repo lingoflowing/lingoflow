@@ -19,7 +19,7 @@ const icon=document.getElementById('playStopIcon');
 
 const PLAY_SVG = `
   <svg class="play-svg" viewBox="0 0 48 48" focusable="false" aria-hidden="true">
-    <path d="M11 8 L37 24 L11 40 Z"></path>
+    <path d="M13 8 L39 24 L13 40 Z"></path>
   </svg>
 `;
 
