@@ -15,7 +15,6 @@ const state={
 
 const photo=document.getElementById('photo');
 const button=document.getElementById('playStopButton');
-const icon=document.getElementById('playStopIcon');
 
 function zhVoice(){
  const voices=speechSynthesis.getVoices();
@@ -38,7 +37,6 @@ function renderCurrentCard(){
 
 function updateButton(){
   button.classList.toggle('is-playing',state.isPlaying);
-  icon.textContent=state.isPlaying?'■':'▶';
   button.setAttribute('aria-label',state.isPlaying?'停止':'再生');
 }
 
