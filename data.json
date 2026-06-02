@@ -1,0 +1,57 @@
+[
+  {
+    "id": "morning",
+    "image": "images/morning.jpg",
+    "imagePortrait": "images/portrait/morning.jpg",
+    "wordZh": "早安",
+    "wordPinyin": "zǎo ān",
+    "wordJa": "おはよう",
+    "sentenceZh": "今天也早安。",
+    "sentencePinyin": "jīn tiān yě zǎo ān",
+    "sentenceJa": "今日もおはよう。"
+  },
+  {
+    "id": "mrt",
+    "image": "images/mrt.jpg",
+    "imagePortrait": "images/portrait/mrt.jpg",
+    "wordZh": "捷運",
+    "wordPinyin": "jié yùn",
+    "wordJa": "MRT",
+    "sentenceZh": "我搭捷運去上班。",
+    "sentencePinyin": "wǒ dā jié yùn qù shàng bān",
+    "sentenceJa": "MRTに乗って仕事へ行きます。"
+  },
+  {
+    "id": "rain",
+    "image": "images/rain.jpg",
+    "imagePortrait": "images/portrait/rain.jpg",
+    "wordZh": "下雨",
+    "wordPinyin": "xià yǔ",
+    "wordJa": "雨が降る",
+    "sentenceZh": "今天下雨了，記得帶傘。",
+    "sentencePinyin": "jīn tiān xià yǔ le，jì de dài sǎn",
+    "sentenceJa": "今日は雨です、傘を持ってね。"
+  },
+  {
+    "id": "night",
+    "image": "images/night.jpg",
+    "imagePortrait": "images/portrait/night.jpg",
+    "wordZh": "夜",
+    "wordPinyin": "yè",
+    "wordJa": "夜",
+    "sentenceZh": "夜晚的台北很漂亮。",
+    "sentencePinyin": "yè wǎn de tái běi hěn piào liàng",
+    "sentenceJa": "夜の台北はきれいです。"
+  },
+  {
+    "id": "tea",
+    "image": "images/tea.jpg",
+    "imagePortrait": "images/portrait/tea.jpg",
+    "wordZh": "茶",
+    "wordPinyin": "chá",
+    "wordJa": "お茶",
+    "sentenceZh": "我喜歡喝茶。",
+    "sentencePinyin": "wǒ xǐ huān hē chá",
+    "sentenceJa": "お茶を飲むのが好きです。"
+  }
+]
