@@ -1,34 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LingoFlow v1 Phase3</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LingoFlow Phase4</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main class="app">
-  <section class="card" aria-live="polite">
-    <div class="image-area">
-      <div class="image-placeholder" id="imageLabel">朝</div>
+  <section id="card" class="card fade">
+    <div class="image-wrap">
+      <div id="imageBox" class="image-box">朝の情景</div>
     </div>
 
-    <div class="word-area">
-      <div class="zh" id="wordZh">早安</div>
-      <div class="pinyin" id="wordPinyin">zǎo ān</div>
-      <div class="ja" id="wordJa">おはよう</div>
+    <div class="word">
+      <div id="zh" class="zh">早安</div>
+      <div id="py" class="py">zǎo ān</div>
+      <div id="ja" class="ja">おはよう</div>
     </div>
 
-    <div class="sentence-area">
-      <div class="sentence-zh" id="sentenceZh">今天也早安。</div>
-      <div class="sentence-pinyin" id="sentencePinyin">jīn tiān yě zǎo ān</div>
-      <div class="sentence-ja" id="sentenceJa">今日もおはよう。</div>
+    <div class="sentence">
+      <div id="szh">今天也早安。</div>
+      <div id="spy">jīn tiān yě zǎo ān</div>
+      <div id="sja">今日もおはよう。</div>
     </div>
   </section>
 
-  <button id="playButton" class="play-button" type="button" aria-label="再生">▶︎</button>
+  <button id="playBtn">▶︎</button>
 </main>
-
 <script src="app.js"></script>
 </body>
 </html>
