@@ -187,3 +187,27 @@ body{
     }
   }
 }
+
+
+/* elegant image transition */
+.photo{
+  opacity:1;
+  transition:opacity .52s ease, filter .52s ease, transform .52s ease;
+}
+
+.photo.is-changing{
+  opacity:.18;
+  filter:blur(2px);
+  transform:scale(.995);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .photo{
+    transition:none;
+  }
+  .photo.is-changing{
+    opacity:1;
+    filter:none;
+    transform:none;
+  }
+}

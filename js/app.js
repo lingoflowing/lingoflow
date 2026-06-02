@@ -3,6 +3,7 @@ import { renderCurrentCard, rerenderForViewport, showError } from './render.js';
 import { wait, clearTimer } from './timer.js';
 import { speak, stopPlayback, stopAllAudio } from './audio.js';
 import { PLAY_SVG, STOP_SVG } from './icons.js';
+import { track } from './analytics.js';
 
 const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
@@ -26,6 +27,7 @@ async function playLoop(runId){
     if(!card) break;
 
     renderCurrentCard();
+    track('card_view', { index: state.currentIndex, id: card.id || null });
 
     await wait(900, runId);
     if(!state.isPlaying || runId !== state.runId) break;
@@ -41,6 +43,7 @@ async function playLoop(runId){
     await wait(1800, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
+    track('card_complete', { index: state.currentIndex, id: card.id || null });
     nextCard();
   }
 }
@@ -48,6 +51,7 @@ async function playLoop(runId){
 function startPlayback(){
   if(state.isPlaying || !state.cards.length) return;
 
+  track('play_start', { index: state.currentIndex });
   state.isPlaying = true;
   state.runId++;
   updateButton();
@@ -55,6 +59,7 @@ function startPlayback(){
 }
 
 function stopAndRender(){
+  if(state.isPlaying) track('play_stop', { index: state.currentIndex });
   stopPlayback();
   updateButton();
 }
@@ -70,6 +75,7 @@ async function loadCards(){
 
   state.cards = cards;
   state.currentIndex = 0;
+  track('app_loaded', { cardCount: cards.length });
   renderCurrentCard();
 }
 

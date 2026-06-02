@@ -2,6 +2,9 @@ import { getCurrentCard } from './state.js';
 
 const photo = document.getElementById('photo');
 
+let lastImage = '';
+let transitionTimerId = null;
+
 function usePortraitImage(){
   return window.matchMedia('(orientation: portrait) and (max-width: 700px)').matches;
 }
@@ -15,11 +18,38 @@ function currentImage(card){
   return usePortraitImage() && card.imagePortrait ? card.imagePortrait : card.image;
 }
 
+function setImageWithFade(src){
+  if(!src) return;
+
+  if(src === lastImage){
+    photo.classList.remove('is-changing');
+    return;
+  }
+
+  clearTimeout(transitionTimerId);
+  photo.classList.add('is-changing');
+
+  transitionTimerId = setTimeout(() => {
+    photo.src = src;
+    lastImage = src;
+  }, 180);
+}
+
+photo.addEventListener('load', () => {
+  requestAnimationFrame(() => {
+    photo.classList.remove('is-changing');
+  });
+});
+
+photo.addEventListener('error', () => {
+  photo.classList.remove('is-changing');
+});
+
 export function renderCurrentCard(){
   const card = getCurrentCard();
   if(!card) return;
 
-  photo.src = currentImage(card);
+  setImageWithFade(currentImage(card));
   photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
 }
 
@@ -29,5 +59,12 @@ export function showError(message){
 }
 
 export function rerenderForViewport(){
-  renderCurrentCard();
+  const card = getCurrentCard();
+  if(!card) return;
+
+  const src = currentImage(card);
+  if(src !== lastImage){
+    photo.src = src;
+    lastImage = src;
+  }
 }
