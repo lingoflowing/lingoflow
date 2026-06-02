@@ -1,4 +1,10 @@
-
-body{margin:0;background:#f6f3ed}
-.app{max-width:520px;margin:auto;padding:20px}
-.photo{width:100%;display:block;border-radius:20px}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f3ed;color:#2b241c;font-family:serif}
+.app{position:relative;max-width:520px;margin:auto;padding:20px;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.photo{width:100%;display:block;border-radius:20px;box-shadow:0 14px 34px rgba(60,45,25,.14)}
+.play-stop-button{position:absolute;left:50%;bottom:42px;transform:translateX(-50%);width:62px;height:62px;border-radius:50%;border:1px solid rgba(255,255,255,.72);background:rgba(255,250,242,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 28px rgba(55,38,18,.18);color:#5d4323;font-size:23px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.play-stop-button:active{transform:translateX(-50%) scale(.96);box-shadow:0 6px 18px rgba(55,38,18,.16)}
+.play-stop-button.is-playing{background:rgba(43,36,28,.62);color:#fff;border-color:rgba(255,255,255,.42)}
+.play-stop-button span{display:block;margin-left:3px}
+.play-stop-button.is-playing span{margin-left:0;font-size:20px}
+@media(max-width:360px){.app{padding:14px}.photo{border-radius:18px}.play-stop-button{width:56px;height:56px;bottom:30px}}

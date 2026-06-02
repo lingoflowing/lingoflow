@@ -3,12 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LingoFlow</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
-<img id="photo" class="photo" src="images/morning.jpg" alt="scene">
-</div>
+<main class="app" aria-label="LingoFlow">
+  <img id="photo" class="photo" src="images/morning.jpg" alt="scene">
+  <button id="playStopButton" class="play-stop-button" type="button" aria-label="再生">
+    <span id="playStopIcon" aria-hidden="true">▶</span>
+  </button>
+</main>
 <script src="app.js"></script>
 </body>
 </html>
