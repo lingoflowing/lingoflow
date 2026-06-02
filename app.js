@@ -15,6 +15,20 @@ const state={
 
 const photo=document.getElementById('photo');
 const button=document.getElementById('playStopButton');
+const icon=document.getElementById('playStopIcon');
+
+const PLAY_SVG = `
+  <svg viewBox="0 0 48 48" focusable="false" aria-hidden="true">
+    <path d="M12 8 L38 24 L12 40 Z"></path>
+  </svg>
+`;
+
+const STOP_SVG = `
+  <svg viewBox="0 0 48 48" focusable="false" aria-hidden="true">
+    <rect x="10" y="10" width="28" height="28" rx="4.5" ry="4.5"></rect>
+  </svg>
+`;
+
 
 function zhVoice(){
  const voices=speechSynthesis.getVoices();
@@ -37,6 +51,7 @@ function renderCurrentCard(){
 
 function updateButton(){
   button.classList.toggle('is-playing',state.isPlaying);
+  icon.innerHTML = state.isPlaying ? STOP_SVG : PLAY_SVG;
   button.setAttribute('aria-label',state.isPlaying?'停止':'再生');
 }
 

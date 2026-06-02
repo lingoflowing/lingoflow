@@ -63,49 +63,36 @@ body{overflow-x:hidden}
 .play-stop-icon{
   width:42px;
   height:42px;
-  display:grid;
-  place-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .play-stop-icon svg{
-  grid-area:1/1;
   width:42px;
   height:42px;
   display:block;
   fill:currentColor;
 }
 
-.icon-play{
-  transform:translateX(2px);
-}
-
-.icon-stop{
-  transform:none;
-  display:none;
-}
-
-.play-stop-button.is-playing .icon-play{
-  display:none;
-}
-
-.play-stop-button.is-playing .icon-stop{
-  display:block;
-}
-
-@media (orientation:portrait) and (max-width:700px){
+.play-stop-button.is-playing .play-stop-button.is-playing @media (orientation:portrait) and (max-width:700px){
   .play-stop-icon,
   .play-stop-icon svg{
-    width:36px;
-    height:36px;
-  }
+  width:42px;
+  height:42px;
+  display:block;
+  fill:currentColor;
+}
 }
 
 @media (max-height:720px){
   .play-stop-icon,
   .play-stop-icon svg{
-    width:34px;
-    height:34px;
-  }
+  width:42px;
+  height:42px;
+  display:block;
+  fill:currentColor;
+}
 }
 
 @media (orientation:portrait) and (max-width:700px){
