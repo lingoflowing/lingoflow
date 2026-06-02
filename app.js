@@ -1,9 +1,9 @@
 const cards=[
-{img:'images/morning.jpg',lines:['早安','今天也早安。']},
-{img:'images/mrt.jpg',lines:['捷運','我搭捷運去上班。']},
-{img:'images/rain.jpg',lines:['下雨','今天下雨了，記得帶傘。']},
-{img:'images/night.jpg',lines:['夜','夜晚的台北很漂亮。']},
-{img:'images/tea.jpg',lines:['茶','我喜歡喝茶。']}
+{img:'images/morning.jpg',imgPortrait:'images/portrait/morning.jpg',lines:['早安','今天也早安。']},
+{img:'images/mrt.jpg',imgPortrait:'images/portrait/mrt.jpg',lines:['捷運','我搭捷運去上班。']},
+{img:'images/rain.jpg',imgPortrait:'images/portrait/rain.jpg',lines:['下雨','今天下雨了，記得帶傘。']},
+{img:'images/night.jpg',imgPortrait:'images/portrait/night.jpg',lines:['夜','夜晚的台北很漂亮。']},
+{img:'images/tea.jpg',imgPortrait:'images/portrait/tea.jpg',lines:['茶','我喜歡喝茶。']}
 ];
 
 const state={
@@ -21,6 +21,19 @@ function zhVoice(){
  const voices=speechSynthesis.getVoices();
  return voices.find(v=>v.lang==='zh-TW')
  || voices.find(v=>v.lang.toLowerCase().startsWith('zh'));
+}
+
+function usePortraitImage(){
+  return window.matchMedia('(orientation: portrait) and (max-width: 700px)').matches;
+}
+
+function currentImage(card){
+  return usePortraitImage() && card.imgPortrait ? card.imgPortrait : card.img;
+}
+
+function renderCurrentCard(){
+  const c=cards[state.index];
+  photo.src=currentImage(c);
 }
 
 function updateButton(){
@@ -73,7 +86,7 @@ function speak(text,runId){
 async function loop(runId){
  while(state.isPlaying && runId===state.runId){
    const c=cards[state.index];
-   photo.src=c.img;
+   renderCurrentCard();
 
    await wait(900,runId);
    if(!state.isPlaying || runId!==state.runId) break;
@@ -108,10 +121,14 @@ window.addEventListener('load',()=>{
   if('speechSynthesis' in window){
     speechSynthesis.onvoiceschanged=()=>{};
   }
-  photo.src=cards[state.index].img;
+  renderCurrentCard();
   updateButton();
 });
 
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden) stopAll();
+});
+
+window.addEventListener('resize',()=>{
+  renderCurrentCard();
 });
