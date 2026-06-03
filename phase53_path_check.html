@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase53 Path Check</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Noto Sans TC",sans-serif;background:#f7f3ec;margin:0;padding:14px;color:#1f1b18}
+.card{background:#fffaf2;border-radius:20px;margin:0 0 16px;overflow:hidden;border:1px solid #ddd0c0}
+img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
+.text{padding:14px 16px 16px}
+.zh{font-size:32px;font-weight:650}
+.py,.ja{color:#756b61}
+</style>
+</head>
+<body>
+<h1>Phase53 Path Check</h1>
+<div id="app"></div>
+<script>
+fetch('./data.json')
+  .then(r => r.json())
+  .then(data => {
+    const cards = data.cards || [];
+    document.getElementById('app').innerHTML = cards.map(c => `
+      <article class="card">
+        <img src="${c.imageFile || c.image}" alt="${c.wordJa || c.ja}">
+        <div class="text">
+          <div class="zh">${c.wordZh || c.zh}</div>
+          <div class="py">${c.wordPinyin || c.pinyin}</div>
+          <div class="ja">${c.wordJa || c.ja}</div>
+          <p>${c.sentenceZh || c.sentence_zh}<br><span class="py">${c.sentencePinyin || c.sentence_pinyin}</span><br><span class="ja">${c.sentenceJa || c.sentence_ja}</span></p>
+        </div>
+      </article>
+    `).join('');
+  });
+</script>
+</body>
+</html>
