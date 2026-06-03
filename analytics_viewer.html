@@ -1,0 +1,158 @@
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LingoFlow Analytics</title>
+
+<style>
+body{
+  font-family:sans-serif;
+  max-width:1000px;
+  margin:40px auto;
+  padding:20px;
+  background:#fafafa;
+  color:#222;
+}
+
+h1{
+  margin-bottom:24px;
+}
+
+.card{
+  background:white;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  border-bottom:1px solid #eee;
+  padding:8px;
+  text-align:left;
+}
+
+button{
+  padding:10px 16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>LingoFlow Analytics</h1>
+
+<div class="card">
+  <h2>Summary</h2>
+
+  <table>
+    <tbody id="summary"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Latest Events</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Event</th>
+      </tr>
+    </thead>
+    <tbody id="events"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <button id="clearBtn">
+    Clear Analytics
+  </button>
+</div>
+
+<script>
+
+const STORAGE_KEY = 'lingoflow_analytics_v1';
+
+function loadEvents(){
+  try{
+    return JSON.parse(
+      localStorage.getItem(STORAGE_KEY)
+    )?.events || [];
+  }catch{
+    return [];
+  }
+}
+
+function render(){
+
+  const events = loadEvents();
+
+  const counts = {};
+
+  events.forEach(e=>{
+    counts[e.event] = (counts[e.event] || 0) + 1;
+  });
+
+  const summary = document.getElementById('summary');
+
+  summary.innerHTML =
+    Object.entries(counts)
+      .map(([name,count]) =>
+        `<tr>
+          <td>${name}</td>
+          <td>${count}</td>
+        </tr>`
+      )
+      .join('');
+
+  const latest =
+    [...events]
+      .reverse()
+      .slice(0,50);
+
+  const tbody =
+    document.getElementById('events');
+
+  tbody.innerHTML =
+    latest
+      .map(e =>
+        `<tr>
+          <td>${e.at}</td>
+          <td>${e.event}</td>
+        </tr>`
+      )
+      .join('');
+}
+
+document
+.getElementById('clearBtn')
+.addEventListener('click',()=>{
+
+  if(confirm('Analyticsを削除しますか？')){
+
+    localStorage.removeItem(
+      STORAGE_KEY
+    );
+
+    render();
+  }
+});
+
+render();
+
+</script>
+
+</body>
+</html>
+```
