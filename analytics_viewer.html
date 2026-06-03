@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LingoFlow Analytics v1.3</title>
+<title>LingoFlow Analytics v1.4</title>
 <style>
 body{font-family:sans-serif;max-width:1000px;margin:40px auto;padding:20px;background:#fafafa;color:#222}
 .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -11,6 +11,7 @@ table{width:100%;border-collapse:collapse}
 th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
 .metric{font-weight:bold}
 button{padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
+ol{margin:0;padding-left:24px}
 </style>
 </head>
 <body>
@@ -23,11 +24,14 @@ button{padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
 </div>
 
 <div class="card">
+<h2>Top Cards</h2>
+<ol id="topCards"></ol>
+</div>
+
+<div class="card">
 <h2>Latest Events</h2>
 <table>
-<thead>
-<tr><th>Time</th><th>Event</th></tr>
-</thead>
+<thead><tr><th>Time</th><th>Event</th></tr></thead>
 <tbody id="events"></tbody>
 </table>
 </div>
@@ -38,6 +42,19 @@ button{padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
 
 <script>
 const STORAGE_KEY='lingoflow_analytics_v1';
+
+const CARD_NAMES={
+  card_001:'早安',
+  card_002:'早餐',
+  card_003:'茶',
+  card_004:'咖啡',
+  card_005:'陽光',
+  card_006:'捷運',
+  card_007:'上班',
+  card_008:'窗戶',
+  card_009:'今天',
+  card_010:'散步'
+};
 
 function loadEvents(){
   try{
@@ -59,49 +76,49 @@ function render(){
   const cardView=counts.card_view||0;
   const cardComplete=counts.card_complete||0;
 
-  const completionRate=cardView>0
-    ? ((cardComplete/cardView)*100).toFixed(1)
-    : '0.0';
+  const completionRate=cardView>0 ? ((cardComplete/cardView)*100).toFixed(1) : '0.0';
+  const cardsPerPlay=playStart>0 ? (cardView/playStart).toFixed(1) : '0.0';
 
-  const cardsPerPlay=playStart>0
-    ? (cardView/playStart).toFixed(1)
-    : '0.0';
+  const learningSessions=new Set(
+    events.filter(e=>e.event==='play_start').map(e=>e.sessionId)
+  ).size;
 
-  const learningSessions=
-    new Set(
-      events
-        .filter(e=>e.event==='play_start')
-        .map(e=>e.sessionId)
-    ).size;
+  const learningDepth=learningSessions>0
+    ? (cardView/learningSessions).toFixed(1)
+    : '0.0';
 
   document.getElementById('summary').innerHTML=
-    Object.entries(counts)
-      .map(([name,count])=>
-        `<tr><td>${name}</td><td>${count}</td></tr>`
-      )
-      .join('')
-    +
-    `<tr>
-      <td class="metric">Completion Rate</td>
-      <td class="metric">${completionRate}%</td>
-    </tr>
-    <tr>
-      <td class="metric">Cards Per Play</td>
-      <td class="metric">${cardsPerPlay}</td>
-    </tr>
-    <tr>
-      <td class="metric">Learning Sessions</td>
-      <td class="metric">${learningSessions}</td>
-    </tr>`;
+    Object.entries(counts).map(([name,count])=>
+      `<tr><td>${name}</td><td>${count}</td></tr>`
+    ).join('')
+    + `
+    <tr><td class="metric">Completion Rate</td><td class="metric">${completionRate}%</td></tr>
+    <tr><td class="metric">Cards Per Play</td><td class="metric">${cardsPerPlay}</td></tr>
+    <tr><td class="metric">Learning Sessions</td><td class="metric">${learningSessions}</td></tr>
+    <tr><td class="metric">Learning Depth</td><td class="metric">${learningDepth}</td></tr>`;
+
+  const topCards={};
+
+  events.filter(e=>e.event==='card_view').forEach(e=>{
+    const id=e.payload?.id;
+    if(!id) return;
+    topCards[id]=(topCards[id]||0)+1;
+  });
+
+  const ranked=Object.entries(topCards)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,5);
+
+  document.getElementById('topCards').innerHTML=ranked.length
+    ? ranked.map(([id,count])=>
+        `<li>${CARD_NAMES[id]||id} (${count})</li>`
+      ).join('')
+    : '<li>No data</li>';
 
   document.getElementById('events').innerHTML=
-    [...events]
-      .reverse()
-      .slice(0,50)
-      .map(e=>
-        `<tr><td>${e.at}</td><td>${e.event}</td></tr>`
-      )
-      .join('');
+    [...events].reverse().slice(0,50)
+    .map(e=>`<tr><td>${e.at}</td><td>${e.event}</td></tr>`)
+    .join('');
 }
 
 document.getElementById('clearBtn').addEventListener('click',()=>{
