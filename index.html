@@ -4,18 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LingoFlow</title>
+<meta name="description" content="台湾華語が、静かに流れる場所。">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <main class="app" aria-label="LingoFlow">
   <section class="card" aria-live="polite">
-    <img id="photo" class="photo" src="images/morning.jpg" alt="LingoFlow scene">
-<div class="sentence-block">
-        <div id="sentenceZh" class="sentence-zh"></div>
-        <div id="sentencePinyin" class="pinyin"></div>
-        <div id="sentenceJa" class="ja"></div>
-      </div>
+    <div class="photo-wrap">
+      <img id="photo" class="photo" src="images/card_001_zaoan.png" alt="LingoFlow scene">
     </div>
+
+    <section class="text-area">
+      <div class="word-block">
+        <div id="wordZh" class="word-zh"></div>
+        <div id="wordPinyin" class="word-pinyin"></div>
+        <div id="wordJa" class="word-ja"></div>
+      </div>
+
+      <div class="sentence-block">
+        <div id="sentenceZh" class="sentence-zh"></div>
+        <div id="sentencePinyin" class="sentence-pinyin"></div>
+        <div id="sentenceJa" class="sentence-ja"></div>
+      </div>
+    </section>
 
     <button id="playStopButton" class="play-stop-button" type="button" aria-label="再生">
       <span id="playStopIcon" class="play-stop-icon" aria-hidden="true"></span>
