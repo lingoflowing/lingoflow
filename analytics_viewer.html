@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LingoFlow Analytics</title>
+<title>LingoFlow Analytics v1.3</title>
 <style>
 body{font-family:sans-serif;max-width:1000px;margin:40px auto;padding:20px;background:#fafafa;color:#222}
-.card{background:white;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 table{width:100%;border-collapse:collapse}
 th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
 .metric{font-weight:bold}
@@ -14,6 +14,7 @@ button{padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
 </style>
 </head>
 <body>
+
 <h1>LingoFlow Analytics</h1>
 
 <div class="card">
@@ -24,7 +25,9 @@ button{padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
 <div class="card">
 <h2>Latest Events</h2>
 <table>
-<thead><tr><th>Time</th><th>Event</th></tr></thead>
+<thead>
+<tr><th>Time</th><th>Event</th></tr>
+</thead>
 <tbody id="events"></tbody>
 </table>
 </div>
@@ -64,23 +67,41 @@ function render(){
     ? (cardView/playStart).toFixed(1)
     : '0.0';
 
-  const uniqueSessions =
-    new Set(events.map(e => e.sessionId)).size;
+  const learningSessions=
+    new Set(
+      events
+        .filter(e=>e.event==='play_start')
+        .map(e=>e.sessionId)
+    ).size;
 
-  document.getElementById('summary').innerHTML =
-    Object.entries(counts).map(([name,count]) =>
-      `<tr><td>${name}</td><td>${count}</td></tr>`
-    ).join('') +
-    `<tr><td class="metric">Completion Rate</td><td class="metric">${completionRate}%</td></tr>
-     <tr><td class="metric">Cards Per Play</td><td class="metric">${cardsPerPlay}</td></tr>
-     <tr><td class="metric">Unique Sessions</td><td class="metric">${uniqueSessions}</td></tr>`;
+  document.getElementById('summary').innerHTML=
+    Object.entries(counts)
+      .map(([name,count])=>
+        `<tr><td>${name}</td><td>${count}</td></tr>`
+      )
+      .join('')
+    +
+    `<tr>
+      <td class="metric">Completion Rate</td>
+      <td class="metric">${completionRate}%</td>
+    </tr>
+    <tr>
+      <td class="metric">Cards Per Play</td>
+      <td class="metric">${cardsPerPlay}</td>
+    </tr>
+    <tr>
+      <td class="metric">Learning Sessions</td>
+      <td class="metric">${learningSessions}</td>
+    </tr>`;
 
-  const latest=[...events].reverse().slice(0,50);
-
-  document.getElementById('events').innerHTML =
-    latest.map(e =>
-      `<tr><td>${e.at}</td><td>${e.event}</td></tr>`
-    ).join('');
+  document.getElementById('events').innerHTML=
+    [...events]
+      .reverse()
+      .slice(0,50)
+      .map(e=>
+        `<tr><td>${e.at}</td><td>${e.event}</td></tr>`
+      )
+      .join('');
 }
 
 document.getElementById('clearBtn').addEventListener('click',()=>{
@@ -92,5 +113,6 @@ document.getElementById('clearBtn').addEventListener('click',()=>{
 
 render();
 </script>
+
 </body>
 </html>
