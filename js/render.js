@@ -11,9 +11,6 @@ const sentenceJa = document.getElementById('sentenceJa');
 let lastImage = '';
 let transitionTimerId = null;
 
-function usePortraitImage(){
-  return window.matchMedia('(orientation: portrait) and (max-width: 700px)').matches;
-}
 
 function safeText(value){
   return typeof value === 'string' ? value : '';
@@ -21,7 +18,7 @@ function safeText(value){
 
 function currentImage(card){
   if(!card) return '';
-  return usePortraitImage() && card.imagePortrait ? card.imagePortrait : card.image;
+  return card.image;
 }
 
 function setImageWithFade(src){

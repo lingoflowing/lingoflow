@@ -2,7 +2,6 @@
   {
     "id": "card_001",
     "image": "images/card_001_zaoan.png",
-    "imagePortrait": "images/portrait/card_001_zaoan.png",
     "wordZh": "早安",
     "wordPinyin": "zǎo ān",
     "wordJa": "おはよう",
@@ -13,7 +12,6 @@
   {
     "id": "card_002",
     "image": "images/card_002_breakfast.png",
-    "imagePortrait": "images/portrait/card_002_breakfast.png",
     "wordZh": "早餐",
     "wordPinyin": "zǎo cān",
     "wordJa": "朝ごはん",
@@ -24,7 +22,6 @@
   {
     "id": "card_003",
     "image": "images/card_003_tea.png",
-    "imagePortrait": "images/portrait/card_003_tea.png",
     "wordZh": "茶",
     "wordPinyin": "chá",
     "wordJa": "お茶",
@@ -35,7 +32,6 @@
   {
     "id": "card_004",
     "image": "images/card_004_coffee.png",
-    "imagePortrait": "images/portrait/card_004_coffee.png",
     "wordZh": "咖啡",
     "wordPinyin": "kā fēi",
     "wordJa": "コーヒー",
@@ -46,7 +42,6 @@
   {
     "id": "card_005",
     "image": "images/card_005_sunlight.png",
-    "imagePortrait": "images/portrait/card_005_sunlight.png",
     "wordZh": "陽光",
     "wordPinyin": "yáng guāng",
     "wordJa": "日差し",
@@ -57,7 +52,6 @@
   {
     "id": "card_006",
     "image": "images/card_006_mrt.png",
-    "imagePortrait": "images/portrait/card_006_mrt.png",
     "wordZh": "捷運",
     "wordPinyin": "jié yùn",
     "wordJa": "MRT",
@@ -68,7 +62,6 @@
   {
     "id": "card_007",
     "image": "images/card_007_work.png",
-    "imagePortrait": "images/portrait/card_007_work.png",
     "wordZh": "上班",
     "wordPinyin": "shàng bān",
     "wordJa": "出勤する",
@@ -79,7 +72,6 @@
   {
     "id": "card_008",
     "image": "images/card_008_window.png",
-    "imagePortrait": "images/portrait/card_008_window.png",
     "wordZh": "窗戶",
     "wordPinyin": "chuāng hù",
     "wordJa": "窓",
@@ -90,7 +82,6 @@
   {
     "id": "card_009",
     "image": "images/card_009_today.png",
-    "imagePortrait": "images/portrait/card_009_today.png",
     "wordZh": "今天",
     "wordPinyin": "jīn tiān",
     "wordJa": "今日",
@@ -101,7 +92,6 @@
   {
     "id": "card_010",
     "image": "images/card_010_walk.png",
-    "imagePortrait": "images/portrait/card_010_walk.png",
     "wordZh": "散步",
     "wordPinyin": "sàn bù",
     "wordJa": "散歩",
