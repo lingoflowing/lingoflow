@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ja">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>data.json check</title>
+<style>body{font-family:sans-serif;padding:16px;background:#f7f3ec}.ok{color:green}.ng{color:red}</style></head>
+<body>
+<h1>data.json check</h1>
+<pre id="out">loading...</pre>
+<script>
+fetch('./data.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+ const ok = Array.isArray(d);
+ document.getElementById('out').innerHTML =
+  (ok?'<span class="ok">OK: array</span>':'<span class="ng">NG: not array</span>')+
+  '\ncount: '+(ok?d.length:(d.cards?d.cards.length:'unknown'))+
+  '\nfirst: '+JSON.stringify(ok?d[0]:(d.cards?d.cards[0]:d),null,2);
+}).catch(e=>{document.getElementById('out').textContent='ERROR '+e.message});
+</script></body></html>
