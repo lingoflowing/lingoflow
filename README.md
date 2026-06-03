@@ -1,17 +1,23 @@
-Phase53 Stable
+# LingoFlow
 
-・10 cards
-・Phase48 inherited architecture
-・Analytics enabled
-・Audio safe
-・ButtonFix2 applied
+台湾華語が、静かに流れる場所。
 
-Structure
+## Concept
+LingoFlow は単語帳ではなく、画像・音声・余白を通じて台湾華語に自然に触れる体験を提供する。
 
-index.html
-data.json
-assets/
+## Current Structure
 css/
-data/
 images/
 js/
+index.html
+data.json
+README.md
+
+## Current Cards
+早安 / 早餐 / 茶 / 咖啡 / 陽光 / 捷運 / 上班 / 窗戶 / 今天 / 散步
+
+## Design Principles
+Small
+Simple
+Stable
+Elegant
