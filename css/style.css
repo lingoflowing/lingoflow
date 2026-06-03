@@ -211,3 +211,44 @@ body{
     transform:none;
   }
 }
+
+
+/* Phase53 TEXTFIX: show text under image */
+.word-block,
+.sentence-block,
+.text-area,
+.card-text,
+.content-text {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.image-only .word-block,
+.image-only .sentence-block,
+.image-only .text-area {
+  display: block !important;
+}
+
+.word-zh, #wordZh, .zh, #zh {
+  color: #1f1b18 !important;
+  font-size: clamp(32px, 8vw, 44px);
+  line-height: 1.15;
+  font-weight: 650;
+  text-align: center;
+}
+
+.word-pinyin, #wordPinyin, .pinyin, #pinyin,
+.word-ja, #wordJa, .ja, #ja,
+.sentence-pinyin, #sentencePinyin,
+.sentence-ja, #sentenceJa {
+  color: #756b61 !important;
+  text-align: center;
+}
+
+.sentence-zh, #sentenceZh {
+  color: #1f1b18 !important;
+  font-size: 18px;
+  line-height: 1.55;
+  text-align: center;
+}

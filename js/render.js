@@ -2,80 +2,144 @@
 function getCardImagePath(card) {
   return card.imageFile || card.image || card.imagePath || card.img || "";
 }
-function getWordZh(card) { return card.wordZh || card.zh || ""; }
-function getWordPinyin(card) { return card.wordPinyin || card.pinyin || ""; }
-function getWordJa(card) { return card.wordJa || card.ja || ""; }
-function getSentenceZh(card) { return card.sentenceZh || card.sentence_zh || ""; }
-function getSentencePinyin(card) { return card.sentencePinyin || card.sentence_pinyin || ""; }
-function getSentenceJa(card) { return card.sentenceJa || card.sentence_ja || ""; }
 
-import { getCurrentCard } from './state.js';
-
-const photo = document.getElementById('photo');
-
-let lastImage = '';
-let transitionTimerId = null;
-
-function usePortraitImage(){
-  return window.matchMedia('(orientation: portrait) and (max-width: 700px)').matches;
+function getWordZh(card) {
+  return card.wordZh || card.zh || card.word || card.word_zh || "";
 }
 
-function safeText(value){
-  return typeof value === 'string' ? value : '';
+function getWordPinyin(card) {
+  return card.wordPinyin || card.pinyin || card.word_pinyin || "";
 }
 
-function currentImage(card){
-  if(!card) return '';
-  return usePortraitImage() && card.imagePortrait ? card.imagePortrait : card.image;
+function getWordJa(card) {
+  return card.wordJa || card.ja || card.word_ja || card.meaning || "";
 }
 
-function setImageWithFade(src){
-  if(!src) return;
+function getSentenceZh(card) {
+  return card.sentenceZh || card.sentence_zh || card.exampleZh || card.example_zh || card.example || "";
+}
 
-  if(src === lastImage){
-    photo.classList.remove('is-changing');
-    return;
+function getSentencePinyin(card) {
+  return card.sentencePinyin || card.sentence_pinyin || card.examplePinyin || card.example_pinyin || "";
+}
+
+function getSentenceJa(card) {
+  return card.sentenceJa || card.sentence_ja || card.exampleJa || card.example_ja || card.translation || "";
+}
+
+function setTextById(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value || "";
+}
+
+function setTextBySelector(selector, value) {
+  const el = document.querySelector(selector);
+  if (el) el.textContent = value || "";
+}
+
+function setImage(card) {
+  const src = getCardImagePath(card);
+  const candidates = [
+    document.getElementById("cardImage"),
+    document.getElementById("image"),
+    document.getElementById("mainImage"),
+    document.querySelector(".card-image"),
+    document.querySelector(".image-area img"),
+    document.querySelector(".imageOnly img"),
+    document.querySelector("img")
+  ].filter(Boolean);
+
+  const img = candidates[0];
+  if (img) {
+    img.src = src;
+    img.alt = getWordJa(card) || getWordZh(card) || "";
   }
-
-  clearTimeout(transitionTimerId);
-  photo.classList.add('is-changing');
-
-  transitionTimerId = setTimeout(() => {
-    photo.src = src;
-    lastImage = src;
-  }, 180);
 }
 
-photo.addEventListener('load', () => {
-  requestAnimationFrame(() => {
-    photo.classList.remove('is-changing');
+function renderCard(card) {
+  if (!card) return;
+
+  setImage(card);
+
+  const wordZh = getWordZh(card);
+  const wordPinyin = getWordPinyin(card);
+  const wordJa = getWordJa(card);
+  const sentenceZh = getSentenceZh(card);
+  const sentencePinyin = getSentencePinyin(card);
+  const sentenceJa = getSentenceJa(card);
+
+  // Common IDs
+  setTextById("wordZh", wordZh);
+  setTextById("wordPinyin", wordPinyin);
+  setTextById("wordJa", wordJa);
+  setTextById("sentenceZh", sentenceZh);
+  setTextById("sentencePinyin", sentencePinyin);
+  setTextById("sentenceJa", sentenceJa);
+
+  setTextById("zh", wordZh);
+  setTextById("pinyin", wordPinyin);
+  setTextById("ja", wordJa);
+  setTextById("sentence_zh", sentenceZh);
+  setTextById("sentence_pinyin", sentencePinyin);
+  setTextById("sentence_ja", sentenceJa);
+
+  // Common classes
+  setTextBySelector(".word-zh", wordZh);
+  setTextBySelector(".word-pinyin", wordPinyin);
+  setTextBySelector(".word-ja", wordJa);
+  setTextBySelector(".sentence-zh", sentenceZh);
+  setTextBySelector(".sentence-pinyin", sentencePinyin);
+  setTextBySelector(".sentence-ja", sentenceJa);
+
+  setTextBySelector(".zh", wordZh);
+  setTextBySelector(".pinyin", wordPinyin);
+  setTextBySelector(".ja", wordJa);
+
+  // If Phase48 has image-only UI with hidden text containers, force show if present.
+  document.querySelectorAll(".word-block, .sentence-block, .text-area, .card-text, .content-text").forEach(el => {
+    el.hidden = false;
+    el.style.display = "";
+    el.style.visibility = "visible";
+    el.style.opacity = "1";
   });
-});
 
-photo.addEventListener('error', () => {
-  photo.classList.remove('is-changing');
-});
+  const shell = document.querySelector(".card-shell, .card, .app");
+  if (shell) {
+    shell.classList.remove("image-only");
+    shell.classList.add("has-text");
+  }
 
-export function renderCurrentCard(){
-  const card = getCurrentCard();
-  if(!card) return;
-
-  setImageWithFade(currentImage(card));
-  photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
-}
-
-export function showError(message){
-  const app = document.querySelector('.app');
-  app.innerHTML = `<div class="error-message">${message}</div>`;
-}
-
-export function rerenderForViewport(){
-  const card = getCurrentCard();
-  if(!card) return;
-
-  const src = currentImage(card);
-  if(src !== lastImage){
-    photo.src = src;
-    lastImage = src;
+  if (typeof track === "function") {
+    try { track("card_view", { id: card.id, wordZh }); } catch (e) {}
   }
 }
+
+// Compatibility aliases possibly used by app.js
+function renderCurrentCard() {
+  if (typeof state !== "undefined" && state.cards) {
+    const index = state.currentIndex || 0;
+    renderCard(state.cards[index]);
+  }
+}
+
+function render() {
+  if (arguments.length > 0) {
+    renderCard(arguments[0]);
+  } else {
+    renderCurrentCard();
+  }
+}
+
+function updateView(card) {
+  renderCard(card);
+}
+
+function showCard(card) {
+  renderCard(card);
+}
+
+window.renderCard = renderCard;
+window.renderCurrentCard = renderCurrentCard;
+window.render = render;
+window.updateView = updateView;
+window.showCard = showCard;
