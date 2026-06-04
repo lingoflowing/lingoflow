@@ -723,3 +723,138 @@ body{
     height: 28px !important;
   }
 }
+
+
+/* ===== Phase55 TYPOGRAPHY v2 =====
+   Goal:
+   - Keep the Chinese / pinyin / Japanese hierarchy.
+   - Scale the whole text system up because pinyin and Japanese were still hard to read.
+   - Especially make sentence Japanese close to the previous sentence Chinese size.
+   - Do not change JS, audio, analytics, or data.
+*/
+
+/* PC / base */
+.word-zh {
+  font-size: clamp(38px, 4.8vw, 52px) !important;
+}
+
+.word-pinyin,
+.word-ja {
+  font-size: clamp(18px, 2.2vw, 24px) !important;
+}
+
+.sentence-zh {
+  font-size: clamp(23px, 2.9vw, 31px) !important;
+}
+
+.sentence-pinyin,
+.sentence-ja {
+  font-size: clamp(17px, 2.1vw, 23px) !important;
+}
+
+.sentence-block {
+  width: min(420px, 100%) !important;
+}
+
+/* iPhone / portrait */
+@media (orientation: portrait) and (max-width: 700px) {
+  .photo {
+    max-height: 45svh !important;
+  }
+
+  .text-area {
+    padding-top: 12px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .word-zh {
+    font-size: clamp(35px, 10.4vw, 44px) !important;
+  }
+
+  .word-pinyin,
+  .word-ja {
+    font-size: clamp(17px, 5vw, 21px) !important;
+  }
+
+  .sentence-block {
+    width: min(420px, 100%) !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+  }
+
+  .sentence-zh {
+    font-size: clamp(21px, 6.2vw, 25px) !important;
+  }
+
+  .sentence-pinyin,
+  .sentence-ja {
+    font-size: clamp(16px, 4.7vw, 19px) !important;
+  }
+}
+
+/* iPhone SE / short portrait */
+@media (orientation: portrait) and (max-height: 700px) {
+  .photo {
+    max-height: 40svh !important;
+  }
+
+  .text-area {
+    padding-top: 10px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .word-zh {
+    font-size: 34px !important;
+  }
+
+  .word-pinyin,
+  .word-ja {
+    font-size: 16px !important;
+  }
+
+  .sentence-block {
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+  }
+
+  .sentence-zh {
+    font-size: 21px !important;
+  }
+
+  .sentence-pinyin,
+  .sentence-ja {
+    font-size: 15.5px !important;
+  }
+
+  .play-stop-button {
+    width: 48px !important;
+    height: 48px !important;
+    margin-top: auto !important;
+    margin-bottom: 1px !important;
+  }
+}
+
+/* Extremely short browser viewport: keep readability, but protect the play button. */
+@media (max-height: 620px) {
+  .photo {
+    max-height: 36svh !important;
+  }
+
+  .word-zh {
+    font-size: 31px !important;
+  }
+
+  .word-pinyin,
+  .word-ja {
+    font-size: 14.5px !important;
+  }
+
+  .sentence-zh {
+    font-size: 18px !important;
+  }
+
+  .sentence-pinyin,
+  .sentence-ja {
+    font-size: 14px !important;
+  }
+}
