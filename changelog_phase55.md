@@ -1,29 +1,41 @@
-# LingoFlow Changelog
+# Changelog Phase55
 
-## Phase55 Typography Update
+## Version
+Phase55 Content + Typography Stable
 
-### Updated
-- 中国語・ピンイン・日本語の文字サイズを全体的に拡大。
-- 既存の階層バランスは維持。
-- 特にピンインと日本語の可読性を改善。
-- iPhone SE向けの最小幅フォールバックも拡大。
+## Summary
+Phase55 adds five new Taiwanese Mandarin learning cards and keeps the Phase55 typography improvements.
 
-### Not Changed
-- レイアウト構造
-- 画像サイズ
-- 再生・停止ロジック
-- 音声安全設計
-- analytics
-- data.json
-- JS modules
+## Added Cards
+1. 下雨 / 下雨了。
+2. 夜晚 / 夜很安靜。
+3. 茶館 / 我在茶館休息。
+4. 傍晚 / 現在是傍晚。
+5. 回家 / 我要回家了。
 
-### Goal
-- 「読める」から「自然に見やすい」へ改善。
-- KPI: また少し聞きたくなるか。
+## Added Images
+- images/card_011_rain.png
+- images/card_012_night.png
+- images/card_013_teahouse.png
+- images/card_014_evening.png
+- images/card_015_home.png
 
+## Kept Stable
+- Phase55 typography v2
+- data.json based card loading
+- play / stop behavior
+- audio safety on tab hidden and page hide
+- analytics events
+- existing JS module structure
 
-## Phase55 Typography v2
-- 例文の日本語がまだ小さい問題を改善。
-- 中国語・ピンイン・日本語の階層比率を維持したまま、全体スケールを追加拡大。
-- iPhone SE向けに画像高さを少し抑え、再生ボタンが画面外に出ないよう調整。
-- JS / audio / analytics / data.json は変更なし。
+## Design Direction
+LingoFlow remains:
+
+> 台湾華語が、静かに流れる場所
+
+## Verification
+- data.json is valid JSON
+- total card count: 15
+- all image paths exist
+- new images are 1448 x 1086 PNG
+- JS files unchanged from Phase55 Typography v2

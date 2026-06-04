@@ -98,5 +98,55 @@
     "sentenceZh": "我想去散步。",
     "sentencePinyin": "wǒ xiǎng qù sàn bù",
     "sentenceJa": "散歩に行きたい。"
+  },
+  {
+    "id": "card_011",
+    "image": "images/card_011_rain.png",
+    "wordZh": "下雨",
+    "wordPinyin": "xià yǔ",
+    "wordJa": "雨が降る",
+    "sentenceZh": "下雨了。",
+    "sentencePinyin": "xià yǔ le",
+    "sentenceJa": "雨が降ってきました。"
+  },
+  {
+    "id": "card_012",
+    "image": "images/card_012_night.png",
+    "wordZh": "夜晚",
+    "wordPinyin": "yè wǎn",
+    "wordJa": "夜",
+    "sentenceZh": "夜很安靜。",
+    "sentencePinyin": "yè hěn ān jìng",
+    "sentenceJa": "夜はとても静かです。"
+  },
+  {
+    "id": "card_013",
+    "image": "images/card_013_teahouse.png",
+    "wordZh": "茶館",
+    "wordPinyin": "chá guǎn",
+    "wordJa": "茶館",
+    "sentenceZh": "我在茶館休息。",
+    "sentencePinyin": "wǒ zài chá guǎn xiū xi",
+    "sentenceJa": "私は茶館で休んでいます。"
+  },
+  {
+    "id": "card_014",
+    "image": "images/card_014_evening.png",
+    "wordZh": "傍晚",
+    "wordPinyin": "bàng wǎn",
+    "wordJa": "夕方",
+    "sentenceZh": "現在是傍晚。",
+    "sentencePinyin": "xiàn zài shì bàng wǎn",
+    "sentenceJa": "今は夕方です。"
+  },
+  {
+    "id": "card_015",
+    "image": "images/card_015_home.png",
+    "wordZh": "回家",
+    "wordPinyin": "huí jiā",
+    "wordJa": "家に帰る",
+    "sentenceZh": "我要回家了。",
+    "sentencePinyin": "wǒ yào huí jiā le",
+    "sentenceJa": "私は家に帰ります。"
   }
 ]

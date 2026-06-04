@@ -1,23 +1,25 @@
-# LingoFlow
+# LingoFlow Phase55 Content + Typography Stable
 
-台湾華語が、静かに流れる場所。
+This package contains the Phase55 update.
+
+## Main Changes
+- Added 5 new cards to `data.json`.
+- Added 5 watercolor-style PNG illustrations to `images/`.
+- Kept Phase55 Typography v2.
+- Kept JS, audio, analytics, and one-button playback structure stable.
+
+## Added Cards
+- card_011: 下雨 / 下雨了。
+- card_012: 夜晚 / 夜很安靜。
+- card_013: 茶館 / 我在茶館休息。
+- card_014: 傍晚 / 現在是傍晚。
+- card_015: 回家 / 我要回家了。
+
+## Verification
+- `data.json` valid JSON
+- total cards: 15
+- all image paths exist
+- new image dimensions: 1448 x 1086
 
 ## Concept
-LingoFlow は単語帳ではなく、画像・音声・余白を通じて台湾華語に自然に触れる体験を提供する。
-
-## Current Structure
-css/
-images/
-js/
-index.html
-data.json
-README.md
-
-## Current Cards
-早安 / 早餐 / 茶 / 咖啡 / 陽光 / 捷運 / 上班 / 窗戶 / 今天 / 散步
-
-## Design Principles
-Small
-Simple
-Stable
-Elegant
+台湾華語が、静かに流れる場所
