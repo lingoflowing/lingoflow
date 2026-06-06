@@ -1,5 +1,7 @@
 const BGM_SRC = 'audio/bgm_piano.mp3';
-const BGM_VOLUME = 0.01;
+
+const BGM_BASE_VOLUME = 0.01;
+const BGM_TRANSITION_VOLUME = 0.002;
 
 const KEY = '__LINGOFLOW_BGM__';
 
@@ -8,21 +10,41 @@ if (!window[KEY]) {
     audio: null,
     initialized: false,
     userStarted: false,
-    starting: false
+    starting: false,
+    transitionUntil: 0,
+    guardTimer: null
   };
 }
 
 const bgm = window[KEY];
 
+function targetVolume() {
+  return Date.now() < bgm.transitionUntil
+    ? BGM_TRANSITION_VOLUME
+    : BGM_BASE_VOLUME;
+}
+
 function clampVolume() {
   if (!bgm.audio) return;
-  if (bgm.audio.volume !== BGM_VOLUME) {
-    bgm.audio.volume = BGM_VOLUME;
+
+  const target = targetVolume();
+
+  if (bgm.audio.volume !== target) {
+    bgm.audio.volume = target;
   }
+}
+
+function startGuard() {
+  if (bgm.guardTimer) return;
+
+  bgm.guardTimer = setInterval(() => {
+    clampVolume();
+  }, 100);
 }
 
 function removeDuplicateBgmAudio() {
   const nodes = Array.from(document.querySelectorAll('audio#bgmAudio'));
+
   nodes.forEach((node, index) => {
     if (index > 0) {
       node.pause();
@@ -49,7 +71,8 @@ export function initBgm() {
   }
 
   bgm.audio.loop = true;
-  bgm.audio.volume = BGM_VOLUME;
+  clampVolume();
+  startGuard();
 
   if (!bgm.initialized) {
     bgm.audio.addEventListener('volumechange', clampVolume);
@@ -66,6 +89,11 @@ export function initBgm() {
 
 export function markBgmUserStarted() {
   bgm.userStarted = true;
+}
+
+export function quietBgmForTransition(ms = 900) {
+  bgm.transitionUntil = Date.now() + ms;
+  clampVolume();
 }
 
 export async function startBgm() {
@@ -87,7 +115,6 @@ export async function startBgm() {
     await bgm.audio.play();
     clampVolume();
   } catch (error) {
-    // iPhone / Safari の自動再生制限時は無視
   } finally {
     bgm.starting = false;
     clampVolume();
@@ -100,5 +127,6 @@ export function stopBgm() {
   bgm.audio.pause();
   bgm.audio.currentTime = 0;
   bgm.starting = false;
+  bgm.transitionUntil = 0;
   clampVolume();
 }

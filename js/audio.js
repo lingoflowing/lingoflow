@@ -1,6 +1,11 @@
 import { state } from './state.js';
 import { clearTimer } from './timer.js';
-import { startBgm, stopBgm, markBgmUserStarted } from './bgm.js';
+import {
+  startBgm,
+  stopBgm,
+  markBgmUserStarted,
+  quietBgmForTransition
+} from './bgm.js';
 
 export function stopAllAudio(){
   if('speechSynthesis' in window){
@@ -14,6 +19,7 @@ export function startPlayback(){
   clearTimer();
 
   markBgmUserStarted();
+  quietBgmForTransition(900);
   startBgm();
 
   return state.runId;
@@ -23,12 +29,14 @@ export function stopPlayback(){
   state.isPlaying = false;
   state.runId++;
   clearTimer();
+
   stopAllAudio();
   stopBgm();
 }
 
 function zhVoice(){
   if(!('speechSynthesis' in window)) return null;
+
   const voices = speechSynthesis.getVoices();
 
   return voices.find(v => v.lang === 'zh-TW')
@@ -41,8 +49,8 @@ export function speak(text, runId){
     if(!text || !state.isPlaying || runId !== state.runId) return resolve();
     if(!('speechSynthesis' in window)) return resolve();
 
-    // 音声が消えないよう保険は残す
-    // ただし bgm.js 側で完全に単一化しているため音量は増えない
+    quietBgmForTransition(900);
+
     markBgmUserStarted();
     startBgm();
 
@@ -57,8 +65,19 @@ export function speak(text, runId){
     utterance.rate = 0.88;
     utterance.pitch = 1;
 
-    utterance.onend = () => resolve();
-    utterance.onerror = () => resolve();
+    utterance.onstart = () => {
+      quietBgmForTransition(500);
+    };
+
+    utterance.onend = () => {
+      quietBgmForTransition(900);
+      resolve();
+    };
+
+    utterance.onerror = () => {
+      quietBgmForTransition(900);
+      resolve();
+    };
 
     speechSynthesis.speak(utterance);
   });
