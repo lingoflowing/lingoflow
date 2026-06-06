@@ -1,91 +1,104 @@
 const BGM_SRC = 'audio/bgm_piano.mp3';
 const BGM_VOLUME = 0.01;
 
-let bgmAudio = null;
-let bgmUserStarted = false;
-let bgmStarting = false;
-let bgmInitialized = false;
-let volumeGuardTimer = null;
+const KEY = '__LINGOFLOW_BGM__';
 
-function clampBgmVolume() {
-  if (!bgmAudio) return;
-  if (bgmAudio.volume !== BGM_VOLUME) {
-    bgmAudio.volume = BGM_VOLUME;
+if (!window[KEY]) {
+  window[KEY] = {
+    audio: null,
+    initialized: false,
+    userStarted: false,
+    starting: false
+  };
+}
+
+const bgm = window[KEY];
+
+function clampVolume() {
+  if (!bgm.audio) return;
+  if (bgm.audio.volume !== BGM_VOLUME) {
+    bgm.audio.volume = BGM_VOLUME;
   }
 }
 
-function startVolumeGuard() {
-  if (volumeGuardTimer) return;
-  volumeGuardTimer = setInterval(clampBgmVolume, 300);
-}
-
-function stopVolumeGuard() {
-  if (!volumeGuardTimer) return;
-  clearInterval(volumeGuardTimer);
-  volumeGuardTimer = null;
+function removeDuplicateBgmAudio() {
+  const nodes = Array.from(document.querySelectorAll('audio#bgmAudio'));
+  nodes.forEach((node, index) => {
+    if (index > 0) {
+      node.pause();
+      node.remove();
+    }
+  });
 }
 
 export function initBgm() {
-  if (bgmInitialized && bgmAudio) return;
+  removeDuplicateBgmAudio();
 
-  bgmAudio = document.getElementById('bgmAudio');
+  if (!bgm.audio) {
+    bgm.audio = document.getElementById('bgmAudio');
 
-  if (!bgmAudio) {
-    bgmAudio = document.createElement('audio');
-    bgmAudio.id = 'bgmAudio';
-    bgmAudio.src = BGM_SRC;
-    bgmAudio.preload = 'auto';
-    bgmAudio.loop = true;
-    bgmAudio.setAttribute('playsinline', '');
-    document.body.appendChild(bgmAudio);
+    if (!bgm.audio) {
+      bgm.audio = document.createElement('audio');
+      bgm.audio.id = 'bgmAudio';
+      bgm.audio.src = BGM_SRC;
+      bgm.audio.preload = 'auto';
+      bgm.audio.loop = true;
+      bgm.audio.setAttribute('playsinline', '');
+      document.body.appendChild(bgm.audio);
+    }
   }
 
-  bgmAudio.loop = true;
-  bgmAudio.volume = BGM_VOLUME;
+  bgm.audio.loop = true;
+  bgm.audio.volume = BGM_VOLUME;
 
-  bgmAudio.addEventListener('volumechange', clampBgmVolume);
+  if (!bgm.initialized) {
+    bgm.audio.addEventListener('volumechange', clampVolume);
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopBgm();
-  });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopBgm();
+      }
+    });
 
-  bgmInitialized = true;
+    bgm.initialized = true;
+  }
 }
 
 export function markBgmUserStarted() {
-  bgmUserStarted = true;
+  bgm.userStarted = true;
 }
 
 export async function startBgm() {
-  if (!bgmAudio) initBgm();
-  if (!bgmAudio) return;
-  if (!bgmUserStarted) return;
+  initBgm();
 
-  clampBgmVolume();
-  startVolumeGuard();
+  if (!bgm.audio) return;
+  if (!bgm.userStarted) return;
 
-  if (!bgmAudio.paused) return;
-  if (bgmStarting) return;
+  removeDuplicateBgmAudio();
+  clampVolume();
 
-  bgmStarting = true;
+  if (!bgm.audio.paused) return;
+  if (bgm.starting) return;
+
+  bgm.starting = true;
 
   try {
-    clampBgmVolume();
-    await bgmAudio.play();
-    clampBgmVolume();
+    clampVolume();
+    await bgm.audio.play();
+    clampVolume();
   } catch (error) {
+    // iPhone / Safari の自動再生制限時は無視
   } finally {
-    bgmStarting = false;
-    clampBgmVolume();
+    bgm.starting = false;
+    clampVolume();
   }
 }
 
 export function stopBgm() {
-  if (!bgmAudio) return;
+  if (!bgm.audio) return;
 
-  bgmAudio.pause();
-  bgmAudio.currentTime = 0;
-  bgmStarting = false;
-  clampBgmVolume();
-  stopVolumeGuard();
+  bgm.audio.pause();
+  bgm.audio.currentTime = 0;
+  bgm.starting = false;
+  clampVolume();
 }

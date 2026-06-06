@@ -41,8 +41,8 @@ export function speak(text, runId){
     if(!text || !state.isPlaying || runId !== state.runId) return resolve();
     if(!('speechSynthesis' in window)) return resolve();
 
-    // BGM開始は保険として残す。
-    // ただし bgm.js 側で多重再生と音量上昇を完全に抑える。
+    // 音声が消えないよう保険は残す
+    // ただし bgm.js 側で完全に単一化しているため音量は増えない
     markBgmUserStarted();
     startBgm();
 
