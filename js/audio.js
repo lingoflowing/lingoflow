@@ -13,8 +13,6 @@ export function startPlayback(){
   state.runId++;
   clearTimer();
 
-  // BGM開始はここだけに集約
-  // 画像切り替え・speak()ごとには呼ばない
   markBgmUserStarted();
   startBgm();
 
@@ -26,13 +24,13 @@ export function stopPlayback(){
   state.runId++;
   clearTimer();
   stopAllAudio();
-
   stopBgm();
 }
 
 function zhVoice(){
   if(!('speechSynthesis' in window)) return null;
   const voices = speechSynthesis.getVoices();
+
   return voices.find(v => v.lang === 'zh-TW')
       || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'))
       || null;
@@ -43,10 +41,10 @@ export function speak(text, runId){
     if(!text || !state.isPlaying || runId !== state.runId) return resolve();
     if(!('speechSynthesis' in window)) return resolve();
 
-    // 重要：
-    // ここで startBgm() を呼ばない。
-    // speak() はカード・文ごとに何度も呼ばれるため、
-    // BGM多重呼び出しの原因になる。
+    // 音声が消えないように fallback は残す
+    // ただし bgm.js 側で多重起動を防止する
+    markBgmUserStarted();
+    startBgm();
 
     speechSynthesis.cancel();
 
@@ -58,6 +56,7 @@ export function speak(text, runId){
 
     utterance.rate = 0.88;
     utterance.pitch = 1;
+
     utterance.onend = () => resolve();
     utterance.onerror = () => resolve();
 

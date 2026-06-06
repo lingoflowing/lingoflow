@@ -1,7 +1,6 @@
 // LingoFlow BGM
-// BGMは1つだけ生成
-// 音量は常に1%固定
-// 画像切り替え時の多重再生を防止
+// 音量1%固定
+// BGM多重起動防止
 
 const BGM_SRC = 'audio/bgm_piano.mp3';
 const BGM_VOLUME = 0.01;
@@ -64,12 +63,10 @@ export async function startBgm() {
   try {
     await bgmAudio.play();
   } catch (error) {
-    // iPhone/Safariの自動再生ブロック時は何もしない
+    // Safari / iPhone 自動再生ブロック対策
   } finally {
     bgmStarting = false;
-    if (bgmAudio) {
-      bgmAudio.volume = BGM_VOLUME;
-    }
+    if (bgmAudio) bgmAudio.volume = BGM_VOLUME;
   }
 }
 
