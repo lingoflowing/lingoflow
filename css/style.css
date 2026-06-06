@@ -1094,3 +1094,150 @@ body{
     max-height: calc(100svh - 230px - env(safe-area-inset-bottom)) !important;
   }
 }
+
+/* ===== Phase69 UNIFIED MAX IMAGE / BUTTON RESERVED =====
+   Goal:
+   - Stop using fixed svh image-height caps for PC and iPhone portrait.
+   - Reserve text area + play button + safe area.
+   - Use the remaining viewport height for the image.
+   - Keep iPhone landscape protected so sentence and play button do not disappear.
+   - Do not change text sizes.
+*/
+
+/* Shared full-screen layout for PC and iPhone portrait */
+@media (min-width: 701px), (orientation: portrait) {
+  .app {
+    height: 100svh !important;
+    min-height: 100svh !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+
+  .card {
+    height: calc(100svh - var(--lf-app-y-padding, 16px) - env(safe-area-inset-bottom)) !important;
+    max-height: calc(100svh - var(--lf-app-y-padding, 16px) - env(safe-area-inset-bottom)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    overflow: visible !important;
+  }
+
+  .photo-wrap {
+    flex: 0 1 auto !important;
+  }
+
+  .text-area {
+    flex: 0 0 auto !important;
+  }
+
+  .play-stop-button {
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+  }
+}
+
+/* PC: reserve text + play button, use the rest for image */
+@media (orientation: landscape) and (min-width: 901px) and (min-height: 701px) {
+  .app {
+    --lf-app-y-padding: 16px;
+    padding-top: 8px !important;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .card {
+    width: min(96vw, 1360px) !important;
+  }
+
+  .photo {
+    aspect-ratio: 4 / 3 !important;
+    max-height: calc(100svh - 225px - env(safe-area-inset-bottom)) !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .play-stop-button {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* PC shorter height: protect text + button */
+@media (orientation: landscape) and (min-width: 701px) and (max-height: 760px) {
+  .photo {
+    aspect-ratio: 4 / 3 !important;
+    max-height: calc(100svh - 220px - env(safe-area-inset-bottom)) !important;
+    object-fit: cover !important;
+  }
+}
+
+/* iPhone portrait: reserve text + play button, use the rest for image */
+@media (orientation: portrait) and (max-width: 700px) {
+  .app {
+    --lf-app-y-padding: 16px;
+    padding: 8px !important;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .card {
+    width: min(96vw, 430px) !important;
+  }
+
+  .photo {
+    aspect-ratio: 1 / 1 !important;
+    max-height: calc(100svh - 255px - env(safe-area-inset-bottom)) !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .play-stop-button {
+    margin-top: auto !important;
+    margin-bottom: 2px !important;
+  }
+}
+
+/* iPhone SE / short portrait: reserve a little more for text + button */
+@media (orientation: portrait) and (max-width: 430px) and (max-height: 700px) {
+  .photo {
+    aspect-ratio: 1 / 1 !important;
+    max-height: calc(100svh - 245px - env(safe-area-inset-bottom)) !important;
+    object-fit: cover !important;
+  }
+
+  .play-stop-button {
+    margin-top: auto !important;
+    margin-bottom: 1px !important;
+  }
+}
+
+/* iPhone landscape: keep Phase67/68 safety.
+   Do not maximize image here because sentence and play button can disappear. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app {
+    height: 100svh !important;
+    min-height: 100svh !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding-top: 6px !important;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .card {
+    width: min(94vw, 720px) !important;
+    height: auto !important;
+    min-height: calc(100svh - 12px - env(safe-area-inset-bottom)) !important;
+    max-height: none !important;
+    justify-content: flex-start !important;
+  }
+
+  .photo {
+    aspect-ratio: 16 / 9 !important;
+    max-height: calc(100svh - 210px - env(safe-area-inset-bottom)) !important;
+    object-fit: cover !important;
+  }
+
+  .play-stop-button {
+    margin: 6px auto 0 !important;
+  }
+}
