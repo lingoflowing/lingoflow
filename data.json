@@ -7,7 +7,20 @@
     "wordJa": "おはよう",
     "sentenceZh": "今天也早安。",
     "sentencePinyin": "jīn tiān yě zǎo ān",
-    "sentenceJa": "今日もおはよう。"
+    "sentenceJa": "今日もおはよう。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "daily_morning",
+      "priority": "normal",
+      "story": "quiet Taiwanese morning greeting",
+      "composition": "Object Storytelling",
+      "camera": "soft morning detail shot",
+      "time": "early morning",
+      "weather": "natural morning light",
+      "emotion": "gentle start",
+      "subject": "simple morning light on a Taiwanese home surface"
+    }
   },
   {
     "id": "card_002",
@@ -17,7 +30,20 @@
     "wordJa": "朝ごはん",
     "sentenceZh": "我想吃早餐。",
     "sentencePinyin": "wǒ xiǎng chī zǎo cān",
-    "sentenceJa": "朝ごはんを食べたい。"
+    "sentenceJa": "朝ごはんを食べたい。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "food",
+      "priority": "normal",
+      "story": "Taiwanese breakfast before the day begins",
+      "composition": "Object Storytelling",
+      "camera": "close medium breakfast table detail",
+      "time": "morning",
+      "weather": "warm indoor natural light",
+      "emotion": "morning appetite",
+      "subject": "breakfast items on a simple counter, no text"
+    }
   },
   {
     "id": "card_003",
@@ -27,7 +53,20 @@
     "wordJa": "お茶",
     "sentenceZh": "我想喝一杯茶。",
     "sentencePinyin": "wǒ xiǎng hē yì bēi chá",
-    "sentenceJa": "お茶を一杯飲みたい。"
+    "sentenceJa": "お茶を一杯飲みたい。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "drink",
+      "priority": "normal",
+      "story": "quiet cup of tea in Taiwanese daily life",
+      "composition": "Object Storytelling",
+      "camera": "close detail shot",
+      "time": "late morning",
+      "weather": "soft natural light",
+      "emotion": "calm",
+      "subject": "single tea cup, tea steam, warm stone surface, no tea-house interior repetition"
+    }
   },
   {
     "id": "card_004",
@@ -37,7 +76,20 @@
     "wordJa": "コーヒー",
     "sentenceZh": "今天想喝咖啡。",
     "sentencePinyin": "jīn tiān xiǎng hē kā fēi",
-    "sentenceJa": "今日はコーヒーが飲みたい。"
+    "sentenceJa": "今日はコーヒーが飲みたい。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "drink",
+      "priority": "normal",
+      "story": "coffee break in Taiwanese daily life",
+      "composition": "Object Storytelling",
+      "camera": "close medium object shot",
+      "time": "morning",
+      "weather": "soft side light",
+      "emotion": "quiet focus",
+      "subject": "coffee cup on minimal counter, warm concrete texture, no cafe logo"
+    }
   },
   {
     "id": "card_005",
@@ -47,7 +99,20 @@
     "wordJa": "日差し",
     "sentenceZh": "今天的陽光很好。",
     "sentencePinyin": "jīn tiān de yáng guāng hěn hǎo",
-    "sentenceJa": "今日の日差しは心地よい。"
+    "sentenceJa": "今日の日差しは心地よい。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "weather",
+      "priority": "normal",
+      "story": "comfortable sunlight in Taiwan",
+      "composition": "Wide Environmental Scene",
+      "camera": "wide light-filled view",
+      "time": "late morning",
+      "weather": "clear sunlight",
+      "emotion": "brightness",
+      "subject": "sunlight across warm concrete and quiet street textures"
+    }
   },
   {
     "id": "card_006",
@@ -57,7 +122,20 @@
     "wordJa": "MRT",
     "sentenceZh": "我每天坐捷運上班。",
     "sentencePinyin": "wǒ měi tiān zuò jié yùn shàng bān",
-    "sentenceJa": "毎日MRTで通勤します。"
+    "sentenceJa": "毎日MRTで通勤します。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "transportation",
+      "priority": "normal",
+      "story": "quiet MRT commute without people",
+      "composition": "Transportation",
+      "camera": "wide station corridor perspective",
+      "time": "morning commute",
+      "weather": "indoor transit lighting",
+      "emotion": "daily rhythm",
+      "subject": "MRT entrance or platform architecture without readable signs"
+    }
   },
   {
     "id": "card_007",
@@ -67,7 +145,20 @@
     "wordJa": "出勤する",
     "sentenceZh": "我要去上班了。",
     "sentencePinyin": "wǒ yào qù shàng bān le",
-    "sentenceJa": "仕事に行きます。"
+    "sentenceJa": "仕事に行きます。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "work",
+      "priority": "normal",
+      "story": "heading to work in Taiwan",
+      "composition": "Street Documentary",
+      "camera": "street-level diagonal view",
+      "time": "morning",
+      "weather": "humid morning air",
+      "emotion": "movement",
+      "subject": "quiet office district street details without people"
+    }
   },
   {
     "id": "card_008",
@@ -77,7 +168,20 @@
     "wordJa": "窓",
     "sentenceZh": "窗戶開著。",
     "sentencePinyin": "chuāng hù kāi zhe",
-    "sentenceJa": "窓が開いています。"
+    "sentenceJa": "窓が開いています。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "home",
+      "priority": "normal",
+      "story": "open window in a Taiwanese home",
+      "composition": "Architectural Detail",
+      "camera": "interior architectural detail",
+      "time": "afternoon",
+      "weather": "soft breeze",
+      "emotion": "airiness",
+      "subject": "open window and wall texture, avoid centered composition"
+    }
   },
   {
     "id": "card_009",
@@ -87,7 +191,20 @@
     "wordJa": "今日",
     "sentenceZh": "今天想安靜一下。",
     "sentencePinyin": "jīn tiān xiǎng ān jìng yí xià",
-    "sentenceJa": "今日は少し静かにしたい。"
+    "sentenceJa": "今日は少し静かにしたい。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "daily_mood",
+      "priority": "normal",
+      "story": "a quiet day in Taiwan",
+      "composition": "Wide Environmental Scene",
+      "camera": "wide negative-space composition",
+      "time": "afternoon",
+      "weather": "soft overcast",
+      "emotion": "quiet reflection",
+      "subject": "calm Taiwanese neighborhood scene"
+    }
   },
   {
     "id": "card_010",
@@ -97,7 +214,20 @@
     "wordJa": "散歩",
     "sentenceZh": "我想去散步。",
     "sentencePinyin": "wǒ xiǎng qù sàn bù",
-    "sentenceJa": "散歩に行きたい。"
+    "sentenceJa": "散歩に行きたい。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "movement",
+      "priority": "normal",
+      "story": "going for a walk in Taiwan",
+      "composition": "Street Documentary",
+      "camera": "walking eye-level perspective",
+      "time": "late afternoon",
+      "weather": "pleasant light",
+      "emotion": "lightness",
+      "subject": "empty walking path in residential Taiwan"
+    }
   },
   {
     "id": "card_011",
@@ -107,7 +237,20 @@
     "wordJa": "雨が降る",
     "sentenceZh": "下雨了。",
     "sentencePinyin": "xià yǔ le",
-    "sentenceJa": "雨が降ってきました。"
+    "sentenceJa": "雨が降ってきました。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "weather",
+      "priority": "normal",
+      "story": "rain falling in a Taiwanese alley",
+      "composition": "Street Documentary",
+      "camera": "street-level rain view",
+      "time": "rainy afternoon",
+      "weather": "rain",
+      "emotion": "rain shelter",
+      "subject": "wet pavement, awning, no people or text"
+    }
   },
   {
     "id": "card_012",
@@ -117,7 +260,20 @@
     "wordJa": "夜",
     "sentenceZh": "夜很安靜。",
     "sentencePinyin": "yè hěn ān jìng",
-    "sentenceJa": "夜はとても静かです。"
+    "sentenceJa": "夜はとても静かです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "night",
+      "priority": "normal",
+      "story": "quiet Taiwanese night",
+      "composition": "Wide Environmental Scene",
+      "camera": "wide night negative-space shot",
+      "time": "night",
+      "weather": "calm night",
+      "emotion": "stillness",
+      "subject": "empty residential street and soft lights"
+    }
   },
   {
     "id": "card_013",
@@ -127,7 +283,20 @@
     "wordJa": "茶館",
     "sentenceZh": "我在茶館休息。",
     "sentencePinyin": "wǒ zài chá guǎn xiū xi",
-    "sentenceJa": "私は茶館で休んでいます。"
+    "sentenceJa": "私は茶館で休んでいます。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "tea_culture",
+      "priority": "normal",
+      "story": "resting in a Taiwanese tea house atmosphere",
+      "composition": "Architectural Detail",
+      "camera": "medium interior architectural detail",
+      "time": "afternoon",
+      "weather": "soft indoor light",
+      "emotion": "rest",
+      "subject": "tea house textures without readable text or repeated table focus"
+    }
   },
   {
     "id": "card_014",
@@ -137,7 +306,20 @@
     "wordJa": "夕方",
     "sentenceZh": "現在是傍晚。",
     "sentencePinyin": "xiàn zài shì bàng wǎn",
-    "sentenceJa": "今は夕方です。"
+    "sentenceJa": "今は夕方です。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "time",
+      "priority": "normal",
+      "story": "Taiwan at evening",
+      "composition": "Elevated View",
+      "camera": "elevated dusk view",
+      "time": "evening",
+      "weather": "soft evening glow",
+      "emotion": "transition",
+      "subject": "quiet rooftops and warm dusk light"
+    }
   },
   {
     "id": "card_015",
@@ -147,6 +329,364 @@
     "wordJa": "家に帰る",
     "sentenceZh": "我要回家了。",
     "sentencePinyin": "wǒ yào huí jiā le",
-    "sentenceJa": "私は家に帰ります。"
+    "sentenceJa": "私は家に帰ります。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "home",
+      "priority": "normal",
+      "story": "returning home in Taiwan",
+      "composition": "Transportation",
+      "camera": "street-level homeward route view",
+      "time": "dusk",
+      "weather": "soft evening air",
+      "emotion": "coming home",
+      "subject": "empty lane, scooter parking, apartment lights"
+    }
+  },
+  {
+    "id": "card_016",
+    "image": "images/card_016_park.png",
+    "wordZh": "公園",
+    "wordPinyin": "gōng yuán",
+    "wordJa": "公園",
+    "sentenceZh": "我在公園散步。",
+    "sentencePinyin": "wǒ zài gōng yuán sàn bù",
+    "sentenceJa": "公園を散歩しています。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "park",
+      "priority": "high",
+      "story": "quiet Taiwanese park",
+      "composition": "Wide Environmental Scene",
+      "camera": "street level wide shot",
+      "time": "morning",
+      "weather": "soft morning light",
+      "emotion": "calm",
+      "subject": "empty park path with Taiwanese residential surroundings"
+    }
+  },
+  {
+    "id": "card_017",
+    "image": "images/card_017_riverwalk.png",
+    "wordZh": "河邊",
+    "wordPinyin": "hé biān",
+    "wordJa": "川辺",
+    "sentenceZh": "河邊的風很舒服。",
+    "sentencePinyin": "hé biān de fēng hěn shū fu",
+    "sentenceJa": "川辺の風が気持ちいいです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "waterfront",
+      "priority": "high",
+      "story": "breeze along a Taiwanese riverside walk",
+      "composition": "Waterfront",
+      "camera": "low street-level view along the river path",
+      "time": "late afternoon",
+      "weather": "light breeze",
+      "emotion": "comfort",
+      "subject": "quiet riverwalk, railing, soft moving air"
+    }
+  },
+  {
+    "id": "card_018",
+    "image": "images/card_018_bookstore.png",
+    "wordZh": "書店",
+    "wordPinyin": "shū diàn",
+    "wordJa": "本屋",
+    "sentenceZh": "我喜歡逛書店。",
+    "sentencePinyin": "wǒ xǐ huān guàng shū diàn",
+    "sentenceJa": "本屋を見て回るのが好きです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "bookstore",
+      "priority": "high",
+      "story": "quiet independent bookstore in Taiwan",
+      "composition": "Architectural Detail",
+      "camera": "medium architectural detail shot",
+      "time": "overcast afternoon",
+      "weather": "humid overcast light",
+      "emotion": "quiet curiosity",
+      "subject": "old bookstore facade and shelves without readable text"
+    }
+  },
+  {
+    "id": "card_019",
+    "image": "images/card_019_weekend.png",
+    "wordZh": "週末",
+    "wordPinyin": "zhōu mò",
+    "wordJa": "週末",
+    "sentenceZh": "今天是週末。",
+    "sentencePinyin": "jīn tiān shì zhōu mò",
+    "sentenceJa": "今日は週末です。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "weekend",
+      "priority": "high",
+      "story": "quiet Taiwanese residential street on the weekend",
+      "composition": "Street Documentary",
+      "camera": "eye-level street corner view",
+      "time": "weekend morning",
+      "weather": "warm soft sunlight",
+      "emotion": "leisure",
+      "subject": "empty residential lane, shutters, scooters without logos"
+    }
+  },
+  {
+    "id": "card_020",
+    "image": "images/card_020_breakfastshop.png",
+    "wordZh": "早餐店",
+    "wordPinyin": "zǎo cān diàn",
+    "wordJa": "朝食店",
+    "sentenceZh": "早餐店剛開門。",
+    "sentencePinyin": "zǎo cān diàn gāng kāi mén",
+    "sentenceJa": "朝食店が開店したところです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "food",
+      "priority": "high",
+      "story": "Taiwanese breakfast shop just opened",
+      "composition": "Object Storytelling",
+      "camera": "close medium shot from outside the counter",
+      "time": "sunrise",
+      "weather": "warm early morning light",
+      "emotion": "morning warmth",
+      "subject": "breakfast shop counter, steam, metal trays, no text signage"
+    }
+  },
+  {
+    "id": "card_021",
+    "image": "images/card_021_seaside.png",
+    "wordZh": "海邊",
+    "wordPinyin": "hǎi biān",
+    "wordJa": "海辺",
+    "sentenceZh": "我喜歡海邊。",
+    "sentencePinyin": "wǒ xǐ huān hǎi biān",
+    "sentenceJa": "海辺が好きです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "waterfront",
+      "priority": "high",
+      "story": "empty Taiwanese coastal road beside the sea",
+      "composition": "Waterfront",
+      "camera": "wide coastal road view",
+      "time": "golden hour",
+      "weather": "sea breeze",
+      "emotion": "openness",
+      "subject": "quiet coastline, road edge, ocean horizon"
+    }
+  },
+  {
+    "id": "card_022",
+    "image": "images/card_022_breeze.png",
+    "wordZh": "微風",
+    "wordPinyin": "wēi fēng",
+    "wordJa": "そよ風",
+    "sentenceZh": "今天有微風。",
+    "sentencePinyin": "jīn tiān yǒu wēi fēng",
+    "sentenceJa": "今日はそよ風があります。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "weather",
+      "priority": "high",
+      "story": "soft breeze passing through a Taiwanese street corner",
+      "composition": "Street Documentary",
+      "camera": "medium street-level view under an awning",
+      "time": "spring afternoon",
+      "weather": "gentle breeze",
+      "emotion": "freshness",
+      "subject": "light fabric shade and quiet street details suggesting wind"
+    }
+  },
+  {
+    "id": "card_023",
+    "image": "images/card_023_alley.png",
+    "wordZh": "巷子",
+    "wordPinyin": "xiàng zi",
+    "wordJa": "路地",
+    "sentenceZh": "我喜歡這條巷子。",
+    "sentencePinyin": "wǒ xǐ huān zhè tiáo xiàng zi",
+    "sentenceJa": "この路地が好きです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "alley",
+      "priority": "high",
+      "story": "quiet Taiwanese alley after rain",
+      "composition": "Architectural Detail",
+      "camera": "narrow alley perspective from entrance",
+      "time": "rainy afternoon",
+      "weather": "after rain",
+      "emotion": "nostalgia",
+      "subject": "wet alley pavement, old concrete walls, subtle residential details"
+    }
+  },
+  {
+    "id": "card_024",
+    "image": "images/card_024_market.png",
+    "wordZh": "市場",
+    "wordPinyin": "shì chǎng",
+    "wordJa": "市場",
+    "sentenceZh": "市場快要休息了。",
+    "sentencePinyin": "shì chǎng kuài yào xiū xi le",
+    "sentenceJa": "市場はもうすぐ店じまいです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "market",
+      "priority": "high",
+      "story": "Taiwanese traditional market near closing time",
+      "composition": "Public Life",
+      "camera": "wide interior market aisle without people",
+      "time": "dusk",
+      "weather": "soft indoor ambient light",
+      "emotion": "closing time calm",
+      "subject": "market stalls closing, crates, tarps, no readable signs"
+    }
+  },
+  {
+    "id": "card_025",
+    "image": "images/card_025_bridge.png",
+    "wordZh": "橋",
+    "wordPinyin": "qiáo",
+    "wordJa": "橋",
+    "sentenceZh": "我走過那座橋。",
+    "sentencePinyin": "wǒ zǒu guò nà zuò qiáo",
+    "sentenceJa": "あの橋を渡りました。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "bridge",
+      "priority": "high",
+      "story": "bridge shadow over a Taiwanese river at sunset",
+      "composition": "Elevated View",
+      "camera": "elevated diagonal view",
+      "time": "sunset",
+      "weather": "clear warm light",
+      "emotion": "passing through",
+      "subject": "bridge, river surface, long evening shadows"
+    }
+  },
+  {
+    "id": "card_026",
+    "image": "images/card_026_mountain.png",
+    "wordZh": "山",
+    "wordPinyin": "shān",
+    "wordJa": "山",
+    "sentenceZh": "遠方有一座山。",
+    "sentencePinyin": "yuǎn fāng yǒu yí zuò shān",
+    "sentenceJa": "遠くに山があります。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "mountain",
+      "priority": "high",
+      "story": "Taiwanese city with a distant mountain",
+      "composition": "Wide Environmental Scene",
+      "camera": "wide elevated city edge view",
+      "time": "foggy morning",
+      "weather": "mist",
+      "emotion": "distance",
+      "subject": "distant mountain behind low-rise Taiwanese buildings"
+    }
+  },
+  {
+    "id": "card_027",
+    "image": "images/card_027_harbor.png",
+    "wordZh": "港口",
+    "wordPinyin": "gǎng kǒu",
+    "wordJa": "港",
+    "sentenceZh": "港口很安靜。",
+    "sentencePinyin": "gǎng kǒu hěn ān jìng",
+    "sentenceJa": "港はとても静かです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "harbor",
+      "priority": "high",
+      "story": "quiet Taiwanese fishing harbor",
+      "composition": "Waterfront",
+      "camera": "medium detail shot near moored fishing boats",
+      "time": "blue hour",
+      "weather": "humid evening air",
+      "emotion": "stillness",
+      "subject": "fishing boats, ropes, calm harbor water, no readable boat text"
+    }
+  },
+  {
+    "id": "card_028",
+    "image": "images/card_028_dusk.png",
+    "wordZh": "黃昏",
+    "wordPinyin": "huáng hūn",
+    "wordJa": "黄昏",
+    "sentenceZh": "黃昏的天空很漂亮。",
+    "sentencePinyin": "huáng hūn de tiān kōng hěn piào liang",
+    "sentenceJa": "黄昏の空がきれいです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "time",
+      "priority": "high",
+      "story": "dusk sky above a Taiwanese neighborhood",
+      "composition": "Elevated View",
+      "camera": "rooftop wide shot with large negative sky space",
+      "time": "dusk",
+      "weather": "soft evening glow",
+      "emotion": "soft beauty",
+      "subject": "quiet rooftops and broad dusk sky"
+    }
+  },
+  {
+    "id": "card_029",
+    "image": "images/card_029_relax.png",
+    "wordZh": "放鬆",
+    "wordPinyin": "fàng sōng",
+    "wordJa": "リラックス",
+    "sentenceZh": "今天想放鬆一下。",
+    "sentencePinyin": "jīn tiān xiǎng fàng sōng yí xià",
+    "sentenceJa": "今日は少しゆっくりしたいです。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "rest",
+      "priority": "high",
+      "story": "quiet afternoon rest in Taiwanese daily life",
+      "composition": "Object Storytelling",
+      "camera": "close detail shot on a simple resting surface",
+      "time": "quiet afternoon",
+      "weather": "soft indoor natural light",
+      "emotion": "relaxation",
+      "subject": "linen cloth, book corner, soft afternoon light, warm concrete texture, no cup"
+    }
+  },
+  {
+    "id": "card_030",
+    "image": "images/card_030_goodnight.png",
+    "wordZh": "晚安",
+    "wordPinyin": "wǎn ān",
+    "wordJa": "おやすみ",
+    "sentenceZh": "今天也晚安。",
+    "sentencePinyin": "jīn tiān yě wǎn ān",
+    "sentenceJa": "今日もおやすみ。",
+    "imageMeta": {
+      "styleVersion": "phase61",
+      "imageStatus": "pending",
+      "category": "night",
+      "priority": "high",
+      "story": "quiet Taiwanese residential street at night",
+      "composition": "Street Documentary",
+      "camera": "wide night street view from across the road",
+      "time": "late night",
+      "weather": "calm night air",
+      "emotion": "good night",
+      "subject": "warm apartment lights, empty street, no signage text"
+    }
   }
 ]
