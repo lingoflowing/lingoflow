@@ -1,7 +1,7 @@
 const BGM_SRC = 'audio/bgm_piano.mp3';
 
-const BGM_BASE_VOLUME = 0.01;
-const BGM_IMAGE_SWITCH_VOLUME = 0.001;
+const BGM_BASE_VOLUME = 0.003;
+const BGM_MUTED_VOLUME = 0;
 
 const KEY = '__LINGOFLOW_BGM__';
 
@@ -11,7 +11,7 @@ if (!window[KEY]) {
     initialized: false,
     userStarted: false,
     starting: false,
-    quietUntil: 0,
+    mutedUntil: 0,
     guardTimer: null,
     imageObserverStarted: false
   };
@@ -20,35 +20,31 @@ if (!window[KEY]) {
 const bgm = window[KEY];
 
 function targetVolume() {
-  return Date.now() < bgm.quietUntil
-    ? BGM_IMAGE_SWITCH_VOLUME
+  return Date.now() < bgm.mutedUntil
+    ? BGM_MUTED_VOLUME
     : BGM_BASE_VOLUME;
 }
 
-function clampVolume() {
+function applyVolume() {
   if (!bgm.audio) return;
-  const volume = targetVolume();
-
-  if (bgm.audio.volume !== volume) {
-    bgm.audio.volume = volume;
-  }
+  bgm.audio.volume = targetVolume();
 }
 
-function quietBgm(ms = 1600) {
-  bgm.quietUntil = Math.max(bgm.quietUntil, Date.now() + ms);
-  clampVolume();
+function muteBgmTemporarily(ms = 2200) {
+  bgm.mutedUntil = Math.max(bgm.mutedUntil, Date.now() + ms);
+  applyVolume();
 }
 
-export function quietBgmForTransition(ms = 1600) {
-  quietBgm(ms);
+export function quietBgmForTransition(ms = 2200) {
+  muteBgmTemporarily(ms);
 }
 
 function startGuard() {
   if (bgm.guardTimer) return;
 
   bgm.guardTimer = setInterval(() => {
-    clampVolume();
-  }, 50);
+    applyVolume();
+  }, 30);
 }
 
 function removeDuplicateBgmAudio() {
@@ -68,18 +64,19 @@ function watchImageSwitch() {
   const photo = document.getElementById('photo');
   if (!photo) return;
 
-  const observer = new MutationObserver(() => {
-    quietBgm(1800);
-  });
+  const mute = () => {
+    muteBgmTemporarily(2400);
+  };
+
+  const observer = new MutationObserver(mute);
 
   observer.observe(photo, {
     attributes: true,
     attributeFilter: ['src']
   });
 
-  photo.addEventListener('load', () => {
-    quietBgm(1800);
-  });
+  photo.addEventListener('load', mute);
+  photo.addEventListener('loadstart', mute);
 
   bgm.imageObserverStarted = true;
 }
@@ -102,12 +99,12 @@ export function initBgm() {
   }
 
   bgm.audio.loop = true;
-  clampVolume();
+  applyVolume();
   startGuard();
   watchImageSwitch();
 
   if (!bgm.initialized) {
-    bgm.audio.addEventListener('volumechange', clampVolume);
+    bgm.audio.addEventListener('volumechange', applyVolume);
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
@@ -130,7 +127,7 @@ export async function startBgm() {
   if (!bgm.userStarted) return;
 
   removeDuplicateBgmAudio();
-  clampVolume();
+  applyVolume();
 
   if (!bgm.audio.paused) return;
   if (bgm.starting) return;
@@ -142,7 +139,7 @@ export async function startBgm() {
   } catch (error) {
   } finally {
     bgm.starting = false;
-    clampVolume();
+    applyVolume();
   }
 }
 
@@ -152,6 +149,6 @@ export function stopBgm() {
   bgm.audio.pause();
   bgm.audio.currentTime = 0;
   bgm.starting = false;
-  bgm.quietUntil = 0;
-  clampVolume();
+  bgm.mutedUntil = 0;
+  applyVolume();
 }
