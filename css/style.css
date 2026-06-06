@@ -1034,3 +1034,63 @@ body{
     height: 28px !important;
   }
 }
+
+
+/* ===== Phase68 PC MAX IMAGE / BUTTON RESERVED =====
+   Goal:
+   - PC Firefox: reserve the play-button area and use the remaining height for the image.
+   - Keep iPhone portrait and iPhone landscape behavior from Phase67.
+   - Do not change text sizes.
+*/
+
+/* PC / large landscape only */
+@media (orientation: landscape) and (min-width: 901px) and (min-height: 701px) {
+  .app {
+    height: 100svh !important;
+    min-height: 100svh !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    padding-top: 8px !important;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .card {
+    width: min(96vw, 1280px) !important;
+    height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+    max-height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    overflow: visible !important;
+  }
+
+  .photo-wrap {
+    flex: 0 1 auto !important;
+  }
+
+  .photo {
+    aspect-ratio: 4 / 3 !important;
+    /* 画像以外に、文字エリア＋再生ボタン＋安全余白ぶんを残す */
+    max-height: calc(100svh - 245px - env(safe-area-inset-bottom)) !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .text-area {
+    flex: 0 0 auto !important;
+  }
+
+  .play-stop-button {
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+/* PC but shorter browser height: protect text and button */
+@media (orientation: landscape) and (min-width: 901px) and (max-height: 760px) {
+  .photo {
+    max-height: calc(100svh - 230px - env(safe-area-inset-bottom)) !important;
+  }
+}
