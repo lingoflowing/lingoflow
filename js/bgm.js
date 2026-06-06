@@ -2,7 +2,7 @@ const BGM_SRC = 'audio/bgm_piano.mp3';
 
 // 恒久対策：1%に戻さない
 // iPhone/Safariの音声ダッキング解除時でも前に出ない音量
-const BGM_VOLUME = 0.003;
+const BGM_VOLUME = 0.001;
 
 const KEY = '__LINGOFLOW_BGM__';
 
