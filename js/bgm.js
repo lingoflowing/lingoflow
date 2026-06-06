@@ -1,7 +1,3 @@
-// LingoFlow BGM
-// 音量1%固定
-// BGM多重起動防止
-
 const BGM_SRC = 'audio/bgm_piano.mp3';
 const BGM_VOLUME = 0.01;
 
@@ -9,6 +5,25 @@ let bgmAudio = null;
 let bgmUserStarted = false;
 let bgmStarting = false;
 let bgmInitialized = false;
+let volumeGuardTimer = null;
+
+function clampBgmVolume() {
+  if (!bgmAudio) return;
+  if (bgmAudio.volume !== BGM_VOLUME) {
+    bgmAudio.volume = BGM_VOLUME;
+  }
+}
+
+function startVolumeGuard() {
+  if (volumeGuardTimer) return;
+  volumeGuardTimer = setInterval(clampBgmVolume, 300);
+}
+
+function stopVolumeGuard() {
+  if (!volumeGuardTimer) return;
+  clearInterval(volumeGuardTimer);
+  volumeGuardTimer = null;
+}
 
 export function initBgm() {
   if (bgmInitialized && bgmAudio) return;
@@ -25,19 +40,13 @@ export function initBgm() {
     document.body.appendChild(bgmAudio);
   }
 
-  bgmAudio.volume = BGM_VOLUME;
   bgmAudio.loop = true;
+  bgmAudio.volume = BGM_VOLUME;
 
-  bgmAudio.addEventListener('volumechange', () => {
-    if (bgmAudio && bgmAudio.volume > BGM_VOLUME) {
-      bgmAudio.volume = BGM_VOLUME;
-    }
-  });
+  bgmAudio.addEventListener('volumechange', clampBgmVolume);
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      stopBgm();
-    }
+    if (document.hidden) stopBgm();
   });
 
   bgmInitialized = true;
@@ -52,8 +61,8 @@ export async function startBgm() {
   if (!bgmAudio) return;
   if (!bgmUserStarted) return;
 
-  bgmAudio.volume = BGM_VOLUME;
-  bgmAudio.loop = true;
+  clampBgmVolume();
+  startVolumeGuard();
 
   if (!bgmAudio.paused) return;
   if (bgmStarting) return;
@@ -61,12 +70,13 @@ export async function startBgm() {
   bgmStarting = true;
 
   try {
+    clampBgmVolume();
     await bgmAudio.play();
+    clampBgmVolume();
   } catch (error) {
-    // Safari / iPhone 自動再生ブロック対策
   } finally {
     bgmStarting = false;
-    if (bgmAudio) bgmAudio.volume = BGM_VOLUME;
+    clampBgmVolume();
   }
 }
 
@@ -75,6 +85,7 @@ export function stopBgm() {
 
   bgmAudio.pause();
   bgmAudio.currentTime = 0;
-  bgmAudio.volume = BGM_VOLUME;
   bgmStarting = false;
+  clampBgmVolume();
+  stopVolumeGuard();
 }
