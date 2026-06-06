@@ -43,8 +43,6 @@ export function speak(text, runId){
     if(!text || !state.isPlaying || runId !== state.runId) return resolve();
     if(!('speechSynthesis' in window)) return resolve();
 
-    // speak() のたびに cancel() しない。
-    // cancel() はBGMが一瞬前に出る原因になりやすい。
     markBgmUserStarted();
     startBgm();
 
@@ -54,11 +52,21 @@ export function speak(text, runId){
     const voice = zhVoice();
     if(voice) utterance.voice = voice;
 
-    utterance.rate = 0.88;
+    utterance.rate = 0.9;
     utterance.pitch = 1;
 
-    utterance.onend = () => resolve();
-    utterance.onerror = () => resolve();
+    utterance.onend = () => {
+      // 空白時間を作らない
+      requestAnimationFrame(() => {
+        resolve();
+      });
+    };
+
+    utterance.onerror = () => {
+      requestAnimationFrame(() => {
+        resolve();
+      });
+    };
 
     speechSynthesis.speak(utterance);
   });
