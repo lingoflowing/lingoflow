@@ -1,7 +1,6 @@
 const BGM_SRC = 'audio/bgm_piano.mp3';
 
 const BGM_BASE_VOLUME = 0.003;
-const BGM_MUTED_VOLUME = 0;
 
 const KEY = '__LINGOFLOW_BGM__';
 
@@ -11,32 +10,24 @@ if (!window[KEY]) {
     initialized: false,
     userStarted: false,
     starting: false,
-    mutedUntil: 0,
-    guardTimer: null,
-    imageObserverStarted: false
+    hardMuted: false,
+    releaseTimer: null,
+    guardTimer: null
   };
 }
 
 const bgm = window[KEY];
 
-function targetVolume() {
-  return Date.now() < bgm.mutedUntil
-    ? BGM_MUTED_VOLUME
-    : BGM_BASE_VOLUME;
-}
-
 function applyVolume() {
   if (!bgm.audio) return;
-  bgm.audio.volume = targetVolume();
-}
 
-function muteBgmTemporarily(ms = 2200) {
-  bgm.mutedUntil = Math.max(bgm.mutedUntil, Date.now() + ms);
-  applyVolume();
-}
-
-export function quietBgmForTransition(ms = 2200) {
-  muteBgmTemporarily(ms);
+  if (bgm.hardMuted) {
+    bgm.audio.muted = true;
+    bgm.audio.volume = 0;
+  } else {
+    bgm.audio.muted = false;
+    bgm.audio.volume = BGM_BASE_VOLUME;
+  }
 }
 
 function startGuard() {
@@ -45,6 +36,29 @@ function startGuard() {
   bgm.guardTimer = setInterval(() => {
     applyVolume();
   }, 30);
+}
+
+export function hardMuteBgm() {
+  bgm.hardMuted = true;
+
+  if (bgm.releaseTimer) {
+    clearTimeout(bgm.releaseTimer);
+    bgm.releaseTimer = null;
+  }
+
+  applyVolume();
+}
+
+export function releaseBgmAfter(ms = 1500) {
+  if (bgm.releaseTimer) {
+    clearTimeout(bgm.releaseTimer);
+  }
+
+  bgm.releaseTimer = setTimeout(() => {
+    bgm.hardMuted = false;
+    bgm.releaseTimer = null;
+    applyVolume();
+  }, ms);
 }
 
 function removeDuplicateBgmAudio() {
@@ -56,29 +70,6 @@ function removeDuplicateBgmAudio() {
       node.remove();
     }
   });
-}
-
-function watchImageSwitch() {
-  if (bgm.imageObserverStarted) return;
-
-  const photo = document.getElementById('photo');
-  if (!photo) return;
-
-  const mute = () => {
-    muteBgmTemporarily(2400);
-  };
-
-  const observer = new MutationObserver(mute);
-
-  observer.observe(photo, {
-    attributes: true,
-    attributeFilter: ['src']
-  });
-
-  photo.addEventListener('load', mute);
-  photo.addEventListener('loadstart', mute);
-
-  bgm.imageObserverStarted = true;
 }
 
 export function initBgm() {
@@ -101,7 +92,6 @@ export function initBgm() {
   bgm.audio.loop = true;
   applyVolume();
   startGuard();
-  watchImageSwitch();
 
   if (!bgm.initialized) {
     bgm.audio.addEventListener('volumechange', applyVolume);
@@ -149,6 +139,12 @@ export function stopBgm() {
   bgm.audio.pause();
   bgm.audio.currentTime = 0;
   bgm.starting = false;
-  bgm.mutedUntil = 0;
+  bgm.hardMuted = false;
+
+  if (bgm.releaseTimer) {
+    clearTimeout(bgm.releaseTimer);
+    bgm.releaseTimer = null;
+  }
+
   applyVolume();
 }
