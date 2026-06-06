@@ -1,51 +1,101 @@
-// LingoFlow Phase66 BGM Stable v2
-// 静かなピアノ1曲固定・再生中だけ流れる
-
+/* LingoFlow Phase66 BGM Stable Fix v3
+   - Keep audio.js as main voice controller
+   - This file only manages background piano BGM
+   - Exposes functions to window so audio.js/app.js can call them safely
+*/
 (function () {
-  const BGM_ID = "bgmAudio";
+  const BGM_ID = 'bgmAudio';
+  const BGM_SRC = 'audio/bgm_piano.mp3';
   const BGM_VOLUME = 0.05;
 
-  function getBgmAudio() {
-    let audio = document.getElementById(BGM_ID);
+  let bgmAudio = null;
+  let bgmUnlocked = false;
 
-    if (!audio) {
-      audio = document.createElement("audio");
-      audio.id = BGM_ID;
-      audio.src = "audio/bgm_piano.mp3";
-      audio.loop = true;
-      audio.preload = "auto";
-      audio.setAttribute("playsinline", "");
-      document.body.appendChild(audio);
+  function ensureBgmAudio() {
+    bgmAudio = document.getElementById(BGM_ID);
+
+    if (!bgmAudio) {
+      bgmAudio = document.createElement('audio');
+      bgmAudio.id = BGM_ID;
+      bgmAudio.src = BGM_SRC;
+      bgmAudio.preload = 'auto';
+      bgmAudio.loop = true;
+      bgmAudio.playsInline = true;
+      document.body.appendChild(bgmAudio);
     }
 
-    audio.volume = BGM_VOLUME;
-    audio.loop = true;
-    return audio;
+    bgmAudio.loop = true;
+    bgmAudio.volume = BGM_VOLUME;
+    return bgmAudio;
   }
 
-  window.startBgm = function startBgm() {
-    const bgmAudio = getBgmAudio();
-    bgmAudio.volume = BGM_VOLUME;
-
-    if (!bgmAudio.paused) return;
-
-    bgmAudio.play().catch(function () {
-      // iPhone/Safariなどでユーザー操作外と判断された場合は無視。
-      // 既存の再生ボタン内から呼べば基本的に再生される。
-    });
-  };
-
-  window.stopBgm = function stopBgm() {
-    const bgmAudio = document.getElementById(BGM_ID);
-    if (!bgmAudio) return;
-
-    bgmAudio.pause();
-    bgmAudio.currentTime = 0;
-  };
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden && typeof window.stopBgm === "function") {
-      window.stopBgm();
+  async function unlockBgm() {
+    const audio = ensureBgmAudio();
+    try {
+      audio.volume = 0;
+      await audio.play();
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = BGM_VOLUME;
+      bgmUnlocked = true;
+      console.log('[BGM] unlocked');
+    } catch (error) {
+      console.warn('[BGM] unlock failed:', error);
     }
+  }
+
+  async function startBgm() {
+    const audio = ensureBgmAudio();
+    try {
+      audio.volume = BGM_VOLUME;
+      audio.loop = true;
+      if (audio.paused) {
+        await audio.play();
+      }
+      console.log('[BGM] started');
+    } catch (error) {
+      console.warn('[BGM] start failed:', error);
+    }
+  }
+
+  function stopBgm() {
+    const audio = ensureBgmAudio();
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+      console.log('[BGM] stopped');
+    } catch (error) {
+      console.warn('[BGM] stop failed:', error);
+    }
+  }
+
+  function pauseBgm() {
+    const audio = ensureBgmAudio();
+    try {
+      audio.pause();
+      console.log('[BGM] paused');
+    } catch (error) {
+      console.warn('[BGM] pause failed:', error);
+    }
+  }
+
+  // Expose globally. This is important when audio.js is not an ES module.
+  window.ensureBgmAudio = ensureBgmAudio;
+  window.unlockBgm = unlockBgm;
+  window.startBgm = startBgm;
+  window.stopBgm = stopBgm;
+  window.pauseBgm = pauseBgm;
+
+  document.addEventListener('DOMContentLoaded', ensureBgmAudio);
+
+  // iPhone/Safari: unlock must happen after a real user gesture.
+  ['pointerdown', 'touchstart', 'click'].forEach((eventName) => {
+    document.addEventListener(eventName, () => {
+      if (!bgmUnlocked) unlockBgm();
+    }, { once: false, passive: true });
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopBgm();
   });
 })();
