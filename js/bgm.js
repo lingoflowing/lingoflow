@@ -1,14 +1,19 @@
-// LingoFlow Phase66 BGM v1
-// 静かなピアノBGMを1曲固定・再生中だけ流す
-// UI追加なし / 設定追加なし / 音量5%
+// LingoFlow BGM
+// BGMは1つだけ生成
+// 音量は常に1%固定
+// 画像切り替え時の多重再生を防止
 
 const BGM_SRC = 'audio/bgm_piano.mp3';
-const BGM_VOLUME = 0.05;
+const BGM_VOLUME = 0.01;
 
 let bgmAudio = null;
 let bgmUserStarted = false;
+let bgmStarting = false;
+let bgmInitialized = false;
 
 export function initBgm() {
+  if (bgmInitialized && bgmAudio) return;
+
   bgmAudio = document.getElementById('bgmAudio');
 
   if (!bgmAudio) {
@@ -24,11 +29,19 @@ export function initBgm() {
   bgmAudio.volume = BGM_VOLUME;
   bgmAudio.loop = true;
 
+  bgmAudio.addEventListener('volumechange', () => {
+    if (bgmAudio && bgmAudio.volume > BGM_VOLUME) {
+      bgmAudio.volume = BGM_VOLUME;
+    }
+  });
+
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       stopBgm();
     }
   });
+
+  bgmInitialized = true;
 }
 
 export function markBgmUserStarted() {
@@ -38,19 +51,25 @@ export function markBgmUserStarted() {
 export async function startBgm() {
   if (!bgmAudio) initBgm();
   if (!bgmAudio) return;
-
-  // iPhone対策：ユーザー操作後だけ再生
   if (!bgmUserStarted) return;
 
   bgmAudio.volume = BGM_VOLUME;
   bgmAudio.loop = true;
 
   if (!bgmAudio.paused) return;
+  if (bgmStarting) return;
+
+  bgmStarting = true;
 
   try {
     await bgmAudio.play();
   } catch (error) {
     // iPhone/Safariの自動再生ブロック時は何もしない
+  } finally {
+    bgmStarting = false;
+    if (bgmAudio) {
+      bgmAudio.volume = BGM_VOLUME;
+    }
   }
 }
 
@@ -59,4 +78,6 @@ export function stopBgm() {
 
   bgmAudio.pause();
   bgmAudio.currentTime = 0;
+  bgmAudio.volume = BGM_VOLUME;
+  bgmStarting = false;
 }
