@@ -52,22 +52,53 @@ export function speak(text, runId){
     const voice = zhVoice();
     if(voice) utterance.voice = voice;
 
-    utterance.rate = 0.9;
+    utterance.rate = 0.88;
     utterance.pitch = 1;
+    utterance.volume = 1;
 
-    utterance.onend = () => {
-      // 空白時間を作らない
-      requestAnimationFrame(() => {
-        resolve();
-      });
-    };
-
-    utterance.onerror = () => {
-      requestAnimationFrame(() => {
-        resolve();
-      });
-    };
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve();
 
     speechSynthesis.speak(utterance);
+  });
+}
+
+export function silentSpeechHold(ms, runId){
+  return new Promise(resolve => {
+    if(!state.isPlaying || runId !== state.runId) return resolve();
+    if(!('speechSynthesis' in window)) {
+      setTimeout(resolve, ms);
+      return;
+    }
+
+    const startedAt = Date.now();
+
+    function loop(){
+      if(!state.isPlaying || runId !== state.runId) return resolve();
+
+      const elapsed = Date.now() - startedAt;
+      if(elapsed >= ms) return resolve();
+
+      const utterance = new SpeechSynthesisUtterance('。');
+      utterance.lang = 'zh-TW';
+      utterance.volume = 0;
+      utterance.rate = 0.5;
+      utterance.pitch = 1;
+
+      const voice = zhVoice();
+      if(voice) utterance.voice = voice;
+
+      utterance.onend = () => {
+        requestAnimationFrame(loop);
+      };
+
+      utterance.onerror = () => {
+        requestAnimationFrame(loop);
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    loop();
   });
 }

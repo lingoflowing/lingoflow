@@ -1,7 +1,7 @@
 import { state, getCurrentCard, nextCard } from './state.js';
 import { renderCurrentCard, rerenderForViewport, showError } from './render.js';
-import { clearTimer } from './timer.js';
-import { speak, stopPlayback, stopAllAudio } from './audio.js';
+import { wait, clearTimer } from './timer.js';
+import { speak, silentSpeechHold, stopPlayback, stopAllAudio } from './audio.js';
 import { PLAY_SVG, STOP_SVG } from './icons.js';
 import { track } from './analytics.js';
 
@@ -21,6 +21,10 @@ function textSequence(card){
   ].filter(Boolean);
 }
 
+async function calmWait(ms, runId){
+  await silentSpeechHold(ms, runId);
+}
+
 async function playLoop(runId){
   while(state.isPlaying && runId === state.runId){
     const card = getCurrentCard();
@@ -29,26 +33,24 @@ async function playLoop(runId){
     renderCurrentCard();
     track('card_view', { index: state.currentIndex, id: card.id || null });
 
-    // 重要：
-    // 画像切替後の待機時間を削除。
-    // ここで待つとBGMだけが前に出る。
+    // 元のゆっくりした余白を維持
+    // ただしBGMだけが前に出ないよう、無音読み上げで保持
+    await calmWait(900, runId);
+    if(!state.isPlaying || runId !== state.runId) break;
+
     for(const text of textSequence(card)){
-      if(!state.isPlaying || runId !== state.runId) break;
-
       await speak(text, runId);
-
       if(!state.isPlaying || runId !== state.runId) break;
 
-      // 単語→例文の待機も入れない。
-      // 中国語音声の空白時間を最小化する。
+      await calmWait(700, runId);
     }
 
     if(!state.isPlaying || runId !== state.runId) break;
 
-    track('card_complete', { index: state.currentIndex, id: card.id || null });
+    await calmWait(1800, runId);
+    if(!state.isPlaying || runId !== state.runId) break;
 
-    // カード終了後の1800ms待機も削除。
-    // すぐ次カードへ進める。
+    track('card_complete', { index: state.currentIndex, id: card.id || null });
     nextCard();
   }
 }
