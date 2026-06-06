@@ -1,7 +1,8 @@
 const BGM_SRC = 'audio/bgm_piano.mp3';
 
-const BGM_BASE_VOLUME = 0.01;
-const BGM_TRANSITION_VOLUME = 0.002;
+// 恒久対策：1%に戻さない
+// iPhone/Safariの音声ダッキング解除時でも前に出ない音量
+const BGM_VOLUME = 0.003;
 
 const KEY = '__LINGOFLOW_BGM__';
 
@@ -11,30 +12,21 @@ if (!window[KEY]) {
     initialized: false,
     userStarted: false,
     starting: false,
-    transitionUntil: 0,
     guardTimer: null
   };
 }
 
 const bgm = window[KEY];
 
-function targetVolume() {
-  return Date.now() < bgm.transitionUntil
-    ? BGM_TRANSITION_VOLUME
-    : BGM_BASE_VOLUME;
-}
-
 function clampVolume() {
   if (!bgm.audio) return;
 
-  const target = targetVolume();
-
-  if (bgm.audio.volume !== target) {
-    bgm.audio.volume = target;
+  if (bgm.audio.volume !== BGM_VOLUME) {
+    bgm.audio.volume = BGM_VOLUME;
   }
 }
 
-function startGuard() {
+function startVolumeGuard() {
   if (bgm.guardTimer) return;
 
   bgm.guardTimer = setInterval(() => {
@@ -72,7 +64,7 @@ export function initBgm() {
 
   bgm.audio.loop = true;
   clampVolume();
-  startGuard();
+  startVolumeGuard();
 
   if (!bgm.initialized) {
     bgm.audio.addEventListener('volumechange', clampVolume);
@@ -89,11 +81,6 @@ export function initBgm() {
 
 export function markBgmUserStarted() {
   bgm.userStarted = true;
-}
-
-export function quietBgmForTransition(ms = 900) {
-  bgm.transitionUntil = Date.now() + ms;
-  clampVolume();
 }
 
 export async function startBgm() {
@@ -127,6 +114,5 @@ export function stopBgm() {
   bgm.audio.pause();
   bgm.audio.currentTime = 0;
   bgm.starting = false;
-  bgm.transitionUntil = 0;
   clampVolume();
 }

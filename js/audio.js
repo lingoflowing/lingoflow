@@ -1,11 +1,6 @@
 import { state } from './state.js';
 import { clearTimer } from './timer.js';
-import {
-  startBgm,
-  stopBgm,
-  markBgmUserStarted,
-  quietBgmForTransition
-} from './bgm.js';
+import { startBgm, stopBgm, markBgmUserStarted } from './bgm.js';
 
 export function stopAllAudio(){
   if('speechSynthesis' in window){
@@ -19,7 +14,6 @@ export function startPlayback(){
   clearTimer();
 
   markBgmUserStarted();
-  quietBgmForTransition(900);
   startBgm();
 
   return state.runId;
@@ -49,8 +43,8 @@ export function speak(text, runId){
     if(!text || !state.isPlaying || runId !== state.runId) return resolve();
     if(!('speechSynthesis' in window)) return resolve();
 
-    quietBgmForTransition(900);
-
+    // 保険として残す。
+    // bgm.js側で単一化・音量固定しているので大きくならない。
     markBgmUserStarted();
     startBgm();
 
@@ -65,19 +59,8 @@ export function speak(text, runId){
     utterance.rate = 0.88;
     utterance.pitch = 1;
 
-    utterance.onstart = () => {
-      quietBgmForTransition(500);
-    };
-
-    utterance.onend = () => {
-      quietBgmForTransition(900);
-      resolve();
-    };
-
-    utterance.onerror = () => {
-      quietBgmForTransition(900);
-      resolve();
-    };
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve();
 
     speechSynthesis.speak(utterance);
   });
