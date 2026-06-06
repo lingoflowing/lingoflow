@@ -1,6 +1,11 @@
 import { state } from './state.js';
 import { clearTimer } from './timer.js';
-import { startBgm, stopBgm, markBgmUserStarted } from './bgm.js';
+import {
+  startBgm,
+  stopBgm,
+  markBgmUserStarted,
+  quietBgmForTransition
+} from './bgm.js';
 
 export function stopAllAudio(){
   if('speechSynthesis' in window){
@@ -14,6 +19,7 @@ export function startPlayback(){
   clearTimer();
 
   markBgmUserStarted();
+  quietBgmForTransition(1200);
   startBgm();
 
   return state.runId;
@@ -43,12 +49,14 @@ export function speak(text, runId){
     if(!text || !state.isPlaying || runId !== state.runId) return resolve();
     if(!('speechSynthesis' in window)) return resolve();
 
-    // 保険として残す。
-    // bgm.js側で単一化・音量固定しているので大きくならない。
+    // 重要：
+    // ここで speechSynthesis.cancel() しない。
+    // 毎回cancelすると、iPhone/SafariでBGMが一瞬前に出やすい。
+
+    quietBgmForTransition(1500);
+
     markBgmUserStarted();
     startBgm();
-
-    speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-TW';
@@ -59,8 +67,19 @@ export function speak(text, runId){
     utterance.rate = 0.88;
     utterance.pitch = 1;
 
-    utterance.onend = () => resolve();
-    utterance.onerror = () => resolve();
+    utterance.onstart = () => {
+      quietBgmForTransition(1500);
+    };
+
+    utterance.onend = () => {
+      quietBgmForTransition(1500);
+      resolve();
+    };
+
+    utterance.onerror = () => {
+      quietBgmForTransition(1500);
+      resolve();
+    };
 
     speechSynthesis.speak(utterance);
   });
