@@ -858,3 +858,61 @@ body{
     font-size: 14px !important;
   }
 }
+
+/* ===== Phase66 IMAGE LARGE v1 =====
+   Goal:
+   - Keep all text sizes unchanged.
+   - Make only the image area larger on PC Firefox and mobile.
+   - Use 4:3 because current card images are 1366x1024 class.
+   - Keep the play button inside the viewport.
+*/
+
+.card {
+  width: min(96vw, 900px) !important;
+}
+
+@media (orientation: landscape), (min-width: 701px) {
+  .card {
+    width: min(96vw, 900px) !important;
+    height: calc(100svh - 20px - env(safe-area-inset-bottom)) !important;
+    max-height: calc(100svh - 20px - env(safe-area-inset-bottom)) !important;
+    justify-content: flex-start !important;
+  }
+
+  .photo {
+    aspect-ratio: 4 / 3 !important;
+    max-height: min(70svh, 700px) !important;
+    object-fit: cover !important;
+  }
+
+  .play-stop-button {
+    margin-top: auto !important;
+    margin-bottom: 2px !important;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 700px) {
+  .card {
+    width: min(96vw, 430px) !important;
+    height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+    max-height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+    justify-content: flex-start !important;
+  }
+
+  .photo {
+    aspect-ratio: 1 / 1 !important;
+    max-height: 55svh !important;
+    object-fit: cover !important;
+  }
+
+  .play-stop-button {
+    margin-top: auto !important;
+    margin-bottom: 2px !important;
+  }
+}
+
+@media (orientation: portrait) and (max-height: 700px) {
+  .photo {
+    max-height: 47svh !important;
+  }
+}
