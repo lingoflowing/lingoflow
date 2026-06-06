@@ -1,8 +1,7 @@
 const BGM_SRC = 'audio/bgm_piano.mp3';
 
-// 恒久対策：1%に戻さない
-// iPhone/Safariの音声ダッキング解除時でも前に出ない音量
-const BGM_VOLUME = 0.001;
+const BGM_BASE_VOLUME = 0.01;
+const BGM_IMAGE_SWITCH_VOLUME = 0.001;
 
 const KEY = '__LINGOFLOW_BGM__';
 
@@ -12,26 +11,44 @@ if (!window[KEY]) {
     initialized: false,
     userStarted: false,
     starting: false,
-    guardTimer: null
+    quietUntil: 0,
+    guardTimer: null,
+    imageObserverStarted: false
   };
 }
 
 const bgm = window[KEY];
 
+function targetVolume() {
+  return Date.now() < bgm.quietUntil
+    ? BGM_IMAGE_SWITCH_VOLUME
+    : BGM_BASE_VOLUME;
+}
+
 function clampVolume() {
   if (!bgm.audio) return;
+  const volume = targetVolume();
 
-  if (bgm.audio.volume !== BGM_VOLUME) {
-    bgm.audio.volume = BGM_VOLUME;
+  if (bgm.audio.volume !== volume) {
+    bgm.audio.volume = volume;
   }
 }
 
-function startVolumeGuard() {
+function quietBgm(ms = 1600) {
+  bgm.quietUntil = Math.max(bgm.quietUntil, Date.now() + ms);
+  clampVolume();
+}
+
+export function quietBgmForTransition(ms = 1600) {
+  quietBgm(ms);
+}
+
+function startGuard() {
   if (bgm.guardTimer) return;
 
   bgm.guardTimer = setInterval(() => {
     clampVolume();
-  }, 100);
+  }, 50);
 }
 
 function removeDuplicateBgmAudio() {
@@ -43,6 +60,28 @@ function removeDuplicateBgmAudio() {
       node.remove();
     }
   });
+}
+
+function watchImageSwitch() {
+  if (bgm.imageObserverStarted) return;
+
+  const photo = document.getElementById('photo');
+  if (!photo) return;
+
+  const observer = new MutationObserver(() => {
+    quietBgm(1800);
+  });
+
+  observer.observe(photo, {
+    attributes: true,
+    attributeFilter: ['src']
+  });
+
+  photo.addEventListener('load', () => {
+    quietBgm(1800);
+  });
+
+  bgm.imageObserverStarted = true;
 }
 
 export function initBgm() {
@@ -64,7 +103,8 @@ export function initBgm() {
 
   bgm.audio.loop = true;
   clampVolume();
-  startVolumeGuard();
+  startGuard();
+  watchImageSwitch();
 
   if (!bgm.initialized) {
     bgm.audio.addEventListener('volumechange', clampVolume);
@@ -98,9 +138,7 @@ export async function startBgm() {
   bgm.starting = true;
 
   try {
-    clampVolume();
     await bgm.audio.play();
-    clampVolume();
   } catch (error) {
   } finally {
     bgm.starting = false;
@@ -114,5 +152,6 @@ export function stopBgm() {
   bgm.audio.pause();
   bgm.audio.currentTime = 0;
   bgm.starting = false;
+  bgm.quietUntil = 0;
   clampVolume();
 }
