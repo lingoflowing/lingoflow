@@ -1,7 +1,7 @@
 import { state, getCurrentCard, nextCard } from './state.js';
 import { renderCurrentCard, rerenderForViewport, showError } from './render.js';
 import { wait, clearTimer } from './timer.js';
-import { speak, silentSpeechHold, stopPlayback, stopAllAudio } from './audio.js';
+import { speak, stopPlayback, stopAllAudio } from './audio.js';
 import { PLAY_SVG, STOP_SVG } from './icons.js';
 import { track } from './analytics.js';
 
@@ -21,10 +21,6 @@ function textSequence(card){
   ].filter(Boolean);
 }
 
-async function calmWait(ms, runId){
-  await silentSpeechHold(ms, runId);
-}
-
 async function playLoop(runId){
   while(state.isPlaying && runId === state.runId){
     const card = getCurrentCard();
@@ -33,21 +29,18 @@ async function playLoop(runId){
     renderCurrentCard();
     track('card_view', { index: state.currentIndex, id: card.id || null });
 
-    // 元のゆっくりした余白を維持
-    // ただしBGMだけが前に出ないよう、無音読み上げで保持
-    await calmWait(900, runId);
+    await wait(900, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
     for(const text of textSequence(card)){
       await speak(text, runId);
       if(!state.isPlaying || runId !== state.runId) break;
-
-      await calmWait(700, runId);
+      await wait(700, runId);
     }
 
     if(!state.isPlaying || runId !== state.runId) break;
 
-    await calmWait(1800, runId);
+    await wait(1800, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
     track('card_complete', { index: state.currentIndex, id: card.id || null });

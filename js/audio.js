@@ -8,11 +8,16 @@ export function stopAllAudio(){
   }
 }
 
+// Phase66 BGM:
+// 再生開始時に呼ぶ共通関数。
+// 既存コードで state.isPlaying = true を直接書いている場合は、
+// そこを startPlayback() に置き換える。
 export function startPlayback(){
   state.isPlaying = true;
   state.runId++;
   clearTimer();
 
+  // iPhone/Safari対策：ユーザー操作後フラグを立ててからBGM開始
   markBgmUserStarted();
   startBgm();
 
@@ -23,16 +28,15 @@ export function stopPlayback(){
   state.isPlaying = false;
   state.runId++;
   clearTimer();
-
   stopAllAudio();
+
+  // Phase66 BGM: 停止時はBGMも必ず停止
   stopBgm();
 }
 
 function zhVoice(){
   if(!('speechSynthesis' in window)) return null;
-
   const voices = speechSynthesis.getVoices();
-
   return voices.find(v => v.lang === 'zh-TW')
       || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'))
       || null;
@@ -43,8 +47,13 @@ export function speak(text, runId){
     if(!text || !state.isPlaying || runId !== state.runId) return resolve();
     if(!('speechSynthesis' in window)) return resolve();
 
+    // Phase66 BGM fallback:
+    // startPlayback() を通らない既存再生処理でも、音声再生直前にBGM開始を試す。
+    // ただし、最も安定するのは再生ボタン押下時に startPlayback() を呼ぶ方法。
     markBgmUserStarted();
     startBgm();
+
+    speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-TW';
@@ -54,51 +63,9 @@ export function speak(text, runId){
 
     utterance.rate = 0.88;
     utterance.pitch = 1;
-    utterance.volume = 1;
-
     utterance.onend = () => resolve();
     utterance.onerror = () => resolve();
 
     speechSynthesis.speak(utterance);
-  });
-}
-
-export function silentSpeechHold(ms, runId){
-  return new Promise(resolve => {
-    if(!state.isPlaying || runId !== state.runId) return resolve();
-    if(!('speechSynthesis' in window)) {
-      setTimeout(resolve, ms);
-      return;
-    }
-
-    const startedAt = Date.now();
-
-    function loop(){
-      if(!state.isPlaying || runId !== state.runId) return resolve();
-
-      const elapsed = Date.now() - startedAt;
-      if(elapsed >= ms) return resolve();
-
-      const utterance = new SpeechSynthesisUtterance('。');
-      utterance.lang = 'zh-TW';
-      utterance.volume = 0;
-      utterance.rate = 0.5;
-      utterance.pitch = 1;
-
-      const voice = zhVoice();
-      if(voice) utterance.voice = voice;
-
-      utterance.onend = () => {
-        requestAnimationFrame(loop);
-      };
-
-      utterance.onerror = () => {
-        requestAnimationFrame(loop);
-      };
-
-      speechSynthesis.speak(utterance);
-    }
-
-    loop();
   });
 }
