@@ -78,6 +78,10 @@ body{
   border-radius:0 0 clamp(20px,2vw,30px) clamp(20px,2vw,30px);
 }
 
+.text-grid{
+  width:100%;
+}
+
 .word-block,
 .sentence-block{
   min-width:0;
@@ -269,12 +273,15 @@ body{
   }
 
   .text-area{
+    padding:9px 14px 8px;
+  }
+
+  .text-grid{
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);
     gap:12px;
     align-items:start;
     text-align:left;
-    padding:9px 14px 8px;
   }
 
   .word-block{
