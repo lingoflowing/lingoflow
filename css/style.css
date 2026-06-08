@@ -1343,3 +1343,9 @@ body{
     font-size:var(--lf-meta-font-mobile-small) !important;
   }
 }
+
+/* ===== Phase92 Button Spacing ===== */
+
+.play-stop-button{
+    margin-top: 18px !important;
+}
