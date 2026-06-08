@@ -1638,4 +1638,27 @@ body{
   font-weight:400 !important;
   color:#a69584 !important;
   text-align:right !important;
+
+/* ===== Phase76 META UNIFIED SINGLE LINE ===== */
+
+.meta-bar{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:center !important;
+  gap:10px !important;
+}
+
+.chapter-title,
+.playlist-title,
+.progress-text{
+  font-size:15px !important;
+  font-weight:400 !important;
+  color:#8a6b44 !important;
+  line-height:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  margin:0 !important;
+  padding:0 !important;
+  opacity:1 !important;
+}
 }
