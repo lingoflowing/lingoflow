@@ -1587,3 +1587,24 @@ body{
     margin-bottom:10px !important;
   }
 }
+
+/* ===== Phase74 META UNIFIED ===== */
+
+.chapter-title{
+  font-size:15px !important;
+  font-weight:400 !important;
+  color:#8a6b44 !important;
+  line-height:1.2 !important;
+}
+
+.playlist-title{
+  font-size:15px !important;
+  font-weight:400 !important;
+  color:#8a6b44 !important;
+  line-height:1.2 !important;
+}
+
+.progress-text{
+  font-size:13px !important;
+  color:#a69584 !important;
+}
