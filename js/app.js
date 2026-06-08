@@ -13,6 +13,8 @@ import { track } from './analytics.js';
 
 const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
+const PLAYLIST_SIZE = 20;
+const PLAYLIST_COUNT = 30;
 
 function updateButton(){
   button.classList.toggle('is-playing', state.isPlaying);
@@ -32,10 +34,12 @@ async function playLoop(runId){
     renderCurrentCard();
     track('card_view', {
       index: state.currentIndex,
-      total: state.cards.length,
+      weeklyTotal: state.cards.length,
+      allTotal: state.allCards.length,
       id: card.id || null,
       chapterNo: card.chapterNo || null,
-      playlistNo: card.playlistNo || null
+      playlistNo: card.playlistNo || null,
+      weekKey: state.weeklyInfo?.weekKey || null
     });
 
     await speakSilent(900, runId);
@@ -54,10 +58,12 @@ async function playLoop(runId){
 
     track('card_complete', {
       index: state.currentIndex,
-      total: state.cards.length,
+      weeklyTotal: state.cards.length,
+      allTotal: state.allCards.length,
       id: card.id || null,
       chapterNo: card.chapterNo || null,
-      playlistNo: card.playlistNo || null
+      playlistNo: card.playlistNo || null,
+      weekKey: state.weeklyInfo?.weekKey || null
     });
     nextCard();
   }
@@ -66,14 +72,24 @@ async function playLoop(runId){
 function startPlayback(){
   if(state.isPlaying || !state.cards.length) return;
 
-  track('play_start', { index: state.currentIndex, total: state.cards.length });
+  track('play_start', {
+    index: state.currentIndex,
+    weeklyTotal: state.cards.length,
+    playlistNo: state.activePlaylist?.playlistNo || null
+  });
   const runId = startAudioPlayback();
   updateButton();
   playLoop(runId);
 }
 
 function stopAndRender(){
-  if(state.isPlaying) track('play_stop', { index: state.currentIndex, total: state.cards.length });
+  if(state.isPlaying){
+    track('play_stop', {
+      index: state.currentIndex,
+      weeklyTotal: state.cards.length,
+      playlistNo: state.activePlaylist?.playlistNo || null
+    });
+  }
   stopPlayback();
   updateButton();
 }
@@ -99,9 +115,68 @@ function mergeCardsAndImages(cards, images){
   });
 }
 
+function startOfWeekLocal(date){
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = d.getDay();
+  const diff = (day + 6) % 7; // Monday start
+  d.setDate(d.getDate() - diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function weekIndexSinceBase(date){
+  // 2026-06-08 is Monday. This keeps the first public v2 week on playlist 001.
+  const baseMonday = new Date(2026, 5, 8);
+  const currentMonday = startOfWeekLocal(date);
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  return Math.floor((currentMonday - baseMonday) / msPerWeek);
+}
+
+function selectWeeklyPlaylist(allCards, playlists, chapters){
+  const weekIndex = weekIndexSinceBase(new Date());
+  const normalizedIndex = ((weekIndex % PLAYLIST_COUNT) + PLAYLIST_COUNT) % PLAYLIST_COUNT;
+  const playlistNo = String(normalizedIndex + 1).padStart(3, '0');
+
+  let weeklyCards = allCards
+    .filter(card => String(card.playlistNo).padStart(3, '0') === playlistNo)
+    .sort((a, b) => Number(a.cardNo || 0) - Number(b.cardNo || 0));
+
+  // Safety net: if playlistNo is missing, use the matching 20-card slice.
+  if(weeklyCards.length !== PLAYLIST_SIZE){
+    const start = normalizedIndex * PLAYLIST_SIZE;
+    weeklyCards = allCards
+      .slice(start, start + PLAYLIST_SIZE)
+      .sort((a, b) => Number(a.cardNo || 0) - Number(b.cardNo || 0));
+  }
+
+  const firstCard = weeklyCards[0] || null;
+  const playlist = playlists.find(item => String(item.playlistNo).padStart(3, '0') === playlistNo)
+    || { playlistNo, title: firstCard?.playlistTitle || `Playlist ${playlistNo}`, chapterNo: firstCard?.chapterNo || null };
+
+  const chapterNo = playlist.chapterNo || firstCard?.chapterNo || null;
+  const chapter = chapters.find(item => String(item.chapterNo).padStart(2, '0') === String(chapterNo).padStart(2, '0'))
+    || { chapterNo, title: firstCard?.chapterTitle || '' };
+
+  const monday = startOfWeekLocal(new Date());
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  return {
+    weeklyCards,
+    playlist,
+    chapter,
+    weeklyInfo: {
+      weekIndex,
+      playlistNo,
+      weekKey: monday.toISOString().slice(0, 10),
+      startDate: monday.toISOString().slice(0, 10),
+      endDate: sunday.toISOString().slice(0, 10),
+      size: weeklyCards.length
+    }
+  };
+}
+
 async function loadCards(){
-  // v2本命: data/cards.json + data/images.json を必ず読む。
-  // ここで旧 data.json へ安易に戻すと、30件版を読んで30→1に戻る原因になる。
   const [cards, images, playlists, chapters] = await Promise.all([
     loadJson('data/cards.json'),
     loadJson('data/images.json'),
@@ -113,17 +188,34 @@ async function loadCards(){
     throw new Error(`data/cards.json must contain 600 cards, actual: ${Array.isArray(cards) ? cards.length : 'not array'}`);
   }
 
-  state.cards = mergeCardsAndImages(cards, Array.isArray(images) ? images : []);
+  const allCards = mergeCardsAndImages(cards, Array.isArray(images) ? images : []);
+  const weekly = selectWeeklyPlaylist(allCards, Array.isArray(playlists) ? playlists : [], Array.isArray(chapters) ? chapters : []);
+
+  if(!weekly.weeklyCards.length){
+    throw new Error('weekly playlist has no cards');
+  }
+
+  state.allCards = allCards;
+  state.cards = weekly.weeklyCards;
   state.images = Array.isArray(images) ? images : [];
   state.playlists = Array.isArray(playlists) ? playlists : [];
   state.chapters = Array.isArray(chapters) ? chapters : [];
+  state.activePlaylist = weekly.playlist;
+  state.activeChapter = weekly.chapter;
+  state.weeklyInfo = weekly.weeklyInfo;
   state.currentIndex = 0;
 
   track('app_loaded', {
-    cardCount: state.cards.length,
+    allCardCount: state.allCards.length,
+    weeklyCardCount: state.cards.length,
     imageCount: state.images.length,
     playlistCount: state.playlists.length,
-    chapterCount: state.chapters.length
+    chapterCount: state.chapters.length,
+    activePlaylistNo: state.activePlaylist?.playlistNo || null,
+    activePlaylistTitle: state.activePlaylist?.title || null,
+    activeChapterNo: state.activeChapter?.chapterNo || null,
+    activeChapterTitle: state.activeChapter?.title || null,
+    weekKey: state.weeklyInfo?.weekKey || null
   });
 
   renderCurrentCard();
@@ -158,7 +250,7 @@ window.addEventListener('load', async () => {
   }catch(error){
     clearTimer();
     stopAllAudio();
-    showError('600カードデータを読み込めませんでした。data/cards.json が600件あるか確認してください。');
+    showError('週替わりプレイリストを読み込めませんでした。data/cards.json が600件あるか確認してください。');
     console.error(error);
   }
 });

@@ -1,8 +1,12 @@
 export const state = {
   cards: [],
+  allCards: [],
   images: [],
   playlists: [],
   chapters: [],
+  activeChapter: null,
+  activePlaylist: null,
+  weeklyInfo: null,
   currentIndex: 0,
   isPlaying: false,
   timerId: null,

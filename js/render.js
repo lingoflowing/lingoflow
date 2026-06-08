@@ -1,4 +1,4 @@
-import { getCurrentCard } from './state.js';
+import { state, getCurrentCard } from './state.js';
 
 const photo = document.getElementById('photo');
 const wordZh = document.getElementById('wordZh');
@@ -7,6 +7,9 @@ const wordJa = document.getElementById('wordJa');
 const sentenceZh = document.getElementById('sentenceZh');
 const sentencePinyin = document.getElementById('sentencePinyin');
 const sentenceJa = document.getElementById('sentenceJa');
+const chapterTitle = document.getElementById('chapterTitle');
+const playlistTitle = document.getElementById('playlistTitle');
+const progress = document.getElementById('progress');
 
 let lastImage = '';
 let transitionTimerId = null;
@@ -69,6 +72,17 @@ function setText(el, value){
   if(el) el.textContent = safeText(value);
 }
 
+function renderMeta(card){
+  const chapterNo = state.activeChapter?.chapterNo || card.chapterNo || '';
+  const chapterName = state.activeChapter?.title || card.chapterTitle || '';
+  const playlistNo = state.activePlaylist?.playlistNo || card.playlistNo || '';
+  const playlistName = state.activePlaylist?.title || card.playlistTitle || '';
+
+  setText(chapterTitle, chapterNo && chapterName ? `Chapter ${chapterNo}　${chapterName}` : chapterName);
+  setText(playlistTitle, playlistNo && playlistName ? `Playlist ${playlistNo}　${playlistName}` : playlistName);
+  setText(progress, `${state.currentIndex + 1} / ${state.cards.length}`);
+}
+
 if(photo){
   photo.addEventListener('load', () => {
     requestAnimationFrame(() => {
@@ -92,6 +106,8 @@ export function renderCurrentCard(){
 
   setImageWithFade(currentImage(card));
   if(photo) photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
+
+  renderMeta(card);
 
   setText(wordZh, card.wordZh);
   setText(wordPinyin, card.wordPinyin);
