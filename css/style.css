@@ -1588,28 +1588,19 @@ body{
   }
 }
 
-/* ===== Phase78 META FINAL CLEAN =====
-   Goal:
-   - Right-align chapter, playlist, and progress as one calm line.
-   - Use the same size, weight, color, baseline, and font for all three labels.
-   - Remove the meta bar background and underline.
-*/
+/* ===== Phase78 META INTEGRATED ===== */
 
 .meta-bar{
   display:flex !important;
   justify-content:flex-end !important;
   align-items:center !important;
   gap:8px !important;
-  width:100% !important;
-  padding:8px 18px 8px !important;
-  margin:0 !important;
-  background:transparent !important;
-  border:0 !important;
-  border-bottom:0 !important;
+
+  background:rgba(255,250,242,.92) !important;
+  border:none !important;
   box-shadow:none !important;
-  text-align:right !important;
-  line-height:1 !important;
-  font-size:0 !important;
+
+  padding:10px 24px 0 24px !important;
 }
 
 .chapter-title,
@@ -1617,67 +1608,21 @@ body{
 .progress-text{
   display:inline-flex !important;
   align-items:center !important;
-  justify-content:center !important;
-  flex:0 0 auto !important;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Noto Sans TC",sans-serif !important;
-  font-size:12px !important;
+
+  font-size:clamp(18px,2.2vw,24px) !important;
   font-weight:400 !important;
-  line-height:1 !important;
+
   color:#8a6b44 !important;
-  opacity:1 !important;
+
+  line-height:1.35 !important;
+
   margin:0 !important;
   padding:0 !important;
-  border:0 !important;
-  background:transparent !important;
-  text-align:right !important;
-  white-space:nowrap !important;
-  vertical-align:middle !important;
+
+  opacity:1 !important;
   transform:none !important;
 }
 
 .progress-text{
-  font-size:12px !important;
-  font-weight:400 !important;
-  color:#8a6b44 !important;
-  line-height:1 !important;
-}
-
-@media (orientation:portrait) and (max-width:700px){
-  .meta-bar{
-    gap:6px !important;
-    padding:7px 14px 7px !important;
-  }
-
-  .chapter-title,
-  .playlist-title,
-  .progress-text{
-    font-size:11.5px !important;
-  }
-}
-
-@media (max-width:340px){
-  .meta-bar{
-    gap:5px !important;
-    padding-left:12px !important;
-    padding-right:12px !important;
-  }
-
-  .chapter-title,
-  .playlist-title,
-  .progress-text{
-    font-size:11px !important;
-  }
-}
-
-@media (orientation:landscape) and (max-height:500px){
-  .meta-bar{
-    gap:6px !important;
-    padding:5px 14px 5px !important;
-  }
-
-  .chapter-title,
-  .playlist-title,
-  .progress-text{
-    font-size:11px !important;
-  }
+  letter-spacing:0 !important;
 }
