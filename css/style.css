@@ -1608,3 +1608,34 @@ body{
   font-size:13px !important;
   color:#a69584 !important;
 }
+
+/* ===== Phase75 META RIGHT ALIGN ===== */
+
+.meta-bar{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:center !important;
+  gap:10px !important;
+  text-align:right !important;
+}
+
+.chapter-title{
+  font-size:15px !important;
+  font-weight:400 !important;
+  color:#8a6b44 !important;
+  text-align:right !important;
+}
+
+.playlist-title{
+  font-size:15px !important;
+  font-weight:400 !important;
+  color:#8a6b44 !important;
+  text-align:right !important;
+}
+
+.progress-text{
+  font-size:13px !important;
+  font-weight:400 !important;
+  color:#a69584 !important;
+  text-align:right !important;
+}
