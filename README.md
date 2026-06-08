@@ -1,50 +1,20 @@
-# LingoFlow v2 Phase70 Weekly Playlist
-
-## 目的
-
-600カード全体を保持しながら、実際のサイト運用では1週間に1Playlistだけを表示・再生します。
+# LingoFlow v2 Weekly Playlist Progress Restore
 
 ## 仕様
 
-- `data/cards.json`：600件を保持
-- `data/images.json`：600件の画像設計を保持
-- `data/chapters.json`：6Chapter
-- `data/playlists.json`：30Playlist
-- 1Playlist = 20cards
-- 毎週月曜日にPlaylistが自動切替
-- 2026-06-08週を Playlist 001 として開始
-- 30週後は Playlist 001 に戻る
-- 画像未作成カードは自動プレースホルダー表示
+- 600 cards保持
+- 週替わりで20 cardsのみ表示・再生
+- Chapter番号 / Playlist番号は非表示
+- 表示は「台湾の朝」「朝のはじまり」「3 / 20」のみ
+- 例文日本語訳と再生ボタンの間に余白を確保
 
-## 上書き対象
+## 上書き必須
 
-必ず以下を上書きしてください。
+- index.html
+- css/style.css
+- js/render.js
+- js/app.js
+- js/state.js
+- data/ 一式
 
-```text
-index.html
-css/style.css
-js/app.js
-js/render.js
-js/state.js
-data/cards.json
-data/images.json
-data/chapters.json
-data/playlists.json
-```
-
-旧 `data.json` だけを読む構造には戻さないでください。
-
-## 表示
-
-画像下に以下を表示します。
-
-```text
-Chapter 01　台湾の朝
-Playlist 001　朝のはじまり
-1 / 20
-```
-
-## 注意
-
-ローカル環境で `file://` から開くと `fetch()` が失敗する場合があります。
-Cloudflare Pages またはローカルサーバーで確認してください。
+既存の data.json が残っていても、v2 は data/cards.json を優先して読み込みます。

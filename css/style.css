@@ -1308,3 +1308,154 @@ body{
   .playlist-title{font-size:12px !important}
   .progress-text{font-size:11px !important}
 }
+
+
+/* ===== Phase71 META CLEAN / BUTTON GAP =====
+   Goal:
+   - Show only chapter and playlist names: e.g. 台湾の朝 / 朝のはじまり.
+   - Do not show Chapter 01, Playlist 001, or progress text.
+   - Restore comfortable spacing between sentence Japanese and play button.
+*/
+.meta-bar{
+  grid-template-columns:1fr !important;
+  gap:2px !important;
+  padding-top:9px !important;
+  padding-bottom:0 !important;
+}
+
+.chapter-title,
+.playlist-title{
+  grid-column:1 / 2 !important;
+  text-align:center !important;
+}
+
+.progress-text{
+  display:none !important;
+}
+
+.text-area{
+  margin-bottom:18px !important;
+}
+
+@media (orientation:portrait) and (max-width:700px){
+  .meta-bar{
+    padding-top:7px !important;
+    gap:1px !important;
+  }
+
+  .text-area{
+    margin-bottom:16px !important;
+  }
+}
+
+@media (orientation:portrait) and (max-height:700px){
+  .text-area{
+    margin-bottom:12px !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:500px){
+  .meta-bar{
+    padding-top:4px !important;
+    gap:0 !important;
+  }
+
+  .text-area{
+    margin-bottom:8px !important;
+  }
+}
+
+
+/* ===== Phase72 PROGRESS RESTORE =====
+   Goal:
+   - Keep Chapter/Playlist numbers hidden.
+   - Show only human-readable chapter title, playlist title, and progress: 3 / 20.
+   - Keep comfortable gap between sentence Japanese and play button.
+*/
+.meta-bar{
+  grid-template-columns:1fr !important;
+  gap:2px !important;
+  padding-top:9px !important;
+  padding-bottom:0 !important;
+  text-align:center !important;
+}
+
+.chapter-title,
+.playlist-title,
+.progress-text{
+  grid-column:1 / 2 !important;
+  text-align:center !important;
+}
+
+.chapter-title{
+  font-size:clamp(12px,1.5vw,15px) !important;
+  color:#9a8265 !important;
+}
+
+.playlist-title{
+  font-size:clamp(14px,1.8vw,18px) !important;
+  color:#5f5144 !important;
+}
+
+.progress-text{
+  display:block !important;
+  margin-top:4px !important;
+  margin-bottom:16px !important;
+  font-size:14px !important;
+  line-height:1.2 !important;
+  color:#8a6b44 !important;
+  opacity:.75 !important;
+  white-space:nowrap !important;
+}
+
+.text-area{
+  margin-bottom:22px !important;
+}
+
+.play-stop-button{
+  margin-top:0 !important;
+}
+
+@media (orientation:portrait) and (max-width:700px){
+  .meta-bar{
+    padding-top:7px !important;
+    gap:1px !important;
+  }
+
+  .progress-text{
+    margin-top:3px !important;
+    margin-bottom:14px !important;
+    font-size:13px !important;
+  }
+
+  .text-area{
+    margin-bottom:20px !important;
+  }
+}
+
+@media (orientation:portrait) and (max-height:700px){
+  .progress-text{
+    margin-bottom:10px !important;
+  }
+
+  .text-area{
+    margin-bottom:16px !important;
+  }
+}
+
+@media (orientation:landscape) and (max-height:500px){
+  .meta-bar{
+    padding-top:4px !important;
+    gap:0 !important;
+  }
+
+  .progress-text{
+    margin-top:2px !important;
+    margin-bottom:7px !important;
+    font-size:11px !important;
+  }
+
+  .text-area{
+    margin-bottom:10px !important;
+  }
+}

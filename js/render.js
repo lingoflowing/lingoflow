@@ -73,14 +73,17 @@ function setText(el, value){
 }
 
 function renderMeta(card){
-  const chapterNo = state.activeChapter?.chapterNo || card.chapterNo || '';
   const chapterName = state.activeChapter?.title || card.chapterTitle || '';
-  const playlistNo = state.activePlaylist?.playlistNo || card.playlistNo || '';
   const playlistName = state.activePlaylist?.title || card.playlistTitle || '';
 
-  setText(chapterTitle, chapterNo && chapterName ? `Chapter ${chapterNo}　${chapterName}` : chapterName);
-  setText(playlistTitle, playlistNo && playlistName ? `Playlist ${playlistNo}　${playlistName}` : playlistName);
-  setText(progress, `${state.currentIndex + 1} / ${state.cards.length}`);
+  // Display only the human-readable names.
+  // Do not show labels such as "Chapter 01" or "Playlist 001".
+  setText(chapterTitle, chapterName);
+  setText(playlistTitle, playlistName);
+
+  const current = state.currentIndex + 1;
+  const total = state.cards.length || state.weeklyInfo?.size || 20;
+  setText(progress, `${current} / ${total}`);
 }
 
 if(photo){
