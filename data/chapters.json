@@ -1,26 +1,26 @@
 [
   {
     "chapterNo": "01",
-    "chapterTitle": "台湾の朝"
+    "title": "台湾の朝"
   },
   {
     "chapterNo": "02",
-    "chapterTitle": "台湾を歩く"
+    "title": "台湾を歩く"
   },
   {
     "chapterNo": "03",
-    "chapterTitle": "台湾の場所"
+    "title": "台湾の場所"
   },
   {
     "chapterNo": "04",
-    "chapterTitle": "台湾の食文化"
+    "title": "台湾の食文化"
   },
   {
     "chapterNo": "05",
-    "chapterTitle": "台湾の気持ち"
+    "title": "台湾の気持ち"
   },
   {
     "chapterNo": "06",
-    "chapterTitle": "台湾の時間"
+    "title": "台湾の時間"
   }
 ]

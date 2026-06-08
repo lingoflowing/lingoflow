@@ -1,5 +1,6 @@
 export const state = {
   cards: [],
+  images: [],
   playlists: [],
   chapters: [],
   currentIndex: 0,

@@ -32,6 +32,7 @@ async function playLoop(runId){
     renderCurrentCard();
     track('card_view', {
       index: state.currentIndex,
+      total: state.cards.length,
       id: card.id || null,
       chapterNo: card.chapterNo || null,
       playlistNo: card.playlistNo || null
@@ -53,6 +54,7 @@ async function playLoop(runId){
 
     track('card_complete', {
       index: state.currentIndex,
+      total: state.cards.length,
       id: card.id || null,
       chapterNo: card.chapterNo || null,
       playlistNo: card.playlistNo || null
@@ -64,14 +66,14 @@ async function playLoop(runId){
 function startPlayback(){
   if(state.isPlaying || !state.cards.length) return;
 
-  track('play_start', { index: state.currentIndex });
+  track('play_start', { index: state.currentIndex, total: state.cards.length });
   const runId = startAudioPlayback();
   updateButton();
   playLoop(runId);
 }
 
 function stopAndRender(){
-  if(state.isPlaying) track('play_stop', { index: state.currentIndex });
+  if(state.isPlaying) track('play_stop', { index: state.currentIndex, total: state.cards.length });
   stopPlayback();
   updateButton();
 }
@@ -86,8 +88,8 @@ function mergeCardsAndImages(cards, images){
   const imageByCardId = new Map((images || []).map(image => [image.cardId, image]));
 
   return cards.map(card => {
-    const imageMeta = imageByCardId.get(card.id) || null;
-    const image = imageMeta?.imagePath || (card.imageFile ? `images/${card.imageFile}` : '');
+    const imageMeta = imageByCardId.get(card.id) || card.imageMeta || null;
+    const image = imageMeta?.imagePath || card.image || (card.imageFile ? `images/${card.imageFile}` : '');
 
     return {
       ...card,
@@ -98,6 +100,8 @@ function mergeCardsAndImages(cards, images){
 }
 
 async function loadCards(){
+  // v2本命: data/cards.json + data/images.json を必ず読む。
+  // ここで旧 data.json へ安易に戻すと、30件版を読んで30→1に戻る原因になる。
   const [cards, images, playlists, chapters] = await Promise.all([
     loadJson('data/cards.json'),
     loadJson('data/images.json'),
@@ -105,19 +109,21 @@ async function loadCards(){
     loadJson('data/chapters.json').catch(() => [])
   ]);
 
-  if(!Array.isArray(cards) || cards.length === 0){
-    throw new Error('data/cards.json is empty');
+  if(!Array.isArray(cards) || cards.length < 600){
+    throw new Error(`data/cards.json must contain 600 cards, actual: ${Array.isArray(cards) ? cards.length : 'not array'}`);
   }
 
   state.cards = mergeCardsAndImages(cards, Array.isArray(images) ? images : []);
-  state.playlists = playlists;
-  state.chapters = chapters;
+  state.images = Array.isArray(images) ? images : [];
+  state.playlists = Array.isArray(playlists) ? playlists : [];
+  state.chapters = Array.isArray(chapters) ? chapters : [];
   state.currentIndex = 0;
 
   track('app_loaded', {
     cardCount: state.cards.length,
-    playlistCount: Array.isArray(playlists) ? playlists.length : 0,
-    chapterCount: Array.isArray(chapters) ? chapters.length : 0
+    imageCount: state.images.length,
+    playlistCount: state.playlists.length,
+    chapterCount: state.chapters.length
   });
 
   renderCurrentCard();
@@ -152,7 +158,7 @@ window.addEventListener('load', async () => {
   }catch(error){
     clearTimer();
     stopAllAudio();
-    showError('カードデータを読み込めませんでした。data/cards.json と data/images.json を確認してください。');
+    showError('600カードデータを読み込めませんでした。data/cards.json が600件あるか確認してください。');
     console.error(error);
   }
 });
