@@ -1254,11 +1254,12 @@ body{
   background:#eee7dc !important;
 }
 
-/* ===== Phase90 META DISPLAY SINGLE SOURCE =====
-   Controls only:
+
+/* ===== Phase91 META DEFINITIVE CONTROL =====
+   This is the ONLY place to adjust:
    台湾の朝　朝のはじまり　1 / 20
 
-   Adjust these three values only:
+   Change only these three values:
    --lf-meta-font-pc
    --lf-meta-font-mobile
    --lf-meta-font-mobile-small
@@ -1266,7 +1267,7 @@ body{
 
 :root{
   --lf-meta-font-pc: 14px;
-  --lf-meta-font-mobile: 20px;
+  --lf-meta-font-mobile: 12px;
   --lf-meta-font-mobile-small: 11px;
 }
 
@@ -1281,34 +1282,28 @@ body{
   display:flex !important;
   justify-content:flex-end !important;
   align-items:center !important;
-
   width:100% !important;
   margin:0 0 clamp(10px,1.6vw,16px) 0 !important;
   padding:clamp(10px,1.6vw,16px) 0 0 0 !important;
-
   background:transparent !important;
   border:0 !important;
-  border-bottom:0 !important;
   box-shadow:none !important;
-
   text-align:right !important;
   line-height:1.35 !important;
   font-size:0 !important;
 }
 
-.text-area .chapter-title{
+/* Strong ID selector: wins over all old .chapter-title rules */
+#chapterTitle.chapter-title{
   display:block !important;
   width:100% !important;
-
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Serif JP","Noto Sans JP","Noto Sans TC",serif !important;
   font-size:var(--lf-meta-font-pc) !important;
   font-weight:400 !important;
   line-height:1.35 !important;
   letter-spacing:0 !important;
-
   color:#8a6b44 !important;
   opacity:1 !important;
-
   margin:0 !important;
   padding:0 !important;
   border:0 !important;
@@ -1318,11 +1313,8 @@ body{
   transform:none !important;
 }
 
-/* render.js keeps these elements for compatibility,
-   but the meta text is rendered as one text node into #chapterTitle.
-*/
-.text-area .playlist-title,
-.text-area .progress-text{
+#playlistTitle.playlist-title,
+#progress.progress-text{
   display:none !important;
 }
 
@@ -1330,35 +1322,24 @@ body{
   margin-top:0 !important;
 }
 
-/* PC */
-@media (min-width:701px){
-  .text-area .chapter-title{
-    font-size:var(--lf-meta-font-pc) !important;
-  }
-}
-
-/* Smartphone */
 @media (max-width:700px){
-  .text-area .chapter-title{
+  #chapterTitle.chapter-title{
     font-size:var(--lf-meta-font-mobile) !important;
   }
 }
 
-/* Small smartphone */
 @media (max-width:430px){
-  .text-area .chapter-title{
+  #chapterTitle.chapter-title{
     font-size:var(--lf-meta-font-mobile-small) !important;
   }
 }
 
-/* Very short landscape safety */
 @media (orientation:landscape) and (max-height:500px){
   .text-area .meta-bar{
     margin-bottom:6px !important;
     padding-top:6px !important;
   }
-
-  .text-area .chapter-title{
+  #chapterTitle.chapter-title{
     font-size:var(--lf-meta-font-mobile-small) !important;
   }
 }
