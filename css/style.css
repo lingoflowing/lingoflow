@@ -1265,8 +1265,8 @@ body{
 */
 
 :root{
-  --lf-meta-font-pc: 20px;
-  --lf-meta-font-mobile: 10px;
+  --lf-meta-font-pc: 50px;
+  --lf-meta-font-mobile: 15px;
   --lf-meta-font-mobile-small: 11px;
 }
 
