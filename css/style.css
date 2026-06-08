@@ -1626,3 +1626,38 @@ body{
 .progress-text{
   letter-spacing:0 !important;
 }
+
+/* ===== Phase79 META BLEND ===== */
+
+/* 背景を text-area と完全統一 */
+.meta-bar{
+  background:rgba(255,250,242,.92) !important;
+  border:none !important;
+  box-shadow:none !important;
+
+  padding:8px 24px 0 24px !important;
+  margin:0 !important;
+}
+
+/* メタ情報はピンインサイズへ */
+.chapter-title,
+.playlist-title,
+.progress-text{
+  font-size:clamp(17px,2.1vw,23px) !important;
+
+  font-weight:400 !important;
+  color:#8a6b44 !important;
+
+  line-height:1.35 !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  opacity:1 !important;
+}
+
+/* text-areaとの境界を消す */
+.text-area{
+  margin-top:0 !important;
+  padding-top:8px !important;
+}
