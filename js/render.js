@@ -75,15 +75,18 @@ function setText(el, value){
 function renderMeta(card){
   const chapterName = state.activeChapter?.title || card.chapterTitle || '';
   const playlistName = state.activePlaylist?.title || card.playlistTitle || '';
-
-  // Display only the human-readable names.
-  // Do not show labels such as "Chapter 01" or "Playlist 001".
-  setText(chapterTitle, chapterName);
-  setText(playlistTitle, playlistName);
-
   const current = state.currentIndex + 1;
   const total = state.cards.length || state.weeklyInfo?.size || 20;
-  setText(progress, `${current} / ${total}`);
+
+  // Render as ONE text node to prevent uneven gaps, size differences,
+  // and baseline mismatch between chapter / playlist / progress.
+  // Full-width spaces keep the visual separation stable in Japanese UI.
+  const parts = [chapterName, playlistName, `${current} / ${total}`].filter(Boolean);
+  setText(chapterTitle, parts.join('　'));
+
+  // These elements are kept in HTML for compatibility, but intentionally emptied.
+  setText(playlistTitle, '');
+  setText(progress, '');
 }
 
 if(photo){
