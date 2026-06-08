@@ -45,9 +45,30 @@ function placeholderImage(card){
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
+function cardImageId(card){
+  const rawId = safeText(card?.id);
+  if(rawId) return rawId;
+
+  const no = card?.cardNo ?? card?.no ?? card?.number;
+  const num = Number(no);
+  if(Number.isFinite(num) && num > 0){
+    return `card_${String(num).padStart(3, '0')}`;
+  }
+
+  return '';
+}
+
 function currentImage(card){
   if(!card) return '';
-  return card.image || placeholderImage(card);
+
+  const id = cardImageId(card);
+
+  // LingoFlow v2 fixed image rule:
+  // images/card_001.png ... images/card_600.png
+  // If the PNG file is not present yet, the img error handler shows the placeholder.
+  if(id) return `images/${id}.png`;
+
+  return placeholderImage(card);
 }
 
 function setImageWithFade(src){
