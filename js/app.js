@@ -15,56 +15,6 @@ const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
 const PLAYLIST_SIZE = 20;
 const PLAYLIST_COUNT = 30;
-const PROGRESS_STORAGE_KEY = 'lingoflow_weekly_progress_v1';
-
-
-function readWeeklyProgress(){
-  try{
-    return JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY)) || {};
-  }catch{
-    return {};
-  }
-}
-
-function writeWeeklyProgress(progress){
-  try{
-    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
-  }catch{
-    // Progress saving must never break playback.
-  }
-}
-
-function progressKey(){
-  const weekKey = state.weeklyInfo?.weekKey || 'unknown-week';
-  const playlistNo = state.activePlaylist?.playlistNo || state.weeklyInfo?.playlistNo || 'unknown-playlist';
-  return `${weekKey}:${playlistNo}`;
-}
-
-function saveCurrentProgress(reason = 'auto'){
-  if(!state.cards.length) return;
-
-  const store = readWeeklyProgress();
-  const key = progressKey();
-  store[key] = {
-    currentIndex: state.currentIndex,
-    total: state.cards.length,
-    playlistNo: state.activePlaylist?.playlistNo || state.weeklyInfo?.playlistNo || null,
-    weekKey: state.weeklyInfo?.weekKey || null,
-    updatedAt: new Date().toISOString(),
-    reason
-  };
-  writeWeeklyProgress(store);
-}
-
-function restoreCurrentProgress(){
-  const store = readWeeklyProgress();
-  const saved = store[progressKey()];
-  if(!saved || !Number.isInteger(saved.currentIndex)) return;
-
-  if(saved.currentIndex >= 0 && saved.currentIndex < state.cards.length){
-    state.currentIndex = saved.currentIndex;
-  }
-}
 
 function updateButton(){
   button.classList.toggle('is-playing', state.isPlaying);
@@ -81,8 +31,8 @@ async function playLoop(runId){
     const card = getCurrentCard();
     if(!card) break;
 
-    saveCurrentProgress('card_view');
     renderCurrentCard();
+
     track('card_view', {
       index: state.currentIndex,
       weeklyTotal: state.cards.length,
@@ -116,8 +66,8 @@ async function playLoop(runId){
       playlistNo: card.playlistNo || null,
       weekKey: state.weeklyInfo?.weekKey || null
     });
+
     nextCard();
-    saveCurrentProgress('card_complete');
   }
 }
 
@@ -129,6 +79,7 @@ function startPlayback(){
     weeklyTotal: state.cards.length,
     playlistNo: state.activePlaylist?.playlistNo || null
   });
+
   const runId = startAudioPlayback();
   updateButton();
   playLoop(runId);
@@ -142,7 +93,7 @@ function stopAndRender(){
       playlistNo: state.activePlaylist?.playlistNo || null
     });
   }
-  saveCurrentProgress('play_stop');
+
   stopPlayback();
   updateButton();
 }
@@ -171,14 +122,13 @@ function mergeCardsAndImages(cards, images){
 function startOfWeekLocal(date){
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const day = d.getDay();
-  const diff = (day + 6) % 7; // Monday start
+  const diff = (day + 6) % 7;
   d.setDate(d.getDate() - diff);
   d.setHours(0, 0, 0, 0);
   return d;
 }
 
 function weekIndexSinceBase(date){
-  // 2026-06-08 is Monday. This keeps the first public v2 week on playlist 001.
   const baseMonday = new Date(2026, 5, 8);
   const currentMonday = startOfWeekLocal(date);
   const msPerWeek = 7 * 24 * 60 * 60 * 1000;
@@ -194,7 +144,6 @@ function selectWeeklyPlaylist(allCards, playlists, chapters){
     .filter(card => String(card.playlistNo).padStart(3, '0') === playlistNo)
     .sort((a, b) => Number(a.cardNo || 0) - Number(b.cardNo || 0));
 
-  // Safety net: if playlistNo is missing, use the matching 20-card slice.
   if(weeklyCards.length !== PLAYLIST_SIZE){
     const start = normalizedIndex * PLAYLIST_SIZE;
     weeklyCards = allCards
@@ -203,10 +152,12 @@ function selectWeeklyPlaylist(allCards, playlists, chapters){
   }
 
   const firstCard = weeklyCards[0] || null;
+
   const playlist = playlists.find(item => String(item.playlistNo).padStart(3, '0') === playlistNo)
     || { playlistNo, title: firstCard?.playlistTitle || `Playlist ${playlistNo}`, chapterNo: firstCard?.chapterNo || null };
 
   const chapterNo = playlist.chapterNo || firstCard?.chapterNo || null;
+
   const chapter = chapters.find(item => String(item.chapterNo).padStart(2, '0') === String(chapterNo).padStart(2, '0'))
     || { chapterNo, title: firstCard?.chapterTitle || '' };
 
@@ -256,8 +207,9 @@ async function loadCards(){
   state.activePlaylist = weekly.playlist;
   state.activeChapter = weekly.chapter;
   state.weeklyInfo = weekly.weeklyInfo;
+
+  // Always start from the first card when the page is opened.
   state.currentIndex = 0;
-  restoreCurrentProgress();
 
   track('app_loaded', {
     allCardCount: state.allCards.length,
