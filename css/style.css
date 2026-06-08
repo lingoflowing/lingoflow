@@ -2007,7 +2007,7 @@ body{
 
 /* PC */
 :root{
-  --lf-meta-font-pc: 15px;
+  --lf-meta-font-pc: 20px;
 }
 
 /* PC */
@@ -2033,7 +2033,7 @@ body{
 @media (max-width:430px){
 
   :root{
-    --lf-meta-font-mobile-small: 10px;
+    --lf-meta-font-mobile-small: 20px;
   }
 
   .text-area .chapter-title{
