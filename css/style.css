@@ -1973,7 +1973,7 @@ body{
 
 @media (orientation:portrait) and (max-height:700px){
   .text-area .chapter-title{
-    font-size:14px !important;
+    font-size:5px !important;
   }
 }
 
