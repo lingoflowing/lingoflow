@@ -1,5 +1,7 @@
 export const state = {
   cards: [],
+  playlists: [],
+  chapters: [],
   currentIndex: 0,
   isPlaying: false,
   timerId: null,

@@ -10,15 +10,40 @@ const sentenceJa = document.getElementById('sentenceJa');
 
 let lastImage = '';
 let transitionTimerId = null;
-
+let handlingImageError = false;
 
 function safeText(value){
   return typeof value === 'string' ? value : '';
 }
 
+function escapeSvgText(value){
+  return safeText(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function placeholderImage(card){
+  const title = escapeSvgText(card?.wordZh || 'LingoFlow');
+  const sub = escapeSvgText(card?.sentenceZh || 'image coming soon');
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+    <rect width="1200" height="900" fill="#eee7dc"/>
+    <rect x="72" y="72" width="1056" height="756" rx="44" fill="#f8f1e7" stroke="#d8c7af" stroke-width="3"/>
+    <circle cx="230" cy="210" r="42" fill="#dfc9a8" opacity="0.72"/>
+    <path d="M150 705 C290 560 405 610 520 500 C640 385 755 505 870 390 C955 310 1030 342 1095 298 L1095 780 L150 780 Z" fill="#e6d8c4"/>
+    <text x="600" y="430" text-anchor="middle" font-size="82" fill="#3a3026" font-family="serif" letter-spacing="8">${title}</text>
+    <text x="600" y="512" text-anchor="middle" font-size="34" fill="#8a6b44" font-family="serif">${sub}</text>
+    <text x="600" y="618" text-anchor="middle" font-size="24" fill="#9b866d" font-family="serif">image coming soon</text>
+  </svg>`;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 function currentImage(card){
   if(!card) return '';
-  return card.image;
+  return card.image || placeholderImage(card);
 }
 
 function setImageWithFade(src){
@@ -30,6 +55,7 @@ function setImageWithFade(src){
   }
 
   clearTimeout(transitionTimerId);
+  handlingImageError = false;
   photo.classList.add('is-changing');
 
   transitionTimerId = setTimeout(() => {
@@ -50,6 +76,11 @@ if(photo){
   });
 
   photo.addEventListener('error', () => {
+    if(handlingImageError) return;
+    handlingImageError = true;
+    const fallback = placeholderImage(getCurrentCard());
+    photo.src = fallback;
+    lastImage = fallback;
     photo.classList.remove('is-changing');
   });
 }

@@ -1,25 +1,71 @@
-# LingoFlow Phase55 Content + Typography Stable
+# LingoFlow v2 data split prototype
 
-This package contains the Phase55 update.
+## 目的
 
-## Main Changes
-- Added 5 new cards to `data.json`.
-- Added 5 watercolor-style PNG illustrations to `images/`.
-- Kept Phase55 Typography v2.
-- Kept JS, audio, analytics, and one-button playback structure stable.
+`CardMaster600.xlsx / ImageMaster600.xlsx` 相当の設計を、サイト運用向けに分離した構成です。
 
-## Added Cards
-- card_011: 下雨 / 下雨了。
-- card_012: 夜晚 / 夜很安靜。
-- card_013: 茶館 / 我在茶館休息。
-- card_014: 傍晚 / 現在是傍晚。
-- card_015: 回家 / 我要回家了。
+## 構成
 
-## Verification
-- `data.json` valid JSON
-- total cards: 15
-- all image paths exist
-- new image dimensions: 1448 x 1086
+```text
+/
+├─ index.html
+├─ css/style.css
+├─ js/app.js
+├─ js/render.js
+├─ js/audio.js
+├─ js/bgm.js
+├─ js/state.js
+├─ js/timer.js
+├─ js/analytics.js
+├─ js/icons.js
+├─ data/cards.json
+├─ data/images.json
+├─ data/chapters.json
+├─ data/playlists.json
+├─ data/data.json        # 互換・確認用の統合版
+├─ images/              # 画像を少しずつ追加
+├─ audio/bgm_piano.mp3   # 既存ファイルを配置
+└─ tools/build_data_from_xlsx.py
+```
 
-## Concept
-台湾華語が、静かに流れる場所
+## データ方針
+
+- `cards.json`: 学習表示・音声読み上げに必要な本文データ
+- `images.json`: 画像ファイル名・Scene・Story・Subject・Prompt v3.6 などの画像生成設計
+- `chapters.json`: Chapter 管理
+- `playlists.json`: Playlist 管理
+
+## 画像追加ルール
+
+`data/images.json` の `imagePath` に合わせて、画像を `images/` に追加します。
+
+例:
+
+```text
+images/card_001_zaoan.png
+images/card_002_breakfast.png
+```
+
+画像がまだ無いカードは、自動でプレースホルダー画像が表示されます。
+
+## 自動変換
+
+```bash
+python tools/build_data_from_xlsx.py ImageMaster600_v36_Semantic_Rebuild_02.xlsx
+```
+
+これで以下が再生成されます。
+
+```text
+data/cards.json
+data/images.json
+data/chapters.json
+data/playlists.json
+```
+
+## 生成結果
+
+- cards: 600件
+- images: 600件
+- chapters: 6件
+- playlists: 30件

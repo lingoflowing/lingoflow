@@ -21,10 +21,7 @@ function updateButton(){
 }
 
 function textSequence(card){
-  return [
-    card.wordZh,
-    card.sentenceZh
-  ].filter(Boolean);
+  return [card.wordZh, card.sentenceZh].filter(Boolean);
 }
 
 async function playLoop(runId){
@@ -33,7 +30,12 @@ async function playLoop(runId){
     if(!card) break;
 
     renderCurrentCard();
-    track('card_view', { index: state.currentIndex, id: card.id || null });
+    track('card_view', {
+      index: state.currentIndex,
+      id: card.id || null,
+      chapterNo: card.chapterNo || null,
+      playlistNo: card.playlistNo || null
+    });
 
     await speakSilent(900, runId);
     if(!state.isPlaying || runId !== state.runId) break;
@@ -49,7 +51,12 @@ async function playLoop(runId){
     await speakSilent(1800, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
-    track('card_complete', { index: state.currentIndex, id: card.id || null });
+    track('card_complete', {
+      index: state.currentIndex,
+      id: card.id || null,
+      chapterNo: card.chapterNo || null,
+      playlistNo: card.playlistNo || null
+    });
     nextCard();
   }
 }
@@ -58,32 +65,61 @@ function startPlayback(){
   if(state.isPlaying || !state.cards.length) return;
 
   track('play_start', { index: state.currentIndex });
-
   const runId = startAudioPlayback();
-
   updateButton();
   playLoop(runId);
 }
 
 function stopAndRender(){
   if(state.isPlaying) track('play_stop', { index: state.currentIndex });
-
   stopPlayback();
   updateButton();
 }
 
-async function loadCards(){
-  const response = await fetch('data.json', { cache: 'no-store' });
-  if(!response.ok) throw new Error('data.json load failed');
+async function loadJson(path){
+  const response = await fetch(path, { cache: 'no-store' });
+  if(!response.ok) throw new Error(`${path} load failed`);
+  return response.json();
+}
 
-  const cards = await response.json();
+function mergeCardsAndImages(cards, images){
+  const imageByCardId = new Map((images || []).map(image => [image.cardId, image]));
+
+  return cards.map(card => {
+    const imageMeta = imageByCardId.get(card.id) || null;
+    const image = imageMeta?.imagePath || (card.imageFile ? `images/${card.imageFile}` : '');
+
+    return {
+      ...card,
+      image,
+      imageMeta
+    };
+  });
+}
+
+async function loadCards(){
+  const [cards, images, playlists, chapters] = await Promise.all([
+    loadJson('data/cards.json'),
+    loadJson('data/images.json'),
+    loadJson('data/playlists.json').catch(() => []),
+    loadJson('data/chapters.json').catch(() => [])
+  ]);
+
   if(!Array.isArray(cards) || cards.length === 0){
-    throw new Error('data.json is empty');
+    throw new Error('data/cards.json is empty');
   }
 
-  state.cards = cards;
+  state.cards = mergeCardsAndImages(cards, Array.isArray(images) ? images : []);
+  state.playlists = playlists;
+  state.chapters = chapters;
   state.currentIndex = 0;
-  track('app_loaded', { cardCount: cards.length });
+
+  track('app_loaded', {
+    cardCount: state.cards.length,
+    playlistCount: Array.isArray(playlists) ? playlists.length : 0,
+    chapterCount: Array.isArray(chapters) ? chapters.length : 0
+  });
+
   renderCurrentCard();
 }
 
@@ -116,7 +152,7 @@ window.addEventListener('load', async () => {
   }catch(error){
     clearTimer();
     stopAllAudio();
-    showError('カードデータを読み込めませんでした。data.json を確認してください。');
+    showError('カードデータを読み込めませんでした。data/cards.json と data/images.json を確認してください。');
     console.error(error);
   }
 });
