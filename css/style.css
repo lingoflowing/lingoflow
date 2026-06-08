@@ -1459,3 +1459,16 @@ body{
     margin-bottom:10px !important;
   }
 }
+
+
+/* ===== Phase70 STARTUP IMAGE FLASH FIX =====
+   Do not show a hard-coded first image before the weekly playlist is resolved.
+*/
+.photo.is-initializing{
+  visibility:hidden !important;
+  opacity:0 !important;
+}
+
+.photo-wrap{
+  background:#eee7dc !important;
+}

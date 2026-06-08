@@ -89,6 +89,7 @@ function renderMeta(card){
 if(photo){
   photo.addEventListener('load', () => {
     requestAnimationFrame(() => {
+      photo.classList.remove('is-initializing');
       photo.classList.remove('is-changing');
     });
   });
@@ -99,6 +100,7 @@ if(photo){
     const fallback = placeholderImage(getCurrentCard());
     photo.src = fallback;
     lastImage = fallback;
+    photo.classList.remove('is-initializing');
     photo.classList.remove('is-changing');
   });
 }

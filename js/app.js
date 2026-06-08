@@ -15,6 +15,56 @@ const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
 const PLAYLIST_SIZE = 20;
 const PLAYLIST_COUNT = 30;
+const PROGRESS_STORAGE_KEY = 'lingoflow_weekly_progress_v1';
+
+
+function readWeeklyProgress(){
+  try{
+    return JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY)) || {};
+  }catch{
+    return {};
+  }
+}
+
+function writeWeeklyProgress(progress){
+  try{
+    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
+  }catch{
+    // Progress saving must never break playback.
+  }
+}
+
+function progressKey(){
+  const weekKey = state.weeklyInfo?.weekKey || 'unknown-week';
+  const playlistNo = state.activePlaylist?.playlistNo || state.weeklyInfo?.playlistNo || 'unknown-playlist';
+  return `${weekKey}:${playlistNo}`;
+}
+
+function saveCurrentProgress(reason = 'auto'){
+  if(!state.cards.length) return;
+
+  const store = readWeeklyProgress();
+  const key = progressKey();
+  store[key] = {
+    currentIndex: state.currentIndex,
+    total: state.cards.length,
+    playlistNo: state.activePlaylist?.playlistNo || state.weeklyInfo?.playlistNo || null,
+    weekKey: state.weeklyInfo?.weekKey || null,
+    updatedAt: new Date().toISOString(),
+    reason
+  };
+  writeWeeklyProgress(store);
+}
+
+function restoreCurrentProgress(){
+  const store = readWeeklyProgress();
+  const saved = store[progressKey()];
+  if(!saved || !Number.isInteger(saved.currentIndex)) return;
+
+  if(saved.currentIndex >= 0 && saved.currentIndex < state.cards.length){
+    state.currentIndex = saved.currentIndex;
+  }
+}
 
 function updateButton(){
   button.classList.toggle('is-playing', state.isPlaying);
@@ -31,6 +81,7 @@ async function playLoop(runId){
     const card = getCurrentCard();
     if(!card) break;
 
+    saveCurrentProgress('card_view');
     renderCurrentCard();
     track('card_view', {
       index: state.currentIndex,
@@ -66,6 +117,7 @@ async function playLoop(runId){
       weekKey: state.weeklyInfo?.weekKey || null
     });
     nextCard();
+    saveCurrentProgress('card_complete');
   }
 }
 
@@ -90,6 +142,7 @@ function stopAndRender(){
       playlistNo: state.activePlaylist?.playlistNo || null
     });
   }
+  saveCurrentProgress('play_stop');
   stopPlayback();
   updateButton();
 }
@@ -204,6 +257,7 @@ async function loadCards(){
   state.activeChapter = weekly.chapter;
   state.weeklyInfo = weekly.weeklyInfo;
   state.currentIndex = 0;
+  restoreCurrentProgress();
 
   track('app_loaded', {
     allCardCount: state.allCards.length,
