@@ -2033,7 +2033,7 @@ body{
 @media (max-width:430px){
 
   :root{
-    --lf-meta-font-mobile-small: 30px;
+    --lf-meta-font-mobile-small: 25px;
   }
 
   .text-area .chapter-title{
