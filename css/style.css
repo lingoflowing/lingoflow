@@ -1967,7 +1967,7 @@ body{
   }
 
   .text-area .chapter-title{
-    font-size:clamp(17px,5vw,21px) !important;
+    font-size:clamp(5px,5vw,21px) !important;
   }
 }
 
