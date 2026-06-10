@@ -1662,3 +1662,22 @@ img#photo.photo{
   margin-top:auto !important;
   margin-bottom:0 !important;
 }
+
+/* ===== Phase103 BUTTON SAFE HEIGHT ===== */
+
+:root{
+  --lf-reserved-height: 410px;
+  --lf-image-max-height: calc(100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom));
+}
+
+.play-stop-button{
+  width:54px !important;
+  height:54px !important;
+  margin-top:12px !important;
+  margin-bottom:8px !important;
+}
+
+.card{
+  height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+  max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+}
