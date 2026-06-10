@@ -3,65 +3,161 @@
 html,body{
   margin:0;
   width:100%;
-  min-height:100%;
+  height:100%;
   background:#f6f3ed;
   color:#2b241c;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Serif JP","Noto Sans JP","Noto Sans TC",serif;
-  overflow-x:hidden;
+  overflow:hidden;
 }
 
 body{
   min-height:100svh;
 }
 
+/* ===== LingoFlow Clean Layout v1 =====
+   Goal:
+   - 1画面内に収める
+   - 再生ボタンを必ず見せる
+   - 画像を切らない
+   - 写真左右の余白を出さない
+   - 画像幅は「使える高さ」から決める
+*/
+
+:root{
+  --lf-page-pad: 16px;
+  --lf-button-size: 54px;
+  --lf-button-bottom: 28px;
+
+  /* テキスト領域＋ボタン領域として確保する高さ */
+  --lf-reserved-height: 385px;
+
+  /* 画像に使える最大高さ */
+  --lf-image-h: calc(100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom));
+
+  /* 画像は4:3なので、高さから幅を決める */
+  --lf-card-w: min(96vw, calc(var(--lf-image-h) * 4 / 3));
+}
+
 .app{
   width:100%;
+  height:100svh;
   min-height:100svh;
-  padding:clamp(10px,2vw,22px);
-  padding-bottom:calc(clamp(12px,2vw,22px) + env(safe-area-inset-bottom));
+  padding:var(--lf-page-pad);
+  padding-bottom:calc(var(--lf-button-size) + var(--lf-button-bottom) + 18px + env(safe-area-inset-bottom));
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
   background:#f6f3ed;
+  overflow:hidden;
 }
 
 .card{
-  width:min(96vw,760px);
-  min-height:0;
+  width:var(--lf-card-w);
+  max-width:96vw;
+  height:auto;
+  max-height:calc(100svh - var(--lf-button-size) - var(--lf-button-bottom) - 24px - env(safe-area-inset-bottom));
   display:flex;
   flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  align-items:stretch;
+  justify-content:flex-start;
   overflow:visible;
   border-radius:28px;
 }
 
+/* 画像枠はカード幅と完全一致。左右余白を作らない */
 .photo-wrap{
   width:100%;
+  height:auto;
+  max-height:var(--lf-image-h);
+  aspect-ratio:4 / 3;
   overflow:hidden;
   border-radius:clamp(20px,2vw,30px) clamp(20px,2vw,30px) 0 0;
   background:#eee7dc;
+  flex:0 0 auto;
 }
 
-.photo{
+/* 画像は枠いっぱい。ただし4:3画像なので切れない */
+.photo,
+img#photo.photo{
   display:block;
   width:100%;
-  aspect-ratio:4/3;
-  object-fit:cover;
+  height:100%;
+  max-width:none;
+  max-height:none;
+  aspect-ratio:auto;
+  object-fit:contain;
+  object-position:center center;
   background:#eee7dc;
+  opacity:1;
+  transition:opacity .52s ease, filter .52s ease, transform .52s ease;
+}
+
+.photo.is-changing{
+  opacity:.18;
+  filter:blur(2px);
+  transform:scale(.995);
+}
+
+.photo.is-initializing{
+  visibility:hidden;
+  opacity:0;
 }
 
 .text-area{
   width:100%;
-  background:rgba(255,250,242,.92);
-  padding:clamp(16px,2.4vw,28px) clamp(16px,3vw,34px) clamp(14px,2.4vw,24px);
+  flex:0 0 auto;
+  background:#fffaf2;
+  padding:0 clamp(16px,3vw,34px) clamp(12px,2vw,20px);
   text-align:center;
   box-shadow:0 18px 42px rgba(60,45,25,.12);
   border-radius:0 0 clamp(20px,2vw,30px) clamp(20px,2vw,30px);
+  overflow:hidden;
+}
+
+.text-area .meta-bar{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  width:100%;
+  margin:0 0 clamp(10px,1.6vw,16px) 0;
+  padding:clamp(10px,1.6vw,16px) 0 0 0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  text-align:right;
+  line-height:1.35;
+  font-size:0;
+}
+
+#chapterTitle.chapter-title{
+  display:block;
+  width:100%;
+  font-size:15px;
+  font-weight:400;
+  line-height:1.35;
+  letter-spacing:0;
+  color:#8a6b44;
+  opacity:1;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  white-space:nowrap;
+  text-align:right;
+  transform:none;
+}
+
+#playlistTitle.playlist-title,
+#progress.progress-text{
+  display:none;
+}
+
+.word-block{
+  margin-top:0;
 }
 
 .word-zh{
-  font-size:clamp(38px,5.6vw,54px);
+  font-size:clamp(34px,4.8vw,52px);
   line-height:1.1;
   font-weight:500;
   letter-spacing:.08em;
@@ -69,52 +165,55 @@ body{
 }
 
 .word-pinyin{
-  margin-top:8px;
-  font-size:clamp(18px,2.5vw,25px);
+  margin-top:6px;
+  font-size:clamp(18px,2.2vw,24px);
   line-height:1.35;
   color:#8a6b44;
 }
 
 .word-ja{
-  margin-top:4px;
-  font-size:clamp(16px,2.1vw,21px);
-  line-height:1.45;
+  margin-top:3px;
+  font-size:clamp(17px,2.1vw,22px);
+  line-height:1.35;
   color:#5f5144;
 }
 
 .sentence-block{
-  width:min(360px,100%);
-  margin:18px auto 0;
-  padding-top:16px;
+  width:min(420px,100%);
+  margin:12px auto 0;
+  padding-top:12px;
   border-top:1px solid rgba(138,107,68,.22);
 }
 
 .sentence-zh{
-  font-size:clamp(22px,3.1vw,30px);
-  line-height:1.45;
+  font-size:clamp(22px,2.9vw,31px);
+  line-height:1.4;
   color:#2b241c;
 }
 
 .sentence-pinyin{
   margin-top:6px;
-  font-size:clamp(16px,2.1vw,21px);
-  line-height:1.45;
+  font-size:clamp(17px,2.1vw,23px);
+  line-height:1.4;
   color:#8a6b44;
 }
 
 .sentence-ja{
   margin-top:4px;
-  font-size:clamp(15px,1.9vw,18px);
-  line-height:1.45;
+  font-size:clamp(16px,2vw,22px);
+  line-height:1.4;
   color:#5f5144;
 }
 
+/* 再生ボタンはレイアウト外に固定。タスクバーから浮かせる */
 .play-stop-button{
-  position:static;
-  transform:none;
-  flex:0 0 auto;
-  width:68px;
-  height:68px;
+  position:fixed;
+  left:50%;
+  bottom:calc(var(--lf-button-bottom) + env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  width:var(--lf-button-size);
+  height:var(--lf-button-size);
+  margin:0;
   border-radius:50%;
   border:1px solid rgba(255,255,255,.78);
   background:rgba(255,250,242,.88);
@@ -128,12 +227,11 @@ body{
   justify-content:center;
   cursor:pointer;
   transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
-  z-index:3;
-  margin:18px 0 calc(4px + env(safe-area-inset-bottom));
+  z-index:9999;
 }
 
 .play-stop-button:active{
-  transform:scale(.96);
+  transform:translateX(-50%) scale(.96);
   box-shadow:0 6px 18px rgba(55,38,18,.16);
 }
 
@@ -143,84 +241,32 @@ body{
   border-color:rgba(255,255,255,.42);
 }
 
-.play-stop-icon{
-  width:42px;
-  height:42px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
+.play-stop-icon,
 .play-stop-icon svg{
-  width:42px;
-  height:42px;
+  width:34px;
+  height:34px;
   display:block;
   fill:currentColor;
 }
 
-.error-message{
-  max-width:560px;
-  text-align:center;
-  color:rgba(43,36,28,.68);
-  line-height:1.7;
-}
-
-.photo{
-  opacity:1;
-  transition:opacity .52s ease, filter .52s ease, transform .52s ease;
-}
-
-.photo.is-changing{
-  opacity:.18;
-  filter:blur(2px);
-  transform:scale(.995);
-}
-
-@media (orientation:portrait) and (max-width:700px){
-  .app{
-    padding:8px;
-    padding-bottom:calc(10px + env(safe-area-inset-bottom));
-  }
-
-  .card{
-    width:min(96vw,430px);
-  }
-
-  .photo{
-    aspect-ratio:1/1;
+/* 低い画面では文字を少しだけ詰めて、ボタンを必ず守る */
+@media (max-height:760px){
+  :root{
+    --lf-reserved-height: 405px;
+    --lf-button-bottom: 24px;
   }
 
   .text-area{
-    padding:15px 16px 12px;
-  }
-
-  .sentence-block{
-    margin-top:13px;
-    padding-top:12px;
-  }
-
-  .play-stop-button{
-    width:58px;
-    height:58px;
-    margin-top:14px;
-    margin-bottom:calc(8px + env(safe-area-inset-bottom));
-  }
-
-  .play-stop-icon,
-  .play-stop-icon svg{
-    width:36px;
-    height:36px;
-  }
-}
-
-@media (max-height:720px){
-  .photo{
-    aspect-ratio:16/9;
-  }
-
-  .text-area{
-    padding-top:12px;
     padding-bottom:10px;
+  }
+
+  .word-zh{
+    font-size:clamp(30px,4.2vw,44px);
+  }
+
+  .word-pinyin,
+  .word-ja{
+    font-size:clamp(16px,2vw,21px);
   }
 
   .sentence-block{
@@ -228,25 +274,70 @@ body{
     padding-top:10px;
   }
 
-  .play-stop-button{
-    width:54px;
-    height:54px;
-    margin-top:10px;
+  .sentence-zh{
+    font-size:clamp(20px,2.6vw,27px);
   }
 
-  .play-stop-icon,
-  .play-stop-icon svg{
-    width:34px;
-    height:34px;
+  .sentence-pinyin,
+  .sentence-ja{
+    font-size:clamp(15px,1.9vw,20px);
   }
 }
 
-@media (max-width:330px){
-  .word-zh{font-size:33px}
-  .word-pinyin{font-size:16px}
-  .word-ja{font-size:15px}
-  .sentence-zh{font-size:18px}
-  .sentence-pinyin,.sentence-ja{font-size:14px}
+/* スマホ縦 */
+@media (orientation:portrait) and (max-width:700px){
+  :root{
+    --lf-page-pad:8px;
+    --lf-reserved-height:385px;
+    --lf-button-bottom:24px;
+  }
+
+  .card{
+    width:min(96vw,430px);
+  }
+
+  #chapterTitle.chapter-title{
+    font-size:15px;
+  }
+
+  .word-zh{
+    font-size:clamp(34px,10vw,44px);
+  }
+
+  .sentence-zh{
+    font-size:clamp(21px,6vw,25px);
+  }
+
+  .sentence-pinyin,
+  .sentence-ja{
+    font-size:clamp(16px,4.5vw,19px);
+  }
+}
+
+/* iPhone SEなど低い画面 */
+@media (max-height:690px){
+  :root{
+    --lf-reserved-height:410px;
+    --lf-button-bottom:22px;
+  }
+
+  .word-zh{
+    font-size:30px;
+  }
+
+  .word-pinyin,
+  .word-ja{
+    font-size:15px;
+  }
+
+  .sentence-zh{
+    font-size:18px;
+  }
+
+  .sentence-pinyin,
+  .sentence-ja{
+    font-size:14px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -260,1245 +351,9 @@ body{
   }
 }
 
-
-/* ===== Phase53 BUTTONFIX v1 ===== */
-/* PC/large screen: keep the whole card and play button inside viewport */
-.app {
-  min-height: 100svh !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding-top: 14px !important;
-  padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+.error-message{
+  max-width:560px;
+  text-align:center;
+  color:rgba(43,36,28,.68);
+  line-height:1.7;
 }
-
-.card {
-  max-height: calc(100svh - 28px - env(safe-area-inset-bottom)) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-}
-
-.photo-wrap {
-  flex: 0 1 auto !important;
-}
-
-.photo {
-  max-height: min(52svh, 470px) !important;
-  aspect-ratio: 16 / 9 !important;
-  object-fit: cover !important;
-}
-
-.text-area {
-  flex: 0 0 auto !important;
-  padding-top: clamp(12px, 1.8vw, 20px) !important;
-  padding-bottom: clamp(10px, 1.6vw, 16px) !important;
-}
-
-.word-zh {
-  font-size: clamp(32px, 4vw, 44px) !important;
-}
-
-.word-pinyin {
-  margin-top: 5px !important;
-  font-size: clamp(15px, 1.8vw, 20px) !important;
-}
-
-.word-ja {
-  margin-top: 2px !important;
-  font-size: clamp(13px, 1.6vw, 17px) !important;
-}
-
-.sentence-block {
-  margin-top: 12px !important;
-  padding-top: 12px !important;
-}
-
-.sentence-zh {
-  font-size: clamp(18px, 2.2vw, 25px) !important;
-}
-
-.sentence-pinyin,
-.sentence-ja {
-  font-size: clamp(13px, 1.5vw, 16px) !important;
-}
-
-.play-stop-button {
-  flex: 0 0 auto !important;
-  width: 58px !important;
-  height: 58px !important;
-  margin: 12px auto 0 !important;
-  position: relative !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-}
-
-.play-stop-icon,
-.play-stop-icon svg {
-  width: 36px !important;
-  height: 36px !important;
-}
-
-/* Tablet / narrow PC */
-@media (max-width: 900px) {
-  .app {
-    padding-top: 10px !important;
-    padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    max-height: calc(100svh - 22px - env(safe-area-inset-bottom)) !important;
-  }
-
-  .photo {
-    max-height: 46svh !important;
-  }
-
-  .text-area {
-    padding-top: 12px !important;
-    padding-bottom: 10px !important;
-  }
-
-  .play-stop-button {
-    width: 56px !important;
-    height: 56px !important;
-    margin-top: 10px !important;
-  }
-}
-
-/* iPhone / portrait: square image but keep button visible */
-@media (orientation: portrait) and (max-width: 700px) {
-  .app {
-    align-items: center !important;
-    padding: 8px !important;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(96vw, 430px) !important;
-    max-height: calc(100svh - 20px - env(safe-area-inset-bottom)) !important;
-  }
-
-  .photo {
-    aspect-ratio: 1 / 1 !important;
-    max-height: 48svh !important;
-  }
-
-  .text-area {
-    padding: 13px 16px 10px !important;
-  }
-
-  .word-zh {
-    font-size: clamp(30px, 9vw, 40px) !important;
-  }
-
-  .word-pinyin,
-  .word-ja {
-    font-size: 14px !important;
-  }
-
-  .sentence-block {
-    margin-top: 10px !important;
-    padding-top: 10px !important;
-  }
-
-  .sentence-zh {
-    font-size: 17px !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja {
-    font-size: 12.5px !important;
-  }
-
-  .play-stop-button {
-    width: 54px !important;
-    height: 54px !important;
-    margin-top: 10px !important;
-    margin-bottom: 0 !important;
-  }
-
-  .play-stop-icon,
-  .play-stop-icon svg {
-    width: 34px !important;
-    height: 34px !important;
-  }
-}
-
-/* Very short PC windows */
-@media (max-height: 760px) {
-  .photo {
-    max-height: 42svh !important;
-    aspect-ratio: 16 / 8.6 !important;
-  }
-
-  .text-area {
-    padding-top: 10px !important;
-    padding-bottom: 8px !important;
-  }
-
-  .word-zh {
-    font-size: clamp(28px, 3.6vw, 38px) !important;
-  }
-
-  .word-pinyin,
-  .word-ja {
-    font-size: 13px !important;
-  }
-
-  .sentence-block {
-    margin-top: 8px !important;
-    padding-top: 8px !important;
-  }
-
-  .sentence-zh {
-    font-size: 16px !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja {
-    font-size: 12px !important;
-  }
-
-  .play-stop-button {
-    width: 50px !important;
-    height: 50px !important;
-    margin-top: 8px !important;
-  }
-
-  .play-stop-icon,
-  .play-stop-icon svg {
-    width: 32px !important;
-    height: 32px !important;
-  }
-}
-
-/* iPhone SE / small height */
-@media (max-width: 380px), (max-height: 690px) {
-  .photo {
-    max-height: 43svh !important;
-  }
-
-  .text-area {
-    padding-top: 10px !important;
-    padding-bottom: 8px !important;
-  }
-
-  .word-zh {
-    font-size: 30px !important;
-  }
-
-  .sentence-zh {
-    font-size: 16px !important;
-  }
-
-  .play-stop-button {
-    width: 50px !important;
-    height: 50px !important;
-    margin-top: 8px !important;
-  }
-}
-
-
-/* ===== Phase53 BUTTONFIX v2 ===== */
-/* Goal:
-   - iPhone: button should sit near the lower side of the screen
-   - but never disappear outside the viewport
-   - keep a small safe-area gap at the bottom
-*/
-
-/* Base: card takes almost the full viewport height */
-.app {
-  min-height: 100svh !important;
-  height: 100svh !important;
-  padding-top: 10px !important;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: hidden !important;
-}
-
-.card {
-  width: min(96vw, 760px) !important;
-  height: calc(100svh - 20px - env(safe-area-inset-bottom)) !important;
-  max-height: calc(100svh - 20px - env(safe-area-inset-bottom)) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  overflow: visible !important;
-}
-
-.photo-wrap {
-  flex: 0 0 auto !important;
-}
-
-.text-area {
-  flex: 0 0 auto !important;
-}
-
-.play-stop-button {
-  flex: 0 0 auto !important;
-  position: relative !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-  z-index: 5 !important;
-}
-
-/* PC / landscape:
-   keep button visible by limiting image height.
-*/
-@media (orientation: landscape), (min-width: 701px) {
-  .card {
-    justify-content: flex-start !important;
-  }
-
-  .photo {
-    aspect-ratio: 16 / 9 !important;
-    max-height: min(50svh, 460px) !important;
-  }
-
-  .text-area {
-    padding-top: 12px !important;
-    padding-bottom: 10px !important;
-  }
-
-  .sentence-block {
-    margin-top: 10px !important;
-    padding-top: 10px !important;
-  }
-
-  .play-stop-button {
-    width: 56px !important;
-    height: 56px !important;
-    margin: 10px auto 0 !important;
-  }
-}
-
-/* iPhone / portrait:
-   The button is pushed toward the lower side by using auto top margin.
-   Because the card height is viewport-bound, it stays inside the screen.
-*/
-@media (orientation: portrait) and (max-width: 700px) {
-  .app {
-    padding: 8px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(96vw, 430px) !important;
-    height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    max-height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    justify-content: flex-start !important;
-  }
-
-  .photo {
-    aspect-ratio: 1 / 1 !important;
-    max-height: 48svh !important;
-  }
-
-  .text-area {
-    padding-top: 12px !important;
-    padding-bottom: 10px !important;
-  }
-
-  .word-zh {
-    font-size: clamp(30px, 9vw, 40px) !important;
-  }
-
-  .word-pinyin,
-  .word-ja {
-    font-size: 14px !important;
-  }
-
-  .sentence-block {
-    margin-top: 10px !important;
-    padding-top: 10px !important;
-  }
-
-  .sentence-zh {
-    font-size: 17px !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja {
-    font-size: 12.5px !important;
-  }
-
-  .play-stop-button {
-    width: 54px !important;
-    height: 54px !important;
-
-    /* key change: lower side, but still inside */
-    margin-top: auto !important;
-    margin-bottom: 2px !important;
-  }
-
-  .play-stop-icon,
-  .play-stop-icon svg {
-    width: 34px !important;
-    height: 34px !important;
-  }
-}
-
-/* Short iPhone / iPhone SE:
-   reduce image/text slightly, keep button visible at bottom.
-*/
-@media (orientation: portrait) and (max-height: 700px) {
-  .photo {
-    max-height: 43svh !important;
-  }
-
-  .text-area {
-    padding-top: 9px !important;
-    padding-bottom: 7px !important;
-  }
-
-  .word-zh {
-    font-size: 29px !important;
-  }
-
-  .word-pinyin,
-  .word-ja {
-    font-size: 12.5px !important;
-  }
-
-  .sentence-block {
-    margin-top: 7px !important;
-    padding-top: 7px !important;
-  }
-
-  .sentence-zh {
-    font-size: 15.5px !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja {
-    font-size: 11.5px !important;
-  }
-
-  .play-stop-button {
-    width: 48px !important;
-    height: 48px !important;
-    margin-top: auto !important;
-    margin-bottom: 1px !important;
-  }
-
-  .play-stop-icon,
-  .play-stop-icon svg {
-    width: 30px !important;
-    height: 30px !important;
-  }
-}
-
-/* Very short browser viewport:
-   prioritize keeping the play button visible.
-*/
-@media (max-height: 620px) {
-  .photo {
-    max-height: 38svh !important;
-  }
-
-  .word-zh {
-    font-size: 27px !important;
-  }
-
-  .sentence-zh {
-    font-size: 14.5px !important;
-  }
-
-  .play-stop-button {
-    width: 44px !important;
-    height: 44px !important;
-    margin-top: auto !important;
-    margin-bottom: 0 !important;
-  }
-
-  .play-stop-icon,
-  .play-stop-icon svg {
-    width: 28px !important;
-    height: 28px !important;
-  }
-}
-
-
-/* ===== Phase55 TYPOGRAPHY v2 =====
-   Goal:
-   - Keep the Chinese / pinyin / Japanese hierarchy.
-   - Scale the whole text system up because pinyin and Japanese were still hard to read.
-   - Especially make sentence Japanese close to the previous sentence Chinese size.
-   - Do not change JS, audio, analytics, or data.
-*/
-
-/* PC / base */
-.word-zh {
-  font-size: clamp(38px, 4.8vw, 52px) !important;
-}
-
-.word-pinyin,
-.word-ja {
-  font-size: clamp(18px, 2.2vw, 24px) !important;
-}
-
-.sentence-zh {
-  font-size: clamp(23px, 2.9vw, 31px) !important;
-}
-
-.sentence-pinyin,
-.sentence-ja {
-  font-size: clamp(17px, 2.1vw, 23px) !important;
-}
-
-.sentence-block {
-  width: min(420px, 100%) !important;
-}
-
-/* iPhone / portrait */
-@media (orientation: portrait) and (max-width: 700px) {
-  .photo {
-    max-height: 45svh !important;
-  }
-
-  .text-area {
-    padding-top: 12px !important;
-    padding-bottom: 10px !important;
-  }
-
-  .word-zh {
-    font-size: clamp(35px, 10.4vw, 44px) !important;
-  }
-
-  .word-pinyin,
-  .word-ja {
-    font-size: clamp(17px, 5vw, 21px) !important;
-  }
-
-  .sentence-block {
-    width: min(420px, 100%) !important;
-    margin-top: 10px !important;
-    padding-top: 10px !important;
-  }
-
-  .sentence-zh {
-    font-size: clamp(21px, 6.2vw, 25px) !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja {
-    font-size: clamp(16px, 4.7vw, 19px) !important;
-  }
-}
-
-/* iPhone SE / short portrait */
-@media (orientation: portrait) and (max-height: 700px) {
-  .photo {
-    max-height: 40svh !important;
-  }
-
-  .text-area {
-    padding-top: 10px !important;
-    padding-bottom: 8px !important;
-  }
-
-  .word-zh {
-    font-size: 34px !important;
-  }
-
-  .word-pinyin,
-  .word-ja {
-    font-size: 16px !important;
-  }
-
-  .sentence-block {
-    margin-top: 8px !important;
-    padding-top: 8px !important;
-  }
-
-  .sentence-zh {
-    font-size: 21px !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja {
-    font-size: 15.5px !important;
-  }
-
-  .play-stop-button {
-    width: 48px !important;
-    height: 48px !important;
-    margin-top: auto !important;
-    margin-bottom: 1px !important;
-  }
-}
-
-/* Extremely short browser viewport: keep readability, but protect the play button. */
-@media (max-height: 620px) {
-  .photo {
-    max-height: 36svh !important;
-  }
-
-  .word-zh {
-    font-size: 31px !important;
-  }
-
-  .word-pinyin,
-  .word-ja {
-    font-size: 14.5px !important;
-  }
-
-  .sentence-zh {
-    font-size: 18px !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja {
-    font-size: 14px !important;
-  }
-}
-
-/* ===== Phase66 IMAGE LARGE v1 =====
-   Goal:
-   - Keep all text sizes unchanged.
-   - Make only the image area larger on PC Firefox and mobile.
-   - Use 4:3 because current card images are 1366x1024 class.
-   - Keep the play button inside the viewport.
-*/
-
-.card {
-  width: min(96vw, 900px) !important;
-}
-
-@media (orientation: landscape), (min-width: 701px) {
-  .card {
-    width: min(96vw, 900px) !important;
-    height: calc(100svh - 20px - env(safe-area-inset-bottom)) !important;
-    max-height: calc(100svh - 20px - env(safe-area-inset-bottom)) !important;
-    justify-content: flex-start !important;
-  }
-
-  .photo {
-    aspect-ratio: 4 / 3 !important;
-    max-height: min(70svh, 700px) !important;
-    object-fit: cover !important;
-  }
-
-  .play-stop-button {
-    margin-top: auto !important;
-    margin-bottom: 2px !important;
-  }
-}
-
-@media (orientation: portrait) and (max-width: 700px) {
-  .card {
-    width: min(96vw, 430px) !important;
-    height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    max-height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    justify-content: flex-start !important;
-  }
-
-  .photo {
-    aspect-ratio: 1 / 1 !important;
-    max-height: 55svh !important;
-    object-fit: cover !important;
-  }
-
-  .play-stop-button {
-    margin-top: auto !important;
-    margin-bottom: 2px !important;
-  }
-}
-
-@media (orientation: portrait) and (max-height: 700px) {
-  .photo {
-    max-height: 47svh !important;
-  }
-}
-
-/* ===== Phase67 IMAGE LARGE v2 / LANDSCAPE SAFE =====
-   Goal:
-   - PC Firefox: use more left/right and lower empty space by enlarging image/card.
-   - iPhone portrait: enlarge image a little more because lower space remains.
-   - iPhone landscape: prevent sentence/play button from disappearing.
-   - Keep normal PC/portrait text sizes unchanged.
-*/
-
-/* PC / large landscape: larger card and image */
-@media (orientation: landscape) and (min-width: 901px) and (min-height: 701px) {
-  .app {
-    padding-top: 8px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(96vw, 1180px) !important;
-    height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    max-height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    justify-content: flex-start !important;
-  }
-
-  .photo {
-    aspect-ratio: 4 / 3 !important;
-    max-height: min(76svh, 780px) !important;
-    object-fit: cover !important;
-  }
-
-  .play-stop-button {
-    margin-top: auto !important;
-    margin-bottom: 2px !important;
-  }
-}
-
-/* Medium PC / tablet landscape */
-@media (orientation: landscape) and (min-width: 701px) and (max-height: 700px) {
-  .card {
-    width: min(96vw, 980px) !important;
-  }
-
-  .photo {
-    aspect-ratio: 4 / 3 !important;
-    max-height: 62svh !important;
-    object-fit: cover !important;
-  }
-}
-
-/* iPhone portrait: use a little more lower space */
-@media (orientation: portrait) and (max-width: 700px) and (min-height: 701px) {
-  .photo {
-    aspect-ratio: 1 / 1 !important;
-    max-height: 58svh !important;
-    object-fit: cover !important;
-  }
-}
-
-/* iPhone SE / short portrait: keep safe, but slightly larger than previous */
-@media (orientation: portrait) and (max-width: 430px) and (max-height: 700px) {
-  .photo {
-    aspect-ratio: 1 / 1 !important;
-    max-height: 49svh !important;
-    object-fit: cover !important;
-  }
-}
-
-/* iPhone landscape / very short landscape:
-   Do NOT use the large PC image rule here.
-   Make the image shallow and allow vertical scroll as a safety net.
-*/
-@media (orientation: landscape) and (max-height: 500px) {
-  .app {
-    height: 100svh !important;
-    min-height: 100svh !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    padding-top: 6px !important;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(94vw, 720px) !important;
-    height: auto !important;
-    min-height: calc(100svh - 12px - env(safe-area-inset-bottom)) !important;
-    max-height: none !important;
-    justify-content: flex-start !important;
-  }
-
-  .photo {
-    aspect-ratio: 16 / 9 !important;
-    max-height: 38svh !important;
-    object-fit: cover !important;
-  }
-
-  .text-area {
-    padding-top: 7px !important;
-    padding-bottom: 6px !important;
-  }
-
-  .sentence-block {
-    margin-top: 6px !important;
-    padding-top: 6px !important;
-  }
-
-  .play-stop-button {
-    width: 44px !important;
-    height: 44px !important;
-    margin: 6px auto 0 !important;
-  }
-
-  .play-stop-icon,
-  .play-stop-icon svg {
-    width: 28px !important;
-    height: 28px !important;
-  }
-}
-
-
-/* ===== Phase68 PC MAX IMAGE / BUTTON RESERVED =====
-   Goal:
-   - PC Firefox: reserve the play-button area and use the remaining height for the image.
-   - Keep iPhone portrait and iPhone landscape behavior from Phase67.
-   - Do not change text sizes.
-*/
-
-/* PC / large landscape only */
-@media (orientation: landscape) and (min-width: 901px) and (min-height: 701px) {
-  .app {
-    height: 100svh !important;
-    min-height: 100svh !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    overflow: hidden !important;
-    padding-top: 8px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(96vw, 1280px) !important;
-    height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    max-height: calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    overflow: visible !important;
-  }
-
-  .photo-wrap {
-    flex: 0 1 auto !important;
-  }
-
-  .photo {
-    aspect-ratio: 4 / 3 !important;
-    /* 画像以外に、文字エリア＋再生ボタン＋安全余白ぶんを残す */
-    max-height: calc(100svh - 245px - env(safe-area-inset-bottom)) !important;
-    width: 100% !important;
-    object-fit: cover !important;
-  }
-
-  .text-area {
-    flex: 0 0 auto !important;
-  }
-
-  .play-stop-button {
-    flex: 0 0 auto !important;
-    margin-top: auto !important;
-    margin-bottom: 0 !important;
-  }
-}
-
-/* PC but shorter browser height: protect text and button */
-@media (orientation: landscape) and (min-width: 901px) and (max-height: 760px) {
-  .photo {
-    max-height: calc(100svh - 230px - env(safe-area-inset-bottom)) !important;
-  }
-}
-
-/* ===== Phase69 UNIFIED MAX IMAGE / BUTTON RESERVED =====
-   Goal:
-   - Stop using fixed svh image-height caps for PC and iPhone portrait.
-   - Reserve text area + play button + safe area.
-   - Use the remaining viewport height for the image.
-   - Keep iPhone landscape protected so sentence and play button do not disappear.
-   - Do not change text sizes.
-*/
-
-/* Shared full-screen layout for PC and iPhone portrait */
-@media (min-width: 701px), (orientation: portrait) {
-  .app {
-    height: 100svh !important;
-    min-height: 100svh !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    overflow: hidden !important;
-  }
-
-  .card {
-    height: calc(100svh - var(--lf-app-y-padding, 16px) - env(safe-area-inset-bottom)) !important;
-    max-height: calc(100svh - var(--lf-app-y-padding, 16px) - env(safe-area-inset-bottom)) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    overflow: visible !important;
-  }
-
-  .photo-wrap {
-    flex: 0 1 auto !important;
-  }
-
-  .text-area {
-    flex: 0 0 auto !important;
-  }
-
-  .play-stop-button {
-    flex: 0 0 auto !important;
-    margin-top: auto !important;
-  }
-}
-
-/* PC: reserve text + play button, use the rest for image */
-@media (orientation: landscape) and (min-width: 901px) and (min-height: 701px) {
-  .app {
-    --lf-app-y-padding: 16px;
-    padding-top: 8px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(96vw, 1360px) !important;
-  }
-
-  .photo {
-    aspect-ratio: 4 / 3 !important;
-    max-height: calc(100svh - 225px - env(safe-area-inset-bottom)) !important;
-    width: 100% !important;
-    object-fit: cover !important;
-  }
-
-  .play-stop-button {
-    margin-bottom: 0 !important;
-  }
-}
-
-/* PC shorter height: protect text + button */
-@media (orientation: landscape) and (min-width: 701px) and (max-height: 760px) {
-  .photo {
-    aspect-ratio: 4 / 3 !important;
-    max-height: calc(100svh - 220px - env(safe-area-inset-bottom)) !important;
-    object-fit: cover !important;
-  }
-}
-
-/* iPhone portrait: reserve text + play button, use the rest for image */
-@media (orientation: portrait) and (max-width: 700px) {
-  .app {
-    --lf-app-y-padding: 16px;
-    padding: 8px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(96vw, 430px) !important;
-  }
-
-  .photo {
-    aspect-ratio: 1 / 1 !important;
-    max-height: calc(100svh - 255px - env(safe-area-inset-bottom)) !important;
-    width: 100% !important;
-    object-fit: cover !important;
-  }
-
-  .play-stop-button {
-    margin-top: auto !important;
-    margin-bottom: 2px !important;
-  }
-}
-
-/* iPhone SE / short portrait: reserve a little more for text + button */
-@media (orientation: portrait) and (max-width: 430px) and (max-height: 700px) {
-  .photo {
-    aspect-ratio: 1 / 1 !important;
-    max-height: calc(100svh - 245px - env(safe-area-inset-bottom)) !important;
-    object-fit: cover !important;
-  }
-
-  .play-stop-button {
-    margin-top: auto !important;
-    margin-bottom: 1px !important;
-  }
-}
-
-/* iPhone landscape: keep Phase67/68 safety.
-   Do not maximize image here because sentence and play button can disappear. */
-@media (orientation: landscape) and (max-height: 500px) {
-  .app {
-    height: 100svh !important;
-    min-height: 100svh !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    padding-top: 6px !important;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card {
-    width: min(94vw, 720px) !important;
-    height: auto !important;
-    min-height: calc(100svh - 12px - env(safe-area-inset-bottom)) !important;
-    max-height: none !important;
-    justify-content: flex-start !important;
-  }
-
-  .photo {
-    aspect-ratio: 16 / 9 !important;
-    max-height: calc(100svh - 210px - env(safe-area-inset-bottom)) !important;
-    object-fit: cover !important;
-  }
-
-  .play-stop-button {
-    margin: 6px auto 0 !important;
-  }
-}
-
-/* ===== Phase90 STARTUP IMAGE FLASH FIX =====
-   Do not show a hard-coded first image before the weekly playlist is resolved.
-*/
-.photo.is-initializing{
-  visibility:hidden !important;
-  opacity:0 !important;
-}
-
-.photo-wrap{
-  background:#eee7dc !important;
-}
-
-
-/* ===== Phase91 META DEFINITIVE CONTROL =====
-   This is the ONLY place to adjust:
-   台湾の朝　朝のはじまり　1 / 20
-
-   Change only these three values:
-   --lf-meta-font-pc
-   --lf-meta-font-mobile
-   --lf-meta-font-mobile-small
-*/
-
-:root{
-  --lf-meta-font-pc: 15px;
-  --lf-meta-font-mobile: 15px;
-  --lf-meta-font-mobile-small: 15px;
-}
-
-.text-area{
-  background:#fffaf2 !important;
-  margin-top:0 !important;
-  padding-top:0 !important;
-  overflow:hidden !important;
-}
-
-.text-area .meta-bar{
-  display:flex !important;
-  justify-content:flex-end !important;
-  align-items:center !important;
-  width:100% !important;
-  margin:0 0 clamp(10px,1.6vw,16px) 0 !important;
-  padding:clamp(10px,1.6vw,16px) 0 0 0 !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  text-align:right !important;
-  line-height:1.35 !important;
-  font-size:0 !important;
-}
-
-/* Strong ID selector: wins over all old .chapter-title rules */
-#chapterTitle.chapter-title{
-  display:block !important;
-  width:100% !important;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Serif JP","Noto Sans JP","Noto Sans TC",serif !important;
-  font-size:var(--lf-meta-font-pc) !important;
-  font-weight:400 !important;
-  line-height:1.35 !important;
-  letter-spacing:0 !important;
-  color:#8a6b44 !important;
-  opacity:1 !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-  background:transparent !important;
-  white-space:nowrap !important;
-  text-align:right !important;
-  transform:none !important;
-}
-
-#playlistTitle.playlist-title,
-#progress.progress-text{
-  display:none !important;
-}
-
-.word-block{
-  margin-top:0 !important;
-}
-
-@media (max-width:700px){
-  #chapterTitle.chapter-title{
-    font-size:var(--lf-meta-font-mobile) !important;
-  }
-}
-
-@media (max-width:430px){
-  #chapterTitle.chapter-title{
-    font-size:var(--lf-meta-font-mobile-small) !important;
-  }
-}
-
-@media (orientation:landscape) and (max-height:500px){
-  .text-area .meta-bar{
-    margin-bottom:6px !important;
-    padding-top:6px !important;
-  }
-  #chapterTitle.chapter-title{
-    font-size:var(--lf-meta-font-mobile-small) !important;
-  }
-}
-
-/* ===== Phase92 Button Spacing ===== */
-
-.play-stop-button{
-    margin-top: 18px !important;
-}
-
-
-/* ===== Phase105 VIEWPORT SAFE MAGAZINE FINAL =====
-   Goal:
-   - 画像は切らない
-   - 写真左右の内側余白を出さない
-   - 再生ボタンを画面下に固定し、タスクバーから離す
-   - ユーザーにスクロールさせない
-*/
-
-:root{
-  /* 画像以外に必要な高さ: テキスト領域 + 再生ボタン + 下余白 */
-  --lf-reserved-height: 470px;
-  --lf-card-max-width: 900px;
-  --lf-card-width-from-height: calc((100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom)) * 4 / 3);
-}
-
-.app{
-  height:100svh !important;
-  min-height:100svh !important;
-  overflow:hidden !important;
-  display:flex !important;
-  align-items:flex-start !important;
-  justify-content:center !important;
-  padding:8px 8px calc(112px + env(safe-area-inset-bottom)) !important;
-  background:#f6f3ed !important;
-}
-
-/* カード幅は「画面高さから逆算」して決める */
-.card{
-  width:min(96vw, var(--lf-card-max-width), var(--lf-card-width-from-height)) !important;
-  max-width:min(96vw, var(--lf-card-max-width)) !important;
-  height:auto !important;
-  max-height:none !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:stretch !important;
-  justify-content:flex-start !important;
-  overflow:visible !important;
-  border-radius:28px !important;
-}
-
-/* 写真枠はカード幅いっぱい。左右余白を作らない */
-.photo-wrap{
-  width:100% !important;
-  height:auto !important;
-  max-height:none !important;
-  aspect-ratio:auto !important;
-  display:block !important;
-  flex:0 0 auto !important;
-  margin:0 !important;
-  padding:0 !important;
-  overflow:hidden !important;
-  background:#eee7dc !important;
-  border-radius:clamp(20px,2vw,30px) clamp(20px,2vw,30px) 0 0 !important;
-}
-
-/* 画像は横幅100%。元比率維持。切り取りなし */
-img#photo.photo{
-  display:block !important;
-  width:100% !important;
-  height:auto !important;
-  max-width:none !important;
-  max-height:none !important;
-  aspect-ratio:auto !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  margin:0 !important;
-  padding:0 !important;
-  background:#eee7dc !important;
-}
-
-/* テキストはカード幅に揃える */
-.text-area{
-  width:100% !important;
-  max-width:none !important;
-  flex:0 0 auto !important;
-  margin:0 !important;
-}
-
-/* 再生ボタンはレイアウト外に固定。タスクバーから離す */
-.play-stop-button{
-  position:fixed !important;
-  left:50% !important;
-  bottom:calc(42px + env(safe-area-inset-bottom)) !important;
-  transform:translateX(-50%) !important;
-  width:54px !important;
-  height:54px !important;
-  margin:0 !important;
-  z-index:9999 !important;
-}
-
-/* 低い画面では画像をさらに小さくしてボタン優先 */
-@media (max-height:850px){
-  :root{
-    --lf-reserved-height: 510px;
-  }
-
-  .word-zh{
-    font-size:clamp(34px,4.2vw,44px) !important;
-  }
-
-  .sentence-zh{
-    font-size:clamp(20px,2.5vw,26px) !important;
-  }
-
-  .sentence-pinyin,
-  .sentence-ja{
-    font-size:clamp(15px,1.8vw,19px) !important;
-  }
-}
-
-/* スマホ縦は横幅優先で自然に表示 */
-@media (orientation:portrait) and (max-width:700px){
-  :root{
-    --lf-reserved-height: 365px;
-  }
-
-  .card{
-    width:min(96vw,430px) !important;
-  }
-
-  .play-stop-button{
-    bottom:calc(24px + env(safe-area-inset-bottom)) !important;
-  }
-}
-
-/* スマホ横はスクロールさせず、ボタン優先 */
-@media (orientation:landscape) and (max-height:500px){
-  :root{
-    --lf-reserved-height: 300px;
-  }
-
-  .app{
-    padding:6px 6px calc(72px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .card{
-    width:min(94vw, calc((100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom)) * 4 / 3)) !important;
-  }
-
-  .text-area{
-    padding-top:7px !important;
-    padding-bottom:6px !important;
-  }
-
-  .play-stop-button{
-    width:44px !important;
-    height:44px !important;
-    bottom:calc(14px + env(safe-area-inset-bottom)) !important;
-  }
-}
-
