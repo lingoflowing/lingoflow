@@ -1448,3 +1448,37 @@ body{
   object-fit:initial !important;
   object-position:center center !important;
 }
+
+
+/* ===== Phase97 NO SIDE MARGIN ===== */
+
+.card{
+  width:min(96vw,900px) !important;
+}
+
+.photo-wrap{
+  width:100% !important;
+  aspect-ratio:auto !important;
+  height:auto !important;
+}
+
+.photo{
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+
+  object-fit:unset !important;
+  aspect-ratio:auto !important;
+  max-height:none !important;
+}
+
+/* Phase98 */
+
+@media (orientation: landscape) and (min-width: 701px){
+
+  .card{
+    width:min(96vw,900px) !important;
+    max-width:900px !important;
+  }
+
+}
