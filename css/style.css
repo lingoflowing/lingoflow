@@ -1350,209 +1350,21 @@ body{
     margin-top: 18px !important;
 }
 
-/* ===== Phase93 IMAGE FULL PRESERVE ===== */
-/* 元画像を切り取らず、全体を表示する */
 
-.photo{
-  object-fit: contain !important;
-  background:#eee7dc !important;
+/* ===== Phase105 VIEWPORT SAFE MAGAZINE FINAL =====
+   Goal:
+   - 画像は切らない
+   - 写真左右の内側余白を出さない
+   - 再生ボタンを画面下に固定し、タスクバーから離す
+   - ユーザーにスクロールさせない
+*/
+
+:root{
+  /* 画像以外に必要な高さ: テキスト領域 + 再生ボタン + 下余白 */
+  --lf-reserved-height: 470px;
+  --lf-card-max-width: 900px;
+  --lf-card-width-from-height: calc((100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom)) * 4 / 3);
 }
-
-.photo-wrap{
-  background:#eee7dc !important;
-}
-
-/* ===== Phase94 IMAGE TRUE CONTAIN ===== */
-/* 画像の縦横を絶対に切らない */
-
-.photo-wrap{
-  background:#eee7dc !important;
-  overflow:hidden !important;
-}
-
-.photo{
-  width:100% !important;
-  height:100% !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  background:#eee7dc !important;
-}
-
-/* PC */
-@media (min-width:701px){
-  .photo-wrap{
-    aspect-ratio:4 / 3 !important;
-    max-height:calc(100svh - 225px - env(safe-area-inset-bottom)) !important;
-  }
-}
-
-/* スマホ縦 */
-@media (orientation:portrait) and (max-width:700px){
-  .photo-wrap{
-    aspect-ratio:4 / 3 !important;
-    max-height:calc(100svh - 255px - env(safe-area-inset-bottom)) !important;
-  }
-}
-
-/* スマホ横 */
-@media (orientation:landscape) and (max-height:500px){
-  .photo-wrap{
-    aspect-ratio:4 / 3 !important;
-    max-height:calc(100svh - 210px - env(safe-area-inset-bottom)) !important;
-  }
-}
-
-/* ===== Phase95 IMAGE STABLE 4:3 CONTAIN ===== */
-/* どの画面でも画像は4:3枠に入れ、縦横を切らない */
-
-.photo-wrap{
-  width:100% !important;
-  aspect-ratio:4 / 3 !important;
-  height:auto !important;
-  max-height:none !important;
-  background:#eee7dc !important;
-  overflow:hidden !important;
-}
-
-.photo{
-  width:100% !important;
-  height:100% !important;
-  aspect-ratio:auto !important;
-  max-height:none !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  background:#eee7dc !important;
-}
-/* ===== Phase96 MAGAZINE IMAGE ===== */
-
-/* 画像枠は画像の比率に従う */
-.photo-wrap{
-  width:100% !important;
-  height:auto !important;
-  aspect-ratio:auto !important;
-
-  background:#eee7dc !important;
-  overflow:hidden !important;
-}
-
-/* 元画像をそのまま表示 */
-.photo{
-  display:block !important;
-
-  width:100% !important;
-  height:auto !important;
-
-  aspect-ratio:auto !important;
-  max-height:none !important;
-
-  object-fit:initial !important;
-  object-position:center center !important;
-}
-
-
-/* ===== Phase97 NO SIDE MARGIN ===== */
-
-.card{
-  width:min(96vw,900px) !important;
-}
-
-.photo-wrap{
-  width:100% !important;
-  aspect-ratio:auto !important;
-  height:auto !important;
-}
-
-.photo{
-  display:block !important;
-  width:100% !important;
-  height:auto !important;
-
-  object-fit:unset !important;
-  aspect-ratio:auto !important;
-  max-height:none !important;
-}
-
-/* Phase98 */
-
-@media (orientation: landscape) and (min-width: 701px){
-
-  .card{
-    width:min(96vw,900px) !important;
-    max-width:900px !important;
-  }
-
-}
-
-/* ===== Phase99 MAGAZINE NATURAL IMAGE FINAL ===== */
-
-.app{
-  height:auto !important;
-  min-height:100svh !important;
-  overflow-x:hidden !important;
-  overflow-y:auto !important;
-}
-
-.card{
-  width:min(96vw,900px) !important;
-  height:auto !important;
-  max-height:none !important;
-}
-
-.photo-wrap{
-  width:100% !important;
-  height:auto !important;
-  max-height:none !important;
-  aspect-ratio:auto !important;
-  background:#eee7dc !important;
-  overflow:hidden !important;
-}
-
-.photo{
-  display:block !important;
-  width:100% !important;
-  height:auto !important;
-  max-height:none !important;
-  aspect-ratio:auto !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-}
-
-/* ===== Phase100 IMAGE NATURAL FINAL ===== */
-
-.app{
-  height:auto !important;
-  min-height:100svh !important;
-  overflow-x:hidden !important;
-  overflow-y:auto !important;
-}
-
-.card{
-  width:min(96vw,900px) !important;
-  height:auto !important;
-  max-height:none !important;
-}
-
-.photo-wrap{
-  width:100% !important;
-  height:auto !important;
-  max-height:none !important;
-  aspect-ratio:auto !important;
-  flex:0 0 auto !important;
-  overflow:hidden !important;
-}
-
-img#photo.photo{
-  display:block !important;
-  width:100% !important;
-  height:auto !important;
-  max-height:none !important;
-  aspect-ratio:auto !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-}
-
-/* ===== Phase101 HEIGHT BASED IMAGE WIDTH ===== */
-/* 1画面内に必ず収める。画像は縦基準で幅を決める */
 
 .app{
   height:100svh !important;
@@ -1561,167 +1373,132 @@ img#photo.photo{
   display:flex !important;
   align-items:flex-start !important;
   justify-content:center !important;
-  padding:8px !important;
-  padding-bottom:calc(8px + env(safe-area-inset-bottom)) !important;
+  padding:8px 8px calc(112px + env(safe-area-inset-bottom)) !important;
+  background:#f6f3ed !important;
 }
 
-/* カード幅は広げすぎない。高さ優先 */
+/* カード幅は「画面高さから逆算」して決める */
 .card{
-  width:auto !important;
-  max-width:96vw !important;
-  height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-  max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+  width:min(96vw, var(--lf-card-max-width), var(--lf-card-width-from-height)) !important;
+  max-width:min(96vw, var(--lf-card-max-width)) !important;
+  height:auto !important;
+  max-height:none !important;
   display:flex !important;
   flex-direction:column !important;
-  align-items:center !important;
+  align-items:stretch !important;
   justify-content:flex-start !important;
   overflow:visible !important;
+  border-radius:28px !important;
 }
 
-/* 画像枠：高さ基準で幅が決まる */
+/* 写真枠はカード幅いっぱい。左右余白を作らない */
 .photo-wrap{
-  width:auto !important;
+  width:100% !important;
   height:auto !important;
-  max-width:96vw !important;
-  max-height:calc(100svh - 360px - env(safe-area-inset-bottom)) !important;
+  max-height:none !important;
   aspect-ratio:auto !important;
+  display:block !important;
+  flex:0 0 auto !important;
+  margin:0 !important;
+  padding:0 !important;
   overflow:hidden !important;
+  background:#eee7dc !important;
+  border-radius:clamp(20px,2vw,30px) clamp(20px,2vw,30px) 0 0 !important;
+}
+
+/* 画像は横幅100%。元比率維持。切り取りなし */
+img#photo.photo{
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-width:none !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  margin:0 !important;
+  padding:0 !important;
   background:#eee7dc !important;
 }
 
-/* 画像：高さに合わせて縮小、縦横比維持 */
-img#photo.photo{
-  display:block !important;
-  width:auto !important;
-  height:auto !important;
-  max-width:96vw !important;
-  max-height:calc(100svh - 360px - env(safe-area-inset-bottom)) !important;
-  aspect-ratio:auto !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-}
-
-/* テキスト幅は画像幅に合わせる */
+/* テキストはカード幅に揃える */
 .text-area{
   width:100% !important;
-  max-width:96vw !important;
+  max-width:none !important;
   flex:0 0 auto !important;
+  margin:0 !important;
 }
 
-/* 再生ボタンは必ず画面内 */
-.play-stop-button{
-  flex:0 0 auto !important;
-  margin-top:auto !important;
-  margin-bottom:0 !important;
-}
-
-/* ===== Phase102 HEIGHT-BASED CARD FINAL ===== */
-
-:root{
-  --lf-reserved-height: 365px;
-  --lf-image-max-height: calc(100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom));
-}
-
-.app{
-  height:100svh !important;
-  min-height:100svh !important;
-  overflow:hidden !important;
-  align-items:flex-start !important;
-  justify-content:center !important;
-  padding:8px !important;
-}
-
-.card{
-  width:min(96vw, calc(var(--lf-image-max-height) * 4 / 3)) !important;
-  max-width:96vw !important;
-  height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-  max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-}
-
-.photo-wrap{
-  width:100% !important;
-  aspect-ratio:4 / 3 !important;
-  height:auto !important;
-  max-height:var(--lf-image-max-height) !important;
-  overflow:hidden !important;
-}
-
-img#photo.photo{
-  width:100% !important;
-  height:100% !important;
-  max-height:none !important;
-  object-fit:contain !important;
-  aspect-ratio:auto !important;
-}
-
-.text-area{
-  width:100% !important;
-}
-
-.play-stop-button{
-  margin-top:auto !important;
-  margin-bottom:0 !important;
-}
-
-/* ===== Phase103 BUTTON SAFE HEIGHT ===== */
-
-:root{
-  --lf-reserved-height: 410px;
-  --lf-image-max-height: calc(100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom));
-}
-
-.play-stop-button{
-  width:54px !important;
-  height:54px !important;
-  margin-top:12px !important;
-  margin-bottom:8px !important;
-}
-
-.card{
-  height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-  max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-}
-
-/* ===== Phase104 FIXED PLAY BUTTON FINAL ===== */
-
-.app{
-  height:100svh !important;
-  min-height:100svh !important;
-  overflow:hidden !important;
-  padding:8px 8px calc(82px + env(safe-area-inset-bottom)) !important;
-  align-items:flex-start !important;
-}
-
-.card{
-  width:min(96vw,720px) !important;
-  height:auto !important;
-  max-height:calc(100svh - 96px - env(safe-area-inset-bottom)) !important;
-  overflow:hidden !important;
-}
-
-.photo-wrap{
-  width:100% !important;
-  aspect-ratio:4 / 3 !important;
-  max-height:calc(100svh - 430px - env(safe-area-inset-bottom)) !important;
-  overflow:hidden !important;
-}
-
-img#photo.photo{
-  width:100% !important;
-  height:100% !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  max-height:none !important;
-}
-
-/* 再生ボタンは常に画面下に固定 */
+/* 再生ボタンはレイアウト外に固定。タスクバーから離す */
 .play-stop-button{
   position:fixed !important;
   left:50% !important;
-  bottom:calc(28px + env(safe-area-inset-bottom)) !important;
+  bottom:calc(42px + env(safe-area-inset-bottom)) !important;
   transform:translateX(-50%) !important;
   width:54px !important;
   height:54px !important;
   margin:0 !important;
   z-index:9999 !important;
 }
+
+/* 低い画面では画像をさらに小さくしてボタン優先 */
+@media (max-height:850px){
+  :root{
+    --lf-reserved-height: 510px;
+  }
+
+  .word-zh{
+    font-size:clamp(34px,4.2vw,44px) !important;
+  }
+
+  .sentence-zh{
+    font-size:clamp(20px,2.5vw,26px) !important;
+  }
+
+  .sentence-pinyin,
+  .sentence-ja{
+    font-size:clamp(15px,1.8vw,19px) !important;
+  }
+}
+
+/* スマホ縦は横幅優先で自然に表示 */
+@media (orientation:portrait) and (max-width:700px){
+  :root{
+    --lf-reserved-height: 365px;
+  }
+
+  .card{
+    width:min(96vw,430px) !important;
+  }
+
+  .play-stop-button{
+    bottom:calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* スマホ横はスクロールさせず、ボタン優先 */
+@media (orientation:landscape) and (max-height:500px){
+  :root{
+    --lf-reserved-height: 300px;
+  }
+
+  .app{
+    padding:6px 6px calc(72px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .card{
+    width:min(94vw, calc((100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom)) * 4 / 3)) !important;
+  }
+
+  .text-area{
+    padding-top:7px !important;
+    padding-bottom:6px !important;
+  }
+
+  .play-stop-button{
+    width:44px !important;
+    height:44px !important;
+    bottom:calc(14px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
