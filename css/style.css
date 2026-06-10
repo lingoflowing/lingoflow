@@ -1351,5 +1351,13 @@ body{
 }
 
 /* ===== Phase93 IMAGE FULL PRESERVE ===== */
+/* 元画像を切り取らず、全体を表示する */
 
-object-fit: contain
+.photo{
+  object-fit: contain !important;
+  background:#eee7dc !important;
+}
+
+.photo-wrap{
+  background:#eee7dc !important;
+}
