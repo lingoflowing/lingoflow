@@ -11,7 +11,7 @@ html,body{
 }
 
 body{
-  min-height:100svh;
+  min-height:100dvh;
 }
 
 /* ===== LingoFlow Clean Layout v1 =====
@@ -32,7 +32,7 @@ body{
   --lf-reserved-height: 385px;
 
   /* 画像に使える最大高さ */
-  --lf-image-h: calc(100svh - var(--lf-reserved-height) - env(safe-area-inset-bottom));
+  --lf-image-h: calc(100dvh - var(--lf-reserved-height) - env(safe-area-inset-bottom));
 
   /* 画像は4:3なので、高さから幅を決める */
   --lf-card-w: min(96vw, calc(var(--lf-image-h) * 4 / 3));
@@ -40,8 +40,8 @@ body{
 
 .app{
   width:100%;
-  height:100svh;
-  min-height:100svh;
+  height:100dvh;
+  min-height:100dvh;
   padding:var(--lf-page-pad);
   padding-bottom:calc(var(--lf-button-size) + var(--lf-button-bottom) + 18px + env(safe-area-inset-bottom));
   display:flex;
@@ -55,7 +55,7 @@ body{
   width:var(--lf-card-w);
   max-width:96vw;
   height:auto;
-  max-height:calc(100svh - var(--lf-button-size) - var(--lf-button-bottom) - 24px - env(safe-area-inset-bottom));
+  max-height:calc(100dvh - var(--lf-button-size) - var(--lf-button-bottom) - 24px - env(safe-area-inset-bottom));
   display:flex;
   flex-direction:column;
   align-items:stretch;
@@ -371,8 +371,8 @@ img#photo.photo{
 /* ===== Phase106 TRUE FIX ===== */
 
 .app{
-  height:100svh !important;
-  min-height:100svh !important;
+  height:100dvh !important;
+  min-height:100dvh !important;
   overflow:hidden !important;
   padding:8px !important;
   display:flex !important;
@@ -382,8 +382,8 @@ img#photo.photo{
 
 .card{
   width:min(96vw,720px) !important;
-  height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
-  max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+  height:calc(100dvh - 16px - env(safe-area-inset-bottom)) !important;
+  max-height:calc(100dvh - 16px - env(safe-area-inset-bottom)) !important;
   display:grid !important;
   grid-template-rows:minmax(0,1fr) auto 70px !important;
   overflow:hidden !important;
