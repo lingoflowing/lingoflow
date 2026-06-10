@@ -1,54 +1,69 @@
 const STORAGE_KEY = 'lingoflow_analytics_v1';
-const SESSION_ID = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-function readStore(){
-  try{
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { events: [] };
-  }catch{
-    return { events: [] };
-  }
-}
+function getUserId() {
+  let id = localStorage.getItem('lingoflow_user_id');
 
-function writeStore(store){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-  }catch{
-    // Analytics must never break LingoFlow.
-  }
-}
+  if (!id) {
+    id =
+      'u_' +
+      Date.now().toString(36) +
+      '_' +
+      Math.random().toString(36).slice(2, 10);
 
-function deviceInfo(){
-  return {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    userAgent: navigator.userAgent,
-    language: navigator.language
-  };
-}
-
-export function track(eventName, payload = {}){
-  const store = readStore();
-  store.events.push({
-    event: eventName,
-    payload,
-    sessionId: SESSION_ID,
-    path: location.pathname,
-    at: new Date().toISOString(),
-    device: deviceInfo()
-  });
-
-  // Keep it light.
-  if(store.events.length > 300){
-    store.events = store.events.slice(-300);
+    localStorage.setItem('lingoflow_user_id', id);
   }
 
-  writeStore(store);
+  return id;
 }
 
-export function getAnalyticsEvents(){
-  return readStore().events || [];
+function getSessionId() {
+  let id = sessionStorage.getItem('lingoflow_session_id');
+
+  if (!id) {
+    id =
+      's_' +
+      Date.now().toString(36) +
+      '_' +
+      Math.random().toString(36).slice(2, 10);
+
+    sessionStorage.setItem('lingoflow_session_id', id);
+  }
+
+  return id;
 }
 
-export function clearAnalyticsEvents(){
-  writeStore({ events: [] });
-}
+export const Analytics = {
+
+  track(event, payload = {}) {
+
+    try {
+
+      const data =
+        JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+          events: []
+        };
+
+      data.events.push({
+        event,
+        payload,
+        userId: getUserId(),
+        sessionId: getSessionId(),
+        at: new Date().toISOString()
+      });
+
+      if (data.events.length > 5000) {
+        data.events = data.events.slice(-5000);
+      }
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+      );
+
+    } catch (err) {
+      console.warn('Analytics error', err);
+    }
+
+  }
+
+};

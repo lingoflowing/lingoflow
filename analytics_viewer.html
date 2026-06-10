@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LingoFlow Analytics v1.5</title>
+<title>LingoFlow Analytics v1.6</title>
 <style>
 body{font-family:sans-serif;max-width:1000px;margin:40px auto;padding:20px;background:#fafafa;color:#222}
 .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -12,11 +12,18 @@ th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
 .metric{font-weight:bold}
 button{padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
 ol{margin:0;padding-left:24px}
+.note{font-size:13px;color:#666;margin-top:8px;line-height:1.6}
 </style>
 </head>
 <body>
 
-<h1>LingoFlow Analytics v1.5</h1>
+<h1>LingoFlow Analytics v1.6</h1>
+
+<div class="card">
+<h2>User Metrics</h2>
+<table><tbody id="userMetrics"></tbody></table>
+<div class="note">DAU / New Users / Returning Users は「今日のユニークユーザー」を基準に集計します。古いログに userId が無い場合は sessionId で代用します。</div>
+</div>
 
 <div class="card">
 <h2>Summary</h2>
@@ -36,7 +43,7 @@ ol{margin:0;padding-left:24px}
 <div class="card">
 <h2>Latest Events</h2>
 <table>
-<thead><tr><th>Time</th><th>Event</th></tr></thead>
+<thead><tr><th>Time</th><th>Event</th><th>User</th></tr></thead>
 <tbody id="events"></tbody>
 </table>
 </div>
@@ -61,6 +68,53 @@ function loadEvents(){
   }
 }
 
+function localDateKey(iso){
+  const d = iso ? new Date(iso) : new Date();
+  if(Number.isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function userKey(e){
+  return e.userId || e.unique_user_id || e.payload?.unique_user_id || e.payload?.userId || e.sessionId || 'unknown';
+}
+
+function firstSeenByUser(events){
+  const first = {};
+  events.forEach(e=>{
+    const u = userKey(e);
+    const d = localDateKey(e.at);
+    if(!u || !d) return;
+    if(!first[u] || d < first[u]) first[u] = d;
+  });
+  return first;
+}
+
+function calculateUserMetrics(events){
+  const today = localDateKey(new Date().toISOString());
+  const first = firstSeenByUser(events);
+  const todayUsers = new Set(
+    events.filter(e=>localDateKey(e.at)===today).map(userKey)
+  );
+
+  let newUsers = 0;
+  let returningUsers = 0;
+
+  todayUsers.forEach(u=>{
+    if(first[u] === today) newUsers += 1;
+    else returningUsers += 1;
+  });
+
+  return {
+    today,
+    dau: todayUsers.size,
+    newUsers,
+    returningUsers
+  };
+}
+
 function rankCards(events,eventName){
   const counts={};
   events.filter(e=>e.event===eventName).forEach(e=>{
@@ -78,6 +132,13 @@ function render(){
   events.forEach(e=>{
     counts[e.event]=(counts[e.event]||0)+1;
   });
+
+  const userMetrics = calculateUserMetrics(events);
+  document.getElementById('userMetrics').innerHTML =
+    `<tr><td class="metric">Date</td><td class="metric">${userMetrics.today}</td></tr>
+     <tr><td class="metric">DAU</td><td class="metric">${userMetrics.dau}</td></tr>
+     <tr><td class="metric">New Users</td><td class="metric">${userMetrics.newUsers}</td></tr>
+     <tr><td class="metric">Returning Users</td><td class="metric">${userMetrics.returningUsers}</td></tr>`;
 
   const playStart=counts.play_start||0;
   const cardView=counts.card_view||0;
@@ -114,7 +175,7 @@ function render(){
 
   document.getElementById('events').innerHTML =
     [...events].reverse().slice(0,50)
-      .map(e=>`<tr><td>${e.at}</td><td>${e.event}</td></tr>`).join('');
+      .map(e=>`<tr><td>${e.at}</td><td>${e.event}</td><td>${String(userKey(e)).slice(0,18)}</td></tr>`).join('');
 }
 
 document.getElementById('clearBtn').addEventListener('click',()=>{
