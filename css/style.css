@@ -1401,3 +1401,25 @@ body{
     max-height:calc(100svh - 210px - env(safe-area-inset-bottom)) !important;
   }
 }
+
+/* ===== Phase95 IMAGE STABLE 4:3 CONTAIN ===== */
+/* どの画面でも画像は4:3枠に入れ、縦横を切らない */
+
+.photo-wrap{
+  width:100% !important;
+  aspect-ratio:4 / 3 !important;
+  height:auto !important;
+  max-height:none !important;
+  background:#eee7dc !important;
+  overflow:hidden !important;
+}
+
+.photo{
+  width:100% !important;
+  height:100% !important;
+  aspect-ratio:auto !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  background:#eee7dc !important;
+}
