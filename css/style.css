@@ -357,3 +357,13 @@ img#photo.photo{
   color:rgba(43,36,28,.68);
   line-height:1.7;
 }
+
+/* ===== Edge fixed button overlap fix ===== */
+
+.text-area{
+  padding-bottom:calc(42px + var(--lf-button-size)) !important;
+}
+
+.play-stop-button{
+  bottom:calc(22px + env(safe-area-inset-bottom)) !important;
+}
