@@ -576,3 +576,17 @@ img#photo.photo{
     }
   }
 }
+
+/* ===== MOBILE IMAGE NO GAP ===== */
+
+@media (orientation: portrait) and (max-width:700px){
+
+  .photo,
+  img#photo.photo{
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+    object-position:center center !important;
+  }
+
+}
