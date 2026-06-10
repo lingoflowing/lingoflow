@@ -1550,3 +1550,67 @@ img#photo.photo{
   object-fit:contain !important;
   object-position:center center !important;
 }
+
+/* ===== Phase101 HEIGHT BASED IMAGE WIDTH ===== */
+/* 1画面内に必ず収める。画像は縦基準で幅を決める */
+
+.app{
+  height:100svh !important;
+  min-height:100svh !important;
+  overflow:hidden !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  padding:8px !important;
+  padding-bottom:calc(8px + env(safe-area-inset-bottom)) !important;
+}
+
+/* カード幅は広げすぎない。高さ優先 */
+.card{
+  width:auto !important;
+  max-width:96vw !important;
+  height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+  max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  overflow:visible !important;
+}
+
+/* 画像枠：高さ基準で幅が決まる */
+.photo-wrap{
+  width:auto !important;
+  height:auto !important;
+  max-width:96vw !important;
+  max-height:calc(100svh - 360px - env(safe-area-inset-bottom)) !important;
+  aspect-ratio:auto !important;
+  overflow:hidden !important;
+  background:#eee7dc !important;
+}
+
+/* 画像：高さに合わせて縮小、縦横比維持 */
+img#photo.photo{
+  display:block !important;
+  width:auto !important;
+  height:auto !important;
+  max-width:96vw !important;
+  max-height:calc(100svh - 360px - env(safe-area-inset-bottom)) !important;
+  aspect-ratio:auto !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+
+/* テキスト幅は画像幅に合わせる */
+.text-area{
+  width:100% !important;
+  max-width:96vw !important;
+  flex:0 0 auto !important;
+}
+
+/* 再生ボタンは必ず画面内 */
+.play-stop-button{
+  flex:0 0 auto !important;
+  margin-top:auto !important;
+  margin-bottom:0 !important;
+}
