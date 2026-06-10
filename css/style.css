@@ -1349,3 +1349,7 @@ body{
 .play-stop-button{
     margin-top: 18px !important;
 }
+
+/* ===== Phase93 IMAGE FULL PRESERVE ===== */
+
+object-fit: contain
