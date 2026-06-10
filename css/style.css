@@ -367,3 +367,54 @@ img#photo.photo{
 .play-stop-button{
   bottom:calc(22px + env(safe-area-inset-bottom)) !important;
 }
+
+/* ===== Phase106 TRUE FIX ===== */
+
+.app{
+  height:100svh !important;
+  min-height:100svh !important;
+  overflow:hidden !important;
+  padding:8px !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+}
+
+.card{
+  width:min(96vw,720px) !important;
+  height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+  max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
+  display:grid !important;
+  grid-template-rows:minmax(0,1fr) auto 70px !important;
+  overflow:hidden !important;
+}
+
+.photo-wrap{
+  width:100% !important;
+  height:100% !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  overflow:hidden !important;
+}
+
+img#photo.photo{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+
+.text-area{
+  width:100% !important;
+  padding-bottom:14px !important;
+}
+
+.play-stop-button{
+  position:static !important;
+  transform:none !important;
+  width:54px !important;
+  height:54px !important;
+  margin:8px auto 8px !important;
+  align-self:center !important;
+  justify-self:center !important;
+}
