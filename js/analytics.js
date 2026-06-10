@@ -32,38 +32,31 @@ function getSessionId() {
   return id;
 }
 
-export const Analytics = {
+export function track(event, payload = {}) {
+  try {
+    const data =
+      JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+        events: []
+      };
 
-  track(event, payload = {}) {
+    data.events.push({
+      event,
+      payload,
+      userId: getUserId(),
+      sessionId: getSessionId(),
+      at: new Date().toISOString()
+    });
 
-    try {
-
-      const data =
-        JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-          events: []
-        };
-
-      data.events.push({
-        event,
-        payload,
-        userId: getUserId(),
-        sessionId: getSessionId(),
-        at: new Date().toISOString()
-      });
-
-      if (data.events.length > 5000) {
-        data.events = data.events.slice(-5000);
-      }
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(data)
-      );
-
-    } catch (err) {
-      console.warn('Analytics error', err);
+    if (data.events.length > 5000) {
+      data.events = data.events.slice(-5000);
     }
 
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.warn('Analytics error', err);
   }
+}
 
+export const Analytics = {
+  track
 };
