@@ -418,3 +418,34 @@ img#photo.photo{
   align-self:center !important;
   justify-self:center !important;
 }
+
+/* ===== Phase108 MOBILE IMAGE NATURAL HEIGHT ===== */
+/* スマホ上下余白を減らす最終上書き */
+
+.photo-wrap{
+  height:auto !important;
+  aspect-ratio:auto !important;
+}
+
+.photo,
+img#photo.photo{
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+
+.card{
+  display:flex !important;
+  flex-direction:column !important;
+}
+
+.play-stop-button{
+  position:static !important;
+  transform:none !important;
+  flex:0 0 auto !important;
+  margin:8px auto 8px !important;
+}
