@@ -1681,3 +1681,47 @@ img#photo.photo{
   height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
   max-height:calc(100svh - 16px - env(safe-area-inset-bottom)) !important;
 }
+
+/* ===== Phase104 FIXED PLAY BUTTON FINAL ===== */
+
+.app{
+  height:100svh !important;
+  min-height:100svh !important;
+  overflow:hidden !important;
+  padding:8px 8px calc(82px + env(safe-area-inset-bottom)) !important;
+  align-items:flex-start !important;
+}
+
+.card{
+  width:min(96vw,720px) !important;
+  height:auto !important;
+  max-height:calc(100svh - 96px - env(safe-area-inset-bottom)) !important;
+  overflow:hidden !important;
+}
+
+.photo-wrap{
+  width:100% !important;
+  aspect-ratio:4 / 3 !important;
+  max-height:calc(100svh - 430px - env(safe-area-inset-bottom)) !important;
+  overflow:hidden !important;
+}
+
+img#photo.photo{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  max-height:none !important;
+}
+
+/* 再生ボタンは常に画面下に固定 */
+.play-stop-button{
+  position:fixed !important;
+  left:50% !important;
+  bottom:calc(10px + env(safe-area-inset-bottom)) !important;
+  transform:translateX(-50%) !important;
+  width:54px !important;
+  height:54px !important;
+  margin:0 !important;
+  z-index:9999 !important;
+}
