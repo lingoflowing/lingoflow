@@ -1516,3 +1516,37 @@ body{
   object-fit:contain !important;
   object-position:center center !important;
 }
+
+/* ===== Phase100 IMAGE NATURAL FINAL ===== */
+
+.app{
+  height:auto !important;
+  min-height:100svh !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+}
+
+.card{
+  width:min(96vw,900px) !important;
+  height:auto !important;
+  max-height:none !important;
+}
+
+.photo-wrap{
+  width:100% !important;
+  height:auto !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  flex:0 0 auto !important;
+  overflow:hidden !important;
+}
+
+img#photo.photo{
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
