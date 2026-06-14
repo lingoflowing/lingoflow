@@ -107,7 +107,7 @@ function setCardWithFade(card){
     if(!shouldChangeImage){
       removeChangingClassesSmoothly();
     }
-  }, 180);
+  }, 260);
 }
 
 function setText(el, value){
@@ -137,7 +137,7 @@ function removeChangingClassesSmoothly(){
       if(photo) photo.classList.remove('is-changing');
       if(textArea) textArea.classList.remove('is-changing');
     });
-  }, 80);
+  }, 120);
 }
 
 if(photo){

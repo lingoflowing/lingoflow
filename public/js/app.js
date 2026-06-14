@@ -16,6 +16,12 @@ const icon = document.getElementById('playStopIcon');
 const PLAYLIST_SIZE = 20;
 const PLAYLIST_COUNT = 30;
 
+// Calm playback pacing.
+// Keep the silent TTS gaps so BGM does not come forward between spoken lines.
+const CARD_SETTLE_BEFORE_WORD_MS = 1300;
+const PAUSE_AFTER_TEXT_MS = 950;
+const PAUSE_AFTER_CARD_MS = 2600;
+
 function updateButton(){
   button.classList.toggle('is-playing', state.isPlaying);
   icon.innerHTML = state.isPlaying ? STOP_SVG : PLAY_SVG;
@@ -43,18 +49,18 @@ async function playLoop(runId){
       weekKey: state.weeklyInfo?.weekKey || null
     });
 
-    await speakSilent(900, runId);
+    await speakSilent(CARD_SETTLE_BEFORE_WORD_MS, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
     for(const text of textSequence(card)){
       await speak(text, runId);
       if(!state.isPlaying || runId !== state.runId) break;
 
-      await speakSilent(700, runId);
+      await speakSilent(PAUSE_AFTER_TEXT_MS, runId);
       if(!state.isPlaying || runId !== state.runId) break;
     }
 
-    await speakSilent(1800, runId);
+    await speakSilent(PAUSE_AFTER_CARD_MS, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
     track('card_complete', {

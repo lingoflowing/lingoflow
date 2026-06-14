@@ -61,12 +61,12 @@ img#photo.photo{
   object-position:center center;
   background:#eee7dc;
   opacity:1;
-  transition:opacity .42s cubic-bezier(.4,0,.2,1);
+  transition:opacity .62s cubic-bezier(.45,0,.2,1);
   will-change:opacity;
 }
 
 .photo.is-changing{
-  opacity:.08;
+  opacity:.12;
   filter:none;
   transform:none;
 }
@@ -86,7 +86,7 @@ img#photo.photo{
   border-radius:0 0 28px 28px;
   overflow:hidden;
   opacity:1;
-  transition:opacity .42s cubic-bezier(.4,0,.2,1);
+  transition:opacity .62s cubic-bezier(.45,0,.2,1);
   will-change:opacity;
 }
 
