@@ -61,13 +61,14 @@ img#photo.photo{
   object-position:center center;
   background:#eee7dc;
   opacity:1;
-  transition:opacity .52s ease, filter .52s ease, transform .52s ease;
+  transition:opacity .42s cubic-bezier(.4,0,.2,1);
+  will-change:opacity;
 }
 
 .photo.is-changing{
-  opacity:.18;
-  filter:blur(2px);
-  transform:scale(.995);
+  opacity:.08;
+  filter:none;
+  transform:none;
 }
 
 .photo.is-initializing{
@@ -85,13 +86,14 @@ img#photo.photo{
   border-radius:0 0 28px 28px;
   overflow:hidden;
   opacity:1;
-  transition:opacity .52s ease, filter .52s ease, transform .52s ease;
+  transition:opacity .42s cubic-bezier(.4,0,.2,1);
+  will-change:opacity;
 }
 
 .text-area.is-changing{
-  opacity:.18;
-  filter:blur(1.5px);
-  transform:translateY(2px);
+  opacity:0;
+  filter:none;
+  transform:none;
 }
 
 .text-area .meta-bar{

@@ -101,14 +101,12 @@ function setCardWithFade(card){
     setText(sentencePinyin, card.sentencePinyin);
     setText(sentenceJa, card.sentenceJa);
 
-    requestAnimationFrame(() => {
-      // If the image changes, keep both image and text faded until the new image loads.
-      // The photo load/error handlers remove both classes together.
-      if(!shouldChangeImage){
-        photo.classList.remove('is-changing');
-        if(textArea) textArea.classList.remove('is-changing');
-      }
-    });
+    // If the image changes, keep both image and text faded until the new image loads.
+    // The photo load/error handlers remove both classes together.
+    // If only the text changes, give the new text a tiny settle time before fade-in.
+    if(!shouldChangeImage){
+      removeChangingClassesSmoothly();
+    }
   }, 180);
 }
 
@@ -133,13 +131,19 @@ function renderMeta(card){
   setText(progress, '');
 }
 
-if(photo){
-  photo.addEventListener('load', () => {
+function removeChangingClassesSmoothly(){
+  window.setTimeout(() => {
     requestAnimationFrame(() => {
-      photo.classList.remove('is-initializing');
-      photo.classList.remove('is-changing');
+      if(photo) photo.classList.remove('is-changing');
       if(textArea) textArea.classList.remove('is-changing');
     });
+  }, 80);
+}
+
+if(photo){
+  photo.addEventListener('load', () => {
+    photo.classList.remove('is-initializing');
+    removeChangingClassesSmoothly();
   });
 
   photo.addEventListener('error', () => {
@@ -149,8 +153,7 @@ if(photo){
     photo.src = fallback;
     lastImage = fallback;
     photo.classList.remove('is-initializing');
-    photo.classList.remove('is-changing');
-    if(textArea) textArea.classList.remove('is-changing');
+    removeChangingClassesSmoothly();
   });
 }
 
