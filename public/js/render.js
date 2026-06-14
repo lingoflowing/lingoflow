@@ -103,11 +103,11 @@ function setCardWithFade(card){
 
     // If the image changes, keep both image and text faded until the new image loads.
     // The photo load/error handlers remove both classes together.
-    // If only the text changes, give the new text a tiny settle time before fade-in.
+    // If only the text changes, give the new text a quiet settle time before fade-in.
     if(!shouldChangeImage){
       removeChangingClassesSmoothly();
     }
-  }, 260);
+  }, 620);
 }
 
 function setText(el, value){
@@ -137,7 +137,7 @@ function removeChangingClassesSmoothly(){
       if(photo) photo.classList.remove('is-changing');
       if(textArea) textArea.classList.remove('is-changing');
     });
-  }, 120);
+  }, 250);
 }
 
 if(photo){

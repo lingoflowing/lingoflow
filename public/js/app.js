@@ -16,11 +16,12 @@ const icon = document.getElementById('playStopIcon');
 const PLAYLIST_SIZE = 20;
 const PLAYLIST_COUNT = 30;
 
-// Calm playback pacing.
+// Slow calm playback pacing.
 // Keep the silent TTS gaps so BGM does not come forward between spoken lines.
-const CARD_SETTLE_BEFORE_WORD_MS = 1300;
-const PAUSE_AFTER_TEXT_MS = 950;
-const PAUSE_AFTER_CARD_MS = 2600;
+// This keeps one card cycle long enough to feel unhurried and contemplative.
+const CARD_SETTLE_BEFORE_WORD_MS = 2000;
+const PAUSE_AFTER_TEXT_MS = 1350;
+const PAUSE_AFTER_CARD_MS = 3800;
 
 function updateButton(){
   button.classList.toggle('is-playing', state.isPlaying);
