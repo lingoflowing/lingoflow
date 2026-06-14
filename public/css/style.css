@@ -84,6 +84,14 @@ img#photo.photo{
   box-shadow:0 18px 42px rgba(60,45,25,.12);
   border-radius:0 0 28px 28px;
   overflow:hidden;
+  opacity:1;
+  transition:opacity .52s ease, filter .52s ease, transform .52s ease;
+}
+
+.text-area.is-changing{
+  opacity:.18;
+  filter:blur(1.5px);
+  transform:translateY(2px);
 }
 
 .text-area .meta-bar{
@@ -309,11 +317,13 @@ img#photo.photo{
 }
 
 @media (prefers-reduced-motion:reduce){
-  .photo{
+  .photo,
+  .text-area{
     transition:none;
   }
 
-  .photo.is-changing{
+  .photo.is-changing,
+  .text-area.is-changing{
     opacity:1;
     filter:none;
     transform:none;

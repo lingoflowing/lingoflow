@@ -84,20 +84,29 @@ export function speak(text, runId){
     clearSilentTimer();
     speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-TW';
+    // Give the browser a short breath after cancel().
+    // This prevents short words from being skipped while preserving speakSilent().
+    window.setTimeout(() => {
+      if(!text || !state.isPlaying || runId !== state.runId){
+        resolve();
+        return;
+      }
 
-    const voice = zhVoice();
-    if(voice) utterance.voice = voice;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-TW';
 
-    utterance.rate = 0.88;
-    utterance.pitch = 1;
-    utterance.volume = 1;
+      const voice = zhVoice();
+      if(voice) utterance.voice = voice;
 
-    utterance.onend = () => resolve();
-    utterance.onerror = () => resolve();
+      utterance.rate = 0.88;
+      utterance.pitch = 1;
+      utterance.volume = 1;
 
-    speechSynthesis.speak(utterance);
+      utterance.onend = () => resolve();
+      utterance.onerror = () => resolve();
+
+      speechSynthesis.speak(utterance);
+    }, 120);
   });
 }
 

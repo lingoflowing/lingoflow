@@ -1,6 +1,7 @@
 import { state, getCurrentCard } from './state.js';
 
 const photo = document.getElementById('photo');
+const textArea = document.querySelector('.text-area');
 const wordZh = document.getElementById('wordZh');
 const wordPinyin = document.getElementById('wordPinyin');
 const wordJa = document.getElementById('wordJa');
@@ -71,21 +72,43 @@ function currentImage(card){
   return placeholderImage(card);
 }
 
-function setImageWithFade(src){
-  if(!src || !photo) return;
+function setCardWithFade(card){
+  if(!card || !photo) return;
 
-  if(src === lastImage){
-    photo.classList.remove('is-changing');
-    return;
-  }
+  const src = currentImage(card);
+  const shouldChangeImage = Boolean(src && src !== lastImage);
 
   clearTimeout(transitionTimerId);
   handlingImageError = false;
+
   photo.classList.add('is-changing');
+  if(textArea) textArea.classList.add('is-changing');
 
   transitionTimerId = setTimeout(() => {
-    photo.src = src;
-    lastImage = src;
+    if(shouldChangeImage){
+      photo.src = src;
+      lastImage = src;
+    }
+
+    photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
+
+    renderMeta(card);
+
+    setText(wordZh, card.wordZh);
+    setText(wordPinyin, card.wordPinyin);
+    setText(wordJa, card.wordJa);
+    setText(sentenceZh, card.sentenceZh);
+    setText(sentencePinyin, card.sentencePinyin);
+    setText(sentenceJa, card.sentenceJa);
+
+    requestAnimationFrame(() => {
+      // If the image changes, keep both image and text faded until the new image loads.
+      // The photo load/error handlers remove both classes together.
+      if(!shouldChangeImage){
+        photo.classList.remove('is-changing');
+        if(textArea) textArea.classList.remove('is-changing');
+      }
+    });
   }, 180);
 }
 
@@ -115,6 +138,7 @@ if(photo){
     requestAnimationFrame(() => {
       photo.classList.remove('is-initializing');
       photo.classList.remove('is-changing');
+      if(textArea) textArea.classList.remove('is-changing');
     });
   });
 
@@ -126,6 +150,7 @@ if(photo){
     lastImage = fallback;
     photo.classList.remove('is-initializing');
     photo.classList.remove('is-changing');
+    if(textArea) textArea.classList.remove('is-changing');
   });
 }
 
@@ -133,17 +158,7 @@ export function renderCurrentCard(){
   const card = getCurrentCard();
   if(!card) return;
 
-  setImageWithFade(currentImage(card));
-  if(photo) photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
-
-  renderMeta(card);
-
-  setText(wordZh, card.wordZh);
-  setText(wordPinyin, card.wordPinyin);
-  setText(wordJa, card.wordJa);
-  setText(sentenceZh, card.sentenceZh);
-  setText(sentencePinyin, card.sentencePinyin);
-  setText(sentenceJa, card.sentenceJa);
+  setCardWithFade(card);
 }
 
 export function showError(message){
