@@ -1,5 +1,5 @@
 import { state, getCurrentCard, nextCard } from './state.js';
-import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase116-recovery-safe-fade';
+import { renderCurrentCard, rerenderForViewport, showError } from './render.js';
 import { clearTimer } from './timer.js';
 import {
   speak,

@@ -43,7 +43,6 @@ body{
 }
 
 .photo-wrap{
-  position:relative;
   width:100%;
   height:100%;
   overflow:hidden;
@@ -75,21 +74,6 @@ img#photo.photo{
 .photo.is-initializing{
   visibility:hidden;
   opacity:0;
-}
-
-.photo-fade-overlay{
-  display:block;
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  max-width:none;
-  max-height:none;
-  object-fit:contain;
-  object-position:center center;
-  background:#eee7dc;
-  pointer-events:none;
-  z-index:2;
 }
 
 .text-area{
@@ -486,4 +470,10 @@ img#photo.photo{
       height:48px !important;
     }
   }
+}
+
+/* Phase118: disable text-area transition only for immediate first-card rendering. */
+.text-area.no-text-transition{
+  transition:none !important;
+  opacity:1 !important;
 }

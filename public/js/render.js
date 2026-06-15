@@ -117,6 +117,32 @@ function renderText(card){
   setText(sentenceJa, card.sentenceJa);
 }
 
+
+function restoreTextTransitionSoon(){
+  if(!textArea) return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      textArea.classList.remove('no-text-transition');
+    });
+  });
+}
+
+function renderTextImmediately(card){
+  if(textArea){
+    textArea.classList.add('no-text-transition');
+    textArea.classList.remove('is-changing');
+    textArea.style.opacity = '1';
+  }
+
+  renderText(card);
+
+  // Force style application now, so the first card never animates from the
+  // previous .is-changing / transition state. This is intentionally limited
+  // to first render and same-card re-render.
+  if(textArea) void textArea.offsetHeight;
+  restoreTextTransitionSoon();
+}
+
 function ensurePhotoLayout(){
   if(!photo || !photoWrap) return;
 
@@ -242,7 +268,7 @@ function setCardWithFade(card){
   if(!hasRenderedOnce){
     hasRenderedOnce = true;
     removeExistingOverlay();
-    renderText(card);
+    renderTextImmediately(card);
     setImageImmediately(src, card);
     lastRenderedCardKey = key;
     if(textArea) textArea.classList.remove('is-changing');
@@ -255,7 +281,7 @@ function setCardWithFade(card){
   // even though the first card is already visible from page load.
   if(key === lastRenderedCardKey){
     removeExistingOverlay();
-    renderText(card);
+    renderTextImmediately(card);
     photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
     if(textArea) textArea.classList.remove('is-changing');
     if(photo){
