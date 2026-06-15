@@ -14,7 +14,14 @@ const progress = document.getElementById('progress');
 
 let lastImage = '';
 let transitionTimerId = null;
+let overlayTimerId = null;
+let activeImageOverlay = null;
 let handlingImageError = false;
+
+// Content swap timing stays close to the previous behavior.
+// Image smoothness is handled by a temporary overlay crossfade, not by delaying src.
+const CONTENT_SWAP_DELAY_MS = 620;
+const IMAGE_CROSSFADE_MS = 1750;
 
 function safeText(value){
   return typeof value === 'string' ? value : '';
@@ -72,6 +79,80 @@ function currentImage(card){
   return placeholderImage(card);
 }
 
+function cleanupImageOverlay(){
+  clearTimeout(overlayTimerId);
+  overlayTimerId = null;
+
+  if(activeImageOverlay?.parentNode){
+    activeImageOverlay.parentNode.removeChild(activeImageOverlay);
+  }
+
+  activeImageOverlay = null;
+}
+
+function createImageOverlay(){
+  if(!photo || !photo.parentElement || !photo.currentSrc && !photo.src) return null;
+
+  cleanupImageOverlay();
+
+  const wrap = photo.parentElement;
+  const computed = window.getComputedStyle(photo);
+  const wrapComputed = window.getComputedStyle(wrap);
+
+  if(wrapComputed.position === 'static'){
+    wrap.style.position = 'relative';
+  }
+
+  const overlay = document.createElement('img');
+  overlay.alt = '';
+  overlay.src = photo.currentSrc || photo.src;
+  overlay.setAttribute('aria-hidden', 'true');
+
+  Object.assign(overlay.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    maxWidth: 'none',
+    maxHeight: 'none',
+    objectFit: computed.objectFit || 'contain',
+    objectPosition: computed.objectPosition || 'center center',
+    background: computed.backgroundColor || '#eee7dc',
+    pointerEvents: 'none',
+    opacity: '1',
+    zIndex: '2',
+    transition: `opacity ${IMAGE_CROSSFADE_MS}ms cubic-bezier(.45,0,.2,1)`
+  });
+
+  wrap.appendChild(overlay);
+  activeImageOverlay = overlay;
+
+  return overlay;
+}
+
+function crossfadeToImage(src){
+  if(!photo || !src || src === lastImage) return;
+
+  const hasVisibleImage = Boolean(lastImage && photo.src);
+  const overlay = hasVisibleImage ? createImageOverlay() : null;
+
+  photo.classList.remove('is-changing');
+  photo.src = src;
+  lastImage = src;
+
+  if(overlay){
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        overlay.style.opacity = '0';
+      });
+    });
+
+    overlayTimerId = window.setTimeout(() => {
+      cleanupImageOverlay();
+    }, IMAGE_CROSSFADE_MS + 180);
+  }
+}
+
 function setCardWithFade(card){
   if(!card || !photo) return;
 
@@ -81,16 +162,14 @@ function setCardWithFade(card){
   clearTimeout(transitionTimerId);
   handlingImageError = false;
 
-  photo.classList.add('is-changing');
   if(textArea) textArea.classList.add('is-changing');
 
   transitionTimerId = setTimeout(() => {
-    if(shouldChangeImage){
-      photo.src = src;
-      lastImage = src;
-    }
-
     photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
+
+    if(shouldChangeImage){
+      crossfadeToImage(src);
+    }
 
     renderMeta(card);
 
@@ -101,13 +180,10 @@ function setCardWithFade(card){
     setText(sentencePinyin, card.sentencePinyin);
     setText(sentenceJa, card.sentenceJa);
 
-    // If the image changes, keep both image and text faded until the new image loads.
-    // The photo load/error handlers remove both classes together.
-    // If only the text changes, give the new text a quiet settle time before fade-in.
-    if(!shouldChangeImage){
-      removeChangingClassesSmoothly();
-    }
-  }, 620);
+    requestAnimationFrame(() => {
+      if(textArea) textArea.classList.remove('is-changing');
+    });
+  }, CONTENT_SWAP_DELAY_MS);
 }
 
 function setText(el, value){
@@ -131,29 +207,17 @@ function renderMeta(card){
   setText(progress, '');
 }
 
-function removeChangingClassesSmoothly(){
-  window.setTimeout(() => {
-    requestAnimationFrame(() => {
-      if(photo) photo.classList.remove('is-changing');
-      if(textArea) textArea.classList.remove('is-changing');
-    });
-  }, 250);
-}
-
 if(photo){
   photo.addEventListener('load', () => {
     photo.classList.remove('is-initializing');
-    removeChangingClassesSmoothly();
   });
 
   photo.addEventListener('error', () => {
     if(handlingImageError) return;
     handlingImageError = true;
     const fallback = placeholderImage(getCurrentCard());
-    photo.src = fallback;
-    lastImage = fallback;
+    crossfadeToImage(fallback);
     photo.classList.remove('is-initializing');
-    removeChangingClassesSmoothly();
   });
 }
 
@@ -175,6 +239,7 @@ export function rerenderForViewport(){
 
   const src = currentImage(card);
   if(photo && src !== lastImage){
+    cleanupImageOverlay();
     photo.src = src;
     lastImage = src;
   }
