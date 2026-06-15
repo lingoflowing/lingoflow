@@ -5,6 +5,8 @@ const photoWrap = document.querySelector('.photo-wrap');
 
 const CONTENT_SWAP_DELAY_MS = 620;
 const IMAGE_CROSSFADE_MS = 1900;
+const IMAGE_OVERLAY_REMOVE_BUFFER_MS = 160;
+
 const textArea = document.querySelector('.text-area');
 const wordZh = document.getElementById('wordZh');
 const wordPinyin = document.getElementById('wordPinyin');
@@ -18,6 +20,9 @@ const progress = document.getElementById('progress');
 
 let lastImage = '';
 let transitionTimerId = null;
+let overlayTimerId = null;
+let renderToken = 0;
+let hasRenderedOnce = false;
 let handlingImageError = false;
 
 function safeText(value){
@@ -68,102 +73,14 @@ function currentImage(card){
 
   const id = cardImageId(card);
 
-  // LingoFlow v2 fixed image rule:
-  // images/card_001.png ... images/card_600.png
-  // If the PNG file is not present yet, the img error handler shows the placeholder.
+  // Prefer existing image metadata when present.
+  // Fallback to the fixed card_001.png ... card_600.png rule.
+  if(card.image) return card.image;
+  if(card.imageMeta?.imagePath) return card.imageMeta.imagePath;
+  if(card.imageFile) return `images/${card.imageFile}`;
   if(id) return `images/${id}.png`;
 
   return placeholderImage(card);
-}
-
-
-function preparePhotoLayering(){
-  if(!photo || !photoWrap) return;
-
-  photoWrap.style.position = 'relative';
-  photo.style.position = 'relative';
-  photo.style.zIndex = '1';
-}
-
-function createImageFadeOverlay(){
-  if(!photo || !photoWrap) return null;
-
-  const visibleSrc = photo.currentSrc || photo.src || lastImage;
-  if(!visibleSrc) return null;
-
-  const overlay = document.createElement('img');
-  overlay.src = visibleSrc;
-  overlay.alt = '';
-  overlay.setAttribute('aria-hidden', 'true');
-  overlay.className = 'photo-fade-overlay';
-
-  overlay.style.position = 'absolute';
-  overlay.style.inset = '0';
-  overlay.style.width = '100%';
-  overlay.style.height = '100%';
-  overlay.style.maxWidth = 'none';
-  overlay.style.maxHeight = 'none';
-  overlay.style.objectFit = getComputedStyle(photo).objectFit || 'contain';
-  overlay.style.objectPosition = getComputedStyle(photo).objectPosition || 'center center';
-  overlay.style.background = getComputedStyle(photo).backgroundColor || '#eee7dc';
-  overlay.style.opacity = '1';
-  overlay.style.zIndex = '2';
-  overlay.style.pointerEvents = 'none';
-  overlay.style.transition = `opacity ${IMAGE_CROSSFADE_MS}ms cubic-bezier(.45,0,.2,1)`;
-
-  photoWrap.appendChild(overlay);
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      overlay.style.opacity = '0';
-    });
-  });
-
-  window.setTimeout(() => {
-    overlay.remove();
-  }, IMAGE_CROSSFADE_MS + 120);
-
-  return overlay;
-}
-
-function setCardWithFade(card){
-  if(!card || !photo) return;
-
-  const src = currentImage(card);
-  const shouldChangeImage = Boolean(src && src !== lastImage);
-
-  clearTimeout(transitionTimerId);
-  handlingImageError = false;
-
-  preparePhotoLayering();
-
-  // Text keeps the existing gentle fade.
-  // Image is NOT faded by changing the same <img> opacity anymore.
-  // A temporary overlay of the OLD image is faded out above the NEW image.
-  if(textArea) textArea.classList.add('is-changing');
-
-  transitionTimerId = setTimeout(() => {
-    if(shouldChangeImage){
-      createImageFadeOverlay();
-      photo.classList.remove('is-changing');
-      photo.style.opacity = '1';
-      photo.src = src;
-      lastImage = src;
-    }
-
-    photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
-
-    renderMeta(card);
-
-    setText(wordZh, card.wordZh);
-    setText(wordPinyin, card.wordPinyin);
-    setText(wordJa, card.wordJa);
-    setText(sentenceZh, card.sentenceZh);
-    setText(sentencePinyin, card.sentencePinyin);
-    setText(sentenceJa, card.sentenceJa);
-
-    removeChangingClassesSmoothly();
-  }, CONTENT_SWAP_DELAY_MS);
 }
 
 function setText(el, value){
@@ -176,15 +93,122 @@ function renderMeta(card){
   const current = state.currentIndex + 1;
   const total = state.cards.length || state.weeklyInfo?.size || 20;
 
-  // Render as ONE text node to prevent uneven gaps, size differences,
-  // and baseline mismatch between chapter / playlist / progress.
-  // Full-width spaces keep the visual separation stable in Japanese UI.
   const parts = [chapterName, playlistName, `${current} / ${total}`].filter(Boolean);
   setText(chapterTitle, parts.join('　'));
 
-  // These elements are kept in HTML for compatibility, but intentionally emptied.
   setText(playlistTitle, '');
   setText(progress, '');
+}
+
+function renderText(card){
+  renderMeta(card);
+
+  setText(wordZh, card.wordZh);
+  setText(wordPinyin, card.wordPinyin);
+  setText(wordJa, card.wordJa);
+  setText(sentenceZh, card.sentenceZh);
+  setText(sentencePinyin, card.sentencePinyin);
+  setText(sentenceJa, card.sentenceJa);
+}
+
+function ensurePhotoLayout(){
+  if(!photo || !photoWrap) return;
+
+  photoWrap.style.position = 'relative';
+  photo.style.position = 'relative';
+  photo.style.zIndex = '1';
+}
+
+function removeExistingOverlay(){
+  if(overlayTimerId){
+    clearTimeout(overlayTimerId);
+    overlayTimerId = null;
+  }
+
+  document.querySelectorAll('.photo-fade-overlay').forEach(el => el.remove());
+}
+
+function makeOverlayFromCurrentImage(){
+  if(!photo || !photoWrap) return null;
+
+  const visibleSrc = photo.currentSrc || photo.src || lastImage;
+  if(!visibleSrc) return null;
+
+  const overlay = document.createElement('img');
+  overlay.src = visibleSrc;
+  overlay.alt = '';
+  overlay.setAttribute('aria-hidden', 'true');
+  overlay.className = 'photo-fade-overlay';
+
+  const computed = getComputedStyle(photo);
+  overlay.style.position = 'absolute';
+  overlay.style.inset = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.maxWidth = 'none';
+  overlay.style.maxHeight = 'none';
+  overlay.style.objectFit = computed.objectFit || 'contain';
+  overlay.style.objectPosition = computed.objectPosition || 'center center';
+  overlay.style.background = computed.backgroundColor || '#eee7dc';
+  overlay.style.opacity = '1';
+  overlay.style.zIndex = '2';
+  overlay.style.pointerEvents = 'none';
+  overlay.style.transition = `opacity ${IMAGE_CROSSFADE_MS}ms cubic-bezier(.45,0,.2,1)`;
+
+  photoWrap.appendChild(overlay);
+  return overlay;
+}
+
+function fadeOutOverlay(overlay){
+  if(!overlay) return;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '0';
+    });
+  });
+
+  overlayTimerId = window.setTimeout(() => {
+    overlay.remove();
+    overlayTimerId = null;
+  }, IMAGE_CROSSFADE_MS + IMAGE_OVERLAY_REMOVE_BUFFER_MS);
+}
+
+function setImageImmediately(src, card){
+  if(!photo || !src) return;
+
+  handlingImageError = false;
+  photo.classList.remove('is-changing');
+  photo.style.opacity = '1';
+  photo.style.visibility = 'visible';
+  photo.src = src;
+  photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
+  lastImage = src;
+}
+
+function crossfadeToImage(src, card){
+  if(!photo || !src) return;
+
+  ensurePhotoLayout();
+
+  const shouldChangeImage = src !== lastImage;
+  photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
+
+  if(!shouldChangeImage) return;
+
+  handlingImageError = false;
+
+  const overlay = makeOverlayFromCurrentImage();
+
+  // The main image remains fully visible. We change only its src.
+  // The old image is preserved in the overlay and fades out above it.
+  photo.classList.remove('is-changing');
+  photo.style.opacity = '1';
+  photo.style.visibility = 'visible';
+  photo.src = src;
+  lastImage = src;
+
+  fadeOutOverlay(overlay);
 }
 
 function removeChangingClassesSmoothly(){
@@ -196,20 +220,57 @@ function removeChangingClassesSmoothly(){
   }, 250);
 }
 
+function setCardWithFade(card){
+  if(!card || !photo) return;
+
+  const token = ++renderToken;
+  const src = currentImage(card);
+
+  clearTimeout(transitionTimerId);
+  ensurePhotoLayout();
+
+  // First render must be immediate.
+  // This prevents the blank screen caused by waiting for a fade before any
+  // image/text has ever been displayed.
+  if(!hasRenderedOnce){
+    hasRenderedOnce = true;
+    removeExistingOverlay();
+    renderText(card);
+    setImageImmediately(src, card);
+    if(textArea) textArea.classList.remove('is-changing');
+    photo.classList.remove('is-initializing');
+    return;
+  }
+
+  if(textArea) textArea.classList.add('is-changing');
+
+  transitionTimerId = window.setTimeout(() => {
+    if(token !== renderToken) return;
+
+    renderText(card);
+    crossfadeToImage(src, card);
+    removeChangingClassesSmoothly();
+  }, CONTENT_SWAP_DELAY_MS);
+}
+
 if(photo){
   photo.addEventListener('load', () => {
     photo.classList.remove('is-initializing');
-    removeChangingClassesSmoothly();
+    photo.style.visibility = 'visible';
+    photo.style.opacity = '1';
   });
 
   photo.addEventListener('error', () => {
     if(handlingImageError) return;
     handlingImageError = true;
+
     const fallback = placeholderImage(getCurrentCard());
+    photo.classList.remove('is-changing');
+    photo.style.opacity = '1';
+    photo.style.visibility = 'visible';
     photo.src = fallback;
     lastImage = fallback;
     photo.classList.remove('is-initializing');
-    removeChangingClassesSmoothly();
   });
 }
 
@@ -227,11 +288,10 @@ export function showError(message){
 
 export function rerenderForViewport(){
   const card = getCurrentCard();
-  if(!card) return;
+  if(!card || !photo) return;
 
   const src = currentImage(card);
-  if(photo && src !== lastImage){
-    photo.src = src;
-    lastImage = src;
+  if(src && src !== lastImage){
+    setImageImmediately(src, card);
   }
 }
