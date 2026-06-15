@@ -23,6 +23,7 @@ let transitionTimerId = null;
 let overlayTimerId = null;
 let renderToken = 0;
 let hasRenderedOnce = false;
+let lastRenderedCardKey = '';
 let handlingImageError = false;
 
 function safeText(value){
@@ -98,6 +99,11 @@ function renderMeta(card){
 
   setText(playlistTitle, '');
   setText(progress, '');
+}
+
+function renderKey(card, src){
+  const id = safeText(card?.id) || safeText(card?.cardId) || safeText(card?.cardNo) || String(state.currentIndex);
+  return `${id}|${safeText(src)}`;
 }
 
 function renderText(card){
@@ -225,6 +231,7 @@ function setCardWithFade(card){
 
   const token = ++renderToken;
   const src = currentImage(card);
+  const key = renderKey(card, src);
 
   clearTimeout(transitionTimerId);
   ensurePhotoLayout();
@@ -237,8 +244,25 @@ function setCardWithFade(card){
     removeExistingOverlay();
     renderText(card);
     setImageImmediately(src, card);
+    lastRenderedCardKey = key;
     if(textArea) textArea.classList.remove('is-changing');
     photo.classList.remove('is-initializing');
+    return;
+  }
+
+  // Re-rendering the same first/current card must not fade the word/sentence.
+  // This happens when playback starts: app.js calls renderCurrentCard() again
+  // even though the first card is already visible from page load.
+  if(key === lastRenderedCardKey){
+    removeExistingOverlay();
+    renderText(card);
+    photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
+    if(textArea) textArea.classList.remove('is-changing');
+    if(photo){
+      photo.classList.remove('is-changing', 'is-initializing');
+      photo.style.opacity = '1';
+      photo.style.visibility = 'visible';
+    }
     return;
   }
 
@@ -249,6 +273,7 @@ function setCardWithFade(card){
 
     renderText(card);
     crossfadeToImage(src, card);
+    lastRenderedCardKey = key;
     removeChangingClassesSmoothly();
   }, CONTENT_SWAP_DELAY_MS);
 }
@@ -270,6 +295,7 @@ if(photo){
     photo.style.visibility = 'visible';
     photo.src = fallback;
     lastImage = fallback;
+    lastRenderedCardKey = renderKey(getCurrentCard(), fallback);
     photo.classList.remove('is-initializing');
   });
 }
