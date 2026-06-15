@@ -61,12 +61,12 @@ img#photo.photo{
   object-position:center center;
   background:#eee7dc;
   opacity:1;
-  transition:opacity 1.55s cubic-bezier(.45,0,.2,1);
+  transition:opacity 1.75s cubic-bezier(.45,0,.2,1);
   will-change:opacity;
 }
 
 .photo.is-changing{
-  opacity:.18;
+  opacity:.22;
   filter:none;
   transform:none;
 }
