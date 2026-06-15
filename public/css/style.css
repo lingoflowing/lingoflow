@@ -86,12 +86,15 @@ img#photo.photo{
   border-radius:0 0 28px 28px;
   overflow:hidden;
   opacity:1;
-  transition:opacity 1.05s cubic-bezier(.45,0,.2,1);
+  /* Phase119: make text fade out before render.js swaps content at 620ms,
+     then fade the new text back in slowly to match the image crossfade. */
+  transition:opacity 1.45s cubic-bezier(.45,0,.2,1);
   will-change:opacity;
 }
 
 .text-area.is-changing{
-  opacity:.03;
+  opacity:0;
+  transition-duration:.52s;
   filter:none;
   transform:none;
 }
