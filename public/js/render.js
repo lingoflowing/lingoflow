@@ -3,7 +3,7 @@ import { state, getCurrentCard } from './state.js';
 const photo = document.getElementById('photo');
 const photoWrap = document.querySelector('.photo-wrap');
 
-const CONTENT_SWAP_DELAY_MS = 620;
+const CONTENT_SWAP_DELAY_MS = 1050;
 const IMAGE_CROSSFADE_MS = 1900;
 const IMAGE_OVERLAY_REMOVE_BUFFER_MS = 160;
 
