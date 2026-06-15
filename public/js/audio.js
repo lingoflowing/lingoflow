@@ -3,8 +3,10 @@ import { clearTimer } from './timer.js';
 import { startBgm, stopBgm, markBgmUserStarted } from './bgm.js';
 
 const BGM_SAFE_VOLUME = 0.01;
+const SILENT_KEEPALIVE_INTERVAL_MS = 650;
 
-let silentTimer = null;
+let silentEndTimer = null;
+let silentKeepaliveTimer = null;
 let silentUtterance = null;
 
 function forceQuietBgmElements(){
@@ -23,10 +25,16 @@ function startBgmQuietly(){
 }
 
 function clearSilentTimer(){
-  if(silentTimer){
-    clearTimeout(silentTimer);
-    silentTimer = null;
+  if(silentEndTimer){
+    clearTimeout(silentEndTimer);
+    silentEndTimer = null;
   }
+
+  if(silentKeepaliveTimer){
+    clearInterval(silentKeepaliveTimer);
+    silentKeepaliveTimer = null;
+  }
+
   silentUtterance = null;
 }
 
@@ -110,6 +118,29 @@ export function speak(text, runId){
   });
 }
 
+function speakOneSilentPulse(runId){
+  if(!('speechSynthesis' in window)) return;
+  if(!state.isPlaying || runId !== state.runId) return;
+
+  // Keep the speech engine occupied during silent gaps.
+  // This prevents BGM from becoming perceptually dominant after sentence playback.
+  speechSynthesis.cancel();
+
+  silentUtterance = new SpeechSynthesisUtterance('。');
+  silentUtterance.lang = 'zh-TW';
+  silentUtterance.volume = 0;
+  silentUtterance.rate = 0.1;
+  silentUtterance.pitch = 1;
+
+  const voice = zhVoice();
+  if(voice) silentUtterance.voice = voice;
+
+  silentUtterance.onerror = () => {};
+  silentUtterance.onend = () => {};
+
+  speechSynthesis.speak(silentUtterance);
+}
+
 export function speakSilent(durationMs = 800, runId){
   return new Promise(resolve => {
     if(!state.isPlaying || runId !== state.runId){
@@ -132,36 +163,34 @@ export function speakSilent(durationMs = 800, runId){
       if(resolved) return;
       resolved = true;
       clearSilentTimer();
+
+      if('speechSynthesis' in window){
+        speechSynthesis.cancel();
+      }
+
       resolve();
     };
 
     if(!('speechSynthesis' in window)){
-      silentTimer = window.setTimeout(done, duration);
+      clearSilentTimer();
+      silentEndTimer = window.setTimeout(done, duration);
       return;
     }
 
     clearSilentTimer();
-    speechSynthesis.cancel();
 
-    silentUtterance = new SpeechSynthesisUtterance('。');
-    silentUtterance.lang = 'zh-TW';
-    silentUtterance.volume = 0;
-    silentUtterance.rate = 0.1;
-    silentUtterance.pitch = 1;
+    speakOneSilentPulse(runId);
 
-    const voice = zhVoice();
-    if(voice) silentUtterance.voice = voice;
-
-    silentUtterance.onerror = () => {};
-    silentUtterance.onend = () => {};
-
-    speechSynthesis.speak(silentUtterance);
-
-    silentTimer = window.setTimeout(() => {
-      if('speechSynthesis' in window){
-        speechSynthesis.cancel();
+    silentKeepaliveTimer = window.setInterval(() => {
+      if(!state.isPlaying || runId !== state.runId){
+        done();
+        return;
       }
-      done();
-    }, duration);
+
+      startBgmQuietly();
+      speakOneSilentPulse(runId);
+    }, SILENT_KEEPALIVE_INTERVAL_MS);
+
+    silentEndTimer = window.setTimeout(done, duration);
   });
 }
