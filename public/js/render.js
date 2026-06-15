@@ -1,6 +1,10 @@
 import { state, getCurrentCard } from './state.js';
 
 const photo = document.getElementById('photo');
+const photoWrap = document.querySelector('.photo-wrap');
+
+const CONTENT_SWAP_DELAY_MS = 620;
+const IMAGE_CROSSFADE_MS = 1900;
 const textArea = document.querySelector('.text-area');
 const wordZh = document.getElementById('wordZh');
 const wordPinyin = document.getElementById('wordPinyin');
@@ -14,14 +18,7 @@ const progress = document.getElementById('progress');
 
 let lastImage = '';
 let transitionTimerId = null;
-let overlayTimerId = null;
-let activeImageOverlay = null;
 let handlingImageError = false;
-
-// Content swap timing stays close to the previous behavior.
-// Image smoothness is handled by a temporary overlay crossfade, not by delaying src.
-const CONTENT_SWAP_DELAY_MS = 620;
-const IMAGE_CROSSFADE_MS = 1750;
 
 function safeText(value){
   return typeof value === 'string' ? value : '';
@@ -79,78 +76,54 @@ function currentImage(card){
   return placeholderImage(card);
 }
 
-function cleanupImageOverlay(){
-  clearTimeout(overlayTimerId);
-  overlayTimerId = null;
 
-  if(activeImageOverlay?.parentNode){
-    activeImageOverlay.parentNode.removeChild(activeImageOverlay);
-  }
+function preparePhotoLayering(){
+  if(!photo || !photoWrap) return;
 
-  activeImageOverlay = null;
+  photoWrap.style.position = 'relative';
+  photo.style.position = 'relative';
+  photo.style.zIndex = '1';
 }
 
-function createImageOverlay(){
-  if(!photo || !photo.parentElement || !photo.currentSrc && !photo.src) return null;
+function createImageFadeOverlay(){
+  if(!photo || !photoWrap) return null;
 
-  cleanupImageOverlay();
-
-  const wrap = photo.parentElement;
-  const computed = window.getComputedStyle(photo);
-  const wrapComputed = window.getComputedStyle(wrap);
-
-  if(wrapComputed.position === 'static'){
-    wrap.style.position = 'relative';
-  }
+  const visibleSrc = photo.currentSrc || photo.src || lastImage;
+  if(!visibleSrc) return null;
 
   const overlay = document.createElement('img');
+  overlay.src = visibleSrc;
   overlay.alt = '';
-  overlay.src = photo.currentSrc || photo.src;
   overlay.setAttribute('aria-hidden', 'true');
+  overlay.className = 'photo-fade-overlay';
 
-  Object.assign(overlay.style, {
-    position: 'absolute',
-    inset: '0',
-    width: '100%',
-    height: '100%',
-    maxWidth: 'none',
-    maxHeight: 'none',
-    objectFit: computed.objectFit || 'contain',
-    objectPosition: computed.objectPosition || 'center center',
-    background: computed.backgroundColor || '#eee7dc',
-    pointerEvents: 'none',
-    opacity: '1',
-    zIndex: '2',
-    transition: `opacity ${IMAGE_CROSSFADE_MS}ms cubic-bezier(.45,0,.2,1)`
+  overlay.style.position = 'absolute';
+  overlay.style.inset = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.maxWidth = 'none';
+  overlay.style.maxHeight = 'none';
+  overlay.style.objectFit = getComputedStyle(photo).objectFit || 'contain';
+  overlay.style.objectPosition = getComputedStyle(photo).objectPosition || 'center center';
+  overlay.style.background = getComputedStyle(photo).backgroundColor || '#eee7dc';
+  overlay.style.opacity = '1';
+  overlay.style.zIndex = '2';
+  overlay.style.pointerEvents = 'none';
+  overlay.style.transition = `opacity ${IMAGE_CROSSFADE_MS}ms cubic-bezier(.45,0,.2,1)`;
+
+  photoWrap.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '0';
+    });
   });
 
-  wrap.appendChild(overlay);
-  activeImageOverlay = overlay;
+  window.setTimeout(() => {
+    overlay.remove();
+  }, IMAGE_CROSSFADE_MS + 120);
 
   return overlay;
-}
-
-function crossfadeToImage(src){
-  if(!photo || !src || src === lastImage) return;
-
-  const hasVisibleImage = Boolean(lastImage && photo.src);
-  const overlay = hasVisibleImage ? createImageOverlay() : null;
-
-  photo.classList.remove('is-changing');
-  photo.src = src;
-  lastImage = src;
-
-  if(overlay){
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        overlay.style.opacity = '0';
-      });
-    });
-
-    overlayTimerId = window.setTimeout(() => {
-      cleanupImageOverlay();
-    }, IMAGE_CROSSFADE_MS + 180);
-  }
 }
 
 function setCardWithFade(card){
@@ -162,14 +135,23 @@ function setCardWithFade(card){
   clearTimeout(transitionTimerId);
   handlingImageError = false;
 
+  preparePhotoLayering();
+
+  // Text keeps the existing gentle fade.
+  // Image is NOT faded by changing the same <img> opacity anymore.
+  // A temporary overlay of the OLD image is faded out above the NEW image.
   if(textArea) textArea.classList.add('is-changing');
 
   transitionTimerId = setTimeout(() => {
-    photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
-
     if(shouldChangeImage){
-      crossfadeToImage(src);
+      createImageFadeOverlay();
+      photo.classList.remove('is-changing');
+      photo.style.opacity = '1';
+      photo.src = src;
+      lastImage = src;
     }
+
+    photo.alt = safeText(card.wordJa || card.wordZh || 'LingoFlow scene');
 
     renderMeta(card);
 
@@ -180,9 +162,7 @@ function setCardWithFade(card){
     setText(sentencePinyin, card.sentencePinyin);
     setText(sentenceJa, card.sentenceJa);
 
-    requestAnimationFrame(() => {
-      if(textArea) textArea.classList.remove('is-changing');
-    });
+    removeChangingClassesSmoothly();
   }, CONTENT_SWAP_DELAY_MS);
 }
 
@@ -207,17 +187,29 @@ function renderMeta(card){
   setText(progress, '');
 }
 
+function removeChangingClassesSmoothly(){
+  window.setTimeout(() => {
+    requestAnimationFrame(() => {
+      if(photo) photo.classList.remove('is-changing');
+      if(textArea) textArea.classList.remove('is-changing');
+    });
+  }, 250);
+}
+
 if(photo){
   photo.addEventListener('load', () => {
     photo.classList.remove('is-initializing');
+    removeChangingClassesSmoothly();
   });
 
   photo.addEventListener('error', () => {
     if(handlingImageError) return;
     handlingImageError = true;
     const fallback = placeholderImage(getCurrentCard());
-    crossfadeToImage(fallback);
+    photo.src = fallback;
+    lastImage = fallback;
     photo.classList.remove('is-initializing');
+    removeChangingClassesSmoothly();
   });
 }
 
@@ -239,7 +231,6 @@ export function rerenderForViewport(){
 
   const src = currentImage(card);
   if(photo && src !== lastImage){
-    cleanupImageOverlay();
     photo.src = src;
     lastImage = src;
   }
