@@ -249,7 +249,7 @@ function removeChangingClassesSmoothly(){
       if(photo) photo.classList.remove('is-changing');
       if(textArea) textArea.classList.remove('is-changing');
     });
-  }, 250);
+  }, 900);
 }
 
 function setCardWithFade(card){
