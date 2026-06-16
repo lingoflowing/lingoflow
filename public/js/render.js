@@ -1,4 +1,3 @@
-```js
 import { state, getCurrentCard } from './state.js';
 
 const photo = document.getElementById('photo');
@@ -533,4 +532,3 @@ export function rerenderForViewport(){
     setImageImmediately(src, card);
   }
 }
-```
