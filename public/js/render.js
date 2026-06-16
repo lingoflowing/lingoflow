@@ -120,8 +120,13 @@ function renderText(card){
 
 function restoreTextTransitionSoon(){
   if(!textArea) return;
+
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
+      // Remove the inline opacity used only for immediate first-card rendering.
+      // Without this, style="opacity: 1" overrides .text-area.is-changing
+      // and prevents every later text fade-out.
+      textArea.style.removeProperty('opacity');
       textArea.classList.remove('no-text-transition');
     });
   });
