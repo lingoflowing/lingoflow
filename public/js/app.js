@@ -1,15 +1,15 @@
-import { state, getCurrentCard, nextCard } from './state.js';
-import { renderCurrentCard, rerenderForViewport, showError } from './render.js';
-import { clearTimer } from './timer.js';
+import { state, getCurrentCard, nextCard } from './state.js?v=phase123-ios-voice-only-reset';
+import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase123-ios-voice-only-reset';
+import { clearTimer } from './timer.js?v=phase123-ios-voice-only-reset';
 import {
   playCardZhAudio,
   speakSilent,
   startPlayback as startAudioPlayback,
   stopPlayback,
   stopAllAudio
-} from './audio.js';
-import { PLAY_SVG, STOP_SVG } from './icons.js';
-import { track } from './analytics.js';
+} from './audio.js?v=phase123-ios-voice-only-reset';
+import { PLAY_SVG, STOP_SVG } from './icons.js?v=phase123-ios-voice-only-reset';
+import { track } from './analytics.js?v=phase123-ios-voice-only-reset';
 
 const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
@@ -49,8 +49,8 @@ async function playLoop(runId){
     await speakSilent(CARD_SETTLE_BEFORE_WORD_MS, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
-    // playCardZhAudio waits for the card MP3 and the trailing 1000ms silent MP3.
-    // BGM is disabled in this iPhone recovery baseline.
+    // playCardZhAudio waits for the card MP3 and a short voice-only gap.
+    // BGM is disabled in this reset patch to stabilize iPhone narration.
     await playCardZhAudio(card, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 

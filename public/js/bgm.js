@@ -1,37 +1,36 @@
-// Phase122 iPhone stable audio patch
-// BGM is intentionally disabled.
-// This is a recovery baseline: restore iPhone narration reliability first,
-// then reintroduce BGM later at a very low level if needed.
+// Kotoba Biyori phase123-ios-voice-only-reset
+// iPhone音声安定化のため、BGMを完全停止するリセット版。
+// ここではBGM用audioを作らず、既存のBGM audioがあれば停止する。
 
-let bgmAudio = null;
-let bgmUserStarted = false;
-
-export function initBgm() {
-  bgmAudio = document.getElementById('bgmAudio');
-
-  if (bgmAudio) {
-    bgmAudio.pause();
-    bgmAudio.volume = 0;
-    bgmAudio.loop = false;
-  }
+function stopExistingBgmElements(){
+  document.querySelectorAll('audio').forEach(audio => {
+    const key = `${audio.id || ''} ${audio.className || ''} ${audio.src || ''}`.toLowerCase();
+    if(key.includes('bgm') || key.includes('music') || key.includes('piano')){
+      try{
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 0;
+        audio.muted = true;
+        audio.src = '';
+        audio.removeAttribute('src');
+        audio.load?.();
+      }catch(_error){}
+    }
+  });
 }
 
-export function markBgmUserStarted() {
-  bgmUserStarted = true;
+export function initBgm(){
+  stopExistingBgmElements();
 }
 
-export async function startBgm() {
-  if (!bgmAudio) initBgm();
-  if (!bgmAudio) return;
-
-  bgmAudio.pause();
-  bgmAudio.volume = 0;
+export function markBgmUserStarted(){
+  stopExistingBgmElements();
 }
 
-export function stopBgm() {
-  if (!bgmAudio) return;
+export async function startBgm(){
+  stopExistingBgmElements();
+}
 
-  bgmAudio.pause();
-  bgmAudio.currentTime = 0;
-  bgmAudio.volume = 0;
+export function stopBgm(){
+  stopExistingBgmElements();
 }

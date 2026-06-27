@@ -1,93 +1,58 @@
-import { state } from './state.js';
-import { clearTimer } from './timer.js';
+import { state } from './state.js?v=phase123-ios-voice-only-reset';
+import { clearTimer } from './timer.js?v=phase123-ios-voice-only-reset';
+import { stopBgm } from './bgm.js?v=phase123-ios-voice-only-reset';
 
-// Phase122 iPhone stable audio patch
-// - BGM is intentionally disabled in this recovery patch.
-// - The card narration uses one reusable <audio> element.
-// - Silent gaps are plain timers, so speechSynthesis cannot steal audio focus.
-// - A short silent MP3 is played after each card voice to keep mobile audio flow stable.
+const TRAILING_SILENCE_MS = 1000;
 
-const TRAILING_SILENCE_SRC = 'audio/silence/silence_1000ms.mp3';
-
-let silentEndTimer = null;
 let cardAudio = null;
-
-function clearSilentTimer(){
-  if(silentEndTimer){
-    clearTimeout(silentEndTimer);
-    silentEndTimer = null;
-  }
-}
+let activeAudioRunId = 0;
+let silentTimer = null;
 
 function ensureCardAudio(){
   if(cardAudio) return cardAudio;
 
-  cardAudio = document.getElementById('cardZhAudio');
-
-  if(!cardAudio){
-    cardAudio = document.createElement('audio');
-    cardAudio.id = 'cardZhAudio';
-    cardAudio.preload = 'auto';
-    cardAudio.setAttribute('playsinline', '');
-    document.body.appendChild(cardAudio);
-  }
-
+  cardAudio = document.createElement('audio');
+  cardAudio.id = 'cardZhAudio';
+  cardAudio.preload = 'auto';
+  cardAudio.setAttribute('playsinline', '');
   cardAudio.volume = 1;
-  cardAudio.loop = false;
+  document.body.appendChild(cardAudio);
   return cardAudio;
 }
 
-function resetCardAudio(){
-  if(!cardAudio) return;
-
-  try {
-    cardAudio.pause();
-    cardAudio.removeAttribute('src');
-    cardAudio.load();
-  } catch (error) {
-    // Ignore browser-specific media cleanup errors.
+function clearSilentTimer(){
+  if(silentTimer){
+    clearTimeout(silentTimer);
+    silentTimer = null;
   }
 }
 
-export function stopAllAudio(){
-  clearSilentTimer();
-  resetCardAudio();
-
-  if('speechSynthesis' in window){
-    speechSynthesis.cancel();
-  }
-}
-
-export function startPlayback(){
-  state.isPlaying = true;
-  state.runId++;
-  clearTimer();
-  clearSilentTimer();
-
-  // Unlock the reusable audio element from the user's tap.
-  ensureCardAudio();
-
-  return state.runId;
-}
-
-export function stopPlayback(){
-  state.isPlaying = false;
-  state.runId++;
-  clearTimer();
-  stopAllAudio();
+function stopBgmHard(){
+  stopBgm();
+  document.querySelectorAll('audio').forEach(audio => {
+    const key = `${audio.id || ''} ${audio.className || ''} ${audio.src || ''}`.toLowerCase();
+    if(key.includes('bgm') || key.includes('music') || key.includes('piano')){
+      try{
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 0;
+        audio.muted = true;
+        audio.src = '';
+        audio.removeAttribute('src');
+        audio.load?.();
+      }catch(_error){}
+    }
+  });
 }
 
 function cardNoFromCard(card){
   const raw = card?.cardNo ?? card?.no ?? card?.number;
   const numeric = Number(raw);
 
-  if(Number.isFinite(numeric) && numeric > 0){
-    return numeric;
-  }
+  if(Number.isFinite(numeric) && numeric > 0) return numeric;
 
   const id = String(card?.id || card?.cardId || '');
   const match = id.match(/(\d+)/);
-
   if(match){
     const fromId = Number(match[1]);
     if(Number.isFinite(fromId) && fromId > 0) return fromId;
@@ -99,12 +64,26 @@ function cardNoFromCard(card){
 export function zhAudioPath(card){
   const no = cardNoFromCard(card);
   if(!no) return '';
-
   const id = String(no).padStart(3, '0');
   return `audio/zh/Card_${id}_zh.mp3`;
 }
 
-function playAudioSrc(src, runId){
+function waitMs(ms, runId){
+  return new Promise(resolve => {
+    if(!state.isPlaying || runId !== state.runId){
+      resolve();
+      return;
+    }
+
+    clearSilentTimer();
+    silentTimer = window.setTimeout(() => {
+      silentTimer = null;
+      resolve();
+    }, Math.max(0, Number(ms) || 0));
+  });
+}
+
+function playSrc(src, runId){
   return new Promise(resolve => {
     if(!src || !state.isPlaying || runId !== state.runId){
       resolve();
@@ -112,87 +91,92 @@ function playAudioSrc(src, runId){
     }
 
     const audio = ensureCardAudio();
-    let finished = false;
+    activeAudioRunId += 1;
+    const token = activeAudioRunId;
 
-    const cleanup = () => {
-      audio.removeEventListener('ended', onDone);
-      audio.removeEventListener('error', onDone);
-      audio.removeEventListener('abort', onDone);
+    const done = () => {
+      audio.removeEventListener('ended', done);
+      audio.removeEventListener('error', done);
+      if(token === activeAudioRunId) resolve();
     };
 
-    const onDone = () => {
-      if(finished) return;
-      finished = true;
-      cleanup();
-      resolve();
-    };
-
-    try {
+    try{
       audio.pause();
       audio.currentTime = 0;
-    } catch (error) {
-      // Ignore seek errors while changing source.
-    }
+    }catch(_error){}
 
-    audio.addEventListener('ended', onDone);
-    audio.addEventListener('error', onDone);
-    audio.addEventListener('abort', onDone);
-
+    audio.addEventListener('ended', done);
+    audio.addEventListener('error', done);
     audio.volume = 1;
-    audio.loop = false;
+    audio.muted = false;
     audio.src = src;
     audio.load();
 
-    const playPromise = audio.play();
-
-    if(playPromise && typeof playPromise.catch === 'function'){
-      playPromise.catch(onDone);
-    }
+    audio.play().catch(() => {
+      done();
+    });
   });
 }
 
-export async function playCardZhAudio(card, runId){
-  if(!card || !state.isPlaying || runId !== state.runId) return;
+export function stopAllAudio(){
+  clearSilentTimer();
+  activeAudioRunId += 1;
 
-  const src = zhAudioPath(card);
-  if(!src) return;
+  if(cardAudio){
+    try{
+      cardAudio.pause();
+      cardAudio.currentTime = 0;
+    }catch(_error){}
+  }
 
   if('speechSynthesis' in window){
     speechSynthesis.cancel();
   }
 
-  await playAudioSrc(src, runId);
-
-  if(!state.isPlaying || runId !== state.runId) return;
-
-  // Keep the iPhone media pipeline continuous without letting BGM come forward.
-  await playAudioSrc(TRAILING_SILENCE_SRC, runId);
+  stopBgmHard();
 }
 
-// Kept for compatibility. The app now uses pre-generated MP3 narration.
-export function speak(text, runId){
-  return speakSilent(0, runId);
+export function startPlayback(){
+  state.isPlaying = true;
+  state.runId++;
+  clearTimer();
+  clearSilentTimer();
+  ensureCardAudio();
+  stopBgmHard();
+  return state.runId;
+}
+
+export function stopPlayback(){
+  state.isPlaying = false;
+  state.runId++;
+  clearTimer();
+  stopAllAudio();
+}
+
+export async function playCardZhAudio(card, runId){
+  if(!card || !state.isPlaying || runId !== state.runId) return;
+
+  stopBgmHard();
+
+  if('speechSynthesis' in window){
+    speechSynthesis.cancel();
+  }
+
+  const src = zhAudioPath(card);
+  if(!src) return;
+
+  await playSrc(src, runId);
+  if(!state.isPlaying || runId !== state.runId) return;
+
+  // BGMは使わず、カード音声後の余韻だけをタイマーで保持する。
+  await waitMs(TRAILING_SILENCE_MS, runId);
+}
+
+export function speak(_text, runId){
+  return waitMs(0, runId);
 }
 
 export function speakSilent(durationMs = 800, runId){
-  return new Promise(resolve => {
-    if(!state.isPlaying || runId !== state.runId){
-      resolve();
-      return;
-    }
-
-    const duration = Math.max(0, Number(durationMs) || 0);
-
-    if(duration === 0){
-      resolve();
-      return;
-    }
-
-    clearSilentTimer();
-
-    silentEndTimer = window.setTimeout(() => {
-      silentEndTimer = null;
-      resolve();
-    }, duration);
-  });
+  stopBgmHard();
+  return waitMs(durationMs, runId);
 }
