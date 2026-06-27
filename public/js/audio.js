@@ -8,6 +8,7 @@ const SILENT_KEEPALIVE_INTERVAL_MS = 650;
 let silentEndTimer = null;
 let silentKeepaliveTimer = null;
 let silentUtterance = null;
+let currentCardAudio = null;
 
 function forceQuietBgmElements(){
   document.querySelectorAll('audio').forEach(audio => {
@@ -41,6 +42,12 @@ function clearSilentTimer(){
 export function stopAllAudio(){
   clearSilentTimer();
 
+  if(currentCardAudio){
+    currentCardAudio.pause();
+    currentCardAudio.currentTime = 0;
+    currentCardAudio = null;
+  }
+
   if('speechSynthesis' in window){
     speechSynthesis.cancel();
   }
@@ -73,6 +80,80 @@ function zhVoice(){
   return voices.find(v => v.lang === 'zh-TW')
       || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'))
       || null;
+}
+
+
+function cardNoFromCard(card){
+  const raw = card?.cardNo ?? card?.no ?? card?.number;
+  const numeric = Number(raw);
+
+  if(Number.isFinite(numeric) && numeric > 0){
+    return numeric;
+  }
+
+  const id = String(card?.id || card?.cardId || '');
+  const match = id.match(/(\d+)/);
+
+  if(match){
+    const fromId = Number(match[1]);
+    if(Number.isFinite(fromId) && fromId > 0) return fromId;
+  }
+
+  return null;
+}
+
+export function zhAudioPath(card){
+  const no = cardNoFromCard(card);
+  if(!no) return '';
+
+  const id = String(no).padStart(3, '0');
+  return `audio/zh/Card_${id}_zh.mp3`;
+}
+
+export function playCardZhAudio(card, runId){
+  return new Promise(resolve => {
+    if(!card || !state.isPlaying || runId !== state.runId){
+      resolve();
+      return;
+    }
+
+    const src = zhAudioPath(card);
+    if(!src){
+      resolve();
+      return;
+    }
+
+    startBgmQuietly();
+    clearSilentTimer();
+
+    if('speechSynthesis' in window){
+      speechSynthesis.cancel();
+    }
+
+    if(currentCardAudio){
+      currentCardAudio.pause();
+      currentCardAudio.currentTime = 0;
+      currentCardAudio = null;
+    }
+
+    const audio = new Audio(src);
+    currentCardAudio = audio;
+    audio.preload = 'auto';
+    audio.volume = 1;
+    audio.setAttribute('playsinline', '');
+
+    const done = () => {
+      if(currentCardAudio === audio){
+        currentCardAudio = null;
+      }
+      resolve();
+    };
+
+    audio.addEventListener('ended', done, { once: true });
+    audio.addEventListener('error', done, { once: true });
+
+    audio.play().catch(done);
+  });
 }
 
 export function speak(text, runId){

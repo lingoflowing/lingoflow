@@ -2,7 +2,7 @@ import { state, getCurrentCard, nextCard } from './state.js';
 import { renderCurrentCard, rerenderForViewport, showError } from './render.js';
 import { clearTimer } from './timer.js';
 import {
-  speak,
+  playCardZhAudio,
   speakSilent,
   startPlayback as startAudioPlayback,
   stopPlayback,
@@ -29,10 +29,6 @@ function updateButton(){
   button.setAttribute('aria-label', state.isPlaying ? '停止' : '再生');
 }
 
-function textSequence(card){
-  return [card.wordZh, card.sentenceZh].filter(Boolean);
-}
-
 async function playLoop(runId){
   while(state.isPlaying && runId === state.runId){
     const card = getCurrentCard();
@@ -53,13 +49,11 @@ async function playLoop(runId){
     await speakSilent(CARD_SETTLE_BEFORE_WORD_MS, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
-    for(const text of textSequence(card)){
-      await speak(text, runId);
-      if(!state.isPlaying || runId !== state.runId) break;
+    await playCardZhAudio(card, runId);
+    if(!state.isPlaying || runId !== state.runId) break;
 
-      await speakSilent(PAUSE_AFTER_TEXT_MS, runId);
-      if(!state.isPlaying || runId !== state.runId) break;
-    }
+    await speakSilent(PAUSE_AFTER_TEXT_MS, runId);
+    if(!state.isPlaying || runId !== state.runId) break;
 
     await speakSilent(PAUSE_AFTER_CARD_MS, runId);
     if(!state.isPlaying || runId !== state.runId) break;
