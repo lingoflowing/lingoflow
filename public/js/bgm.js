@@ -3,7 +3,7 @@
 // UI追加なし / 設定追加なし / iPhone向けBGM音量0.3%
 
 const BGM_SRC = 'audio/bgm_piano.mp3';
-const BGM_VOLUME = 0.003;
+const BGM_VOLUME = 0;
 
 let bgmAudio = null;
 let bgmUserStarted = false;
