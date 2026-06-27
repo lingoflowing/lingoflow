@@ -49,6 +49,8 @@ async function playLoop(runId){
     await speakSilent(CARD_SETTLE_BEFORE_WORD_MS, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
+    // playCardZhAudio waits for the card MP3 and the trailing 1000ms silence MP3.
+    // This keeps mobile audio focus stable before the app continues the card cycle.
     await playCardZhAudio(card, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 

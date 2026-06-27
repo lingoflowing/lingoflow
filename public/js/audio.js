@@ -1,16 +1,17 @@
 import { state } from './state.js';
 import { clearTimer } from './timer.js';
-import { startBgm, stopBgm, markBgmUserStarted } from './bgm.js';
+import { startBgm, stopBgm, markBgmUserStarted, enforceBgmVolume } from './bgm.js';
 
 const BGM_SAFE_VOLUME = 0.01;
-const SILENT_KEEPALIVE_INTERVAL_MS = 650;
+const SILENCE_AFTER_CARD_SRC = 'audio/silence/silence_1000ms.mp3';
 
 let silentEndTimer = null;
-let silentKeepaliveTimer = null;
-let silentUtterance = null;
-let currentCardAudio = null;
+let sharedCardAudio = null;
+let audioSequenceToken = 0;
 
 function forceQuietBgmElements(){
+  enforceBgmVolume();
+
   document.querySelectorAll('audio').forEach(audio => {
     const key = `${audio.id || ''} ${audio.className || ''} ${audio.src || ''}`.toLowerCase();
     if(key.includes('bgm') || key.includes('music')){
@@ -30,23 +31,42 @@ function clearSilentTimer(){
     clearTimeout(silentEndTimer);
     silentEndTimer = null;
   }
+}
 
-  if(silentKeepaliveTimer){
-    clearInterval(silentKeepaliveTimer);
-    silentKeepaliveTimer = null;
+function getSharedCardAudio(){
+  if(sharedCardAudio) return sharedCardAudio;
+
+  sharedCardAudio = document.getElementById('cardZhAudio');
+
+  if(!sharedCardAudio){
+    sharedCardAudio = document.createElement('audio');
+    sharedCardAudio.id = 'cardZhAudio';
+    sharedCardAudio.preload = 'auto';
+    sharedCardAudio.setAttribute('playsinline', '');
+    document.body.appendChild(sharedCardAudio);
   }
 
-  silentUtterance = null;
+  sharedCardAudio.volume = 1;
+  sharedCardAudio.loop = false;
+  return sharedCardAudio;
+}
+
+function stopSharedCardAudio(){
+  if(!sharedCardAudio) return;
+
+  sharedCardAudio.pause();
+
+  try{
+    sharedCardAudio.currentTime = 0;
+  }catch(error){
+    // Some mobile browsers reject currentTime changes before metadata is loaded.
+  }
 }
 
 export function stopAllAudio(){
+  audioSequenceToken++;
   clearSilentTimer();
-
-  if(currentCardAudio){
-    currentCardAudio.pause();
-    currentCardAudio.currentTime = 0;
-    currentCardAudio = null;
-  }
+  stopSharedCardAudio();
 
   if('speechSynthesis' in window){
     speechSynthesis.cancel();
@@ -56,8 +76,13 @@ export function stopAllAudio(){
 export function startPlayback(){
   state.isPlaying = true;
   state.runId++;
+  audioSequenceToken++;
   clearTimer();
   clearSilentTimer();
+
+  // Create the reusable audio element during the user's first tap.
+  // iPhone/Safari is more stable when later cards reuse this same element.
+  getSharedCardAudio();
 
   startBgmQuietly();
 
@@ -71,17 +96,6 @@ export function stopPlayback(){
   stopAllAudio();
   stopBgm();
 }
-
-function zhVoice(){
-  if(!('speechSynthesis' in window)) return null;
-
-  const voices = speechSynthesis.getVoices();
-
-  return voices.find(v => v.lang === 'zh-TW')
-      || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'))
-      || null;
-}
-
 
 function cardNoFromCard(card){
   const raw = card?.cardNo ?? card?.no ?? card?.number;
@@ -110,52 +124,64 @@ export function zhAudioPath(card){
   return `audio/zh/Card_${id}_zh.mp3`;
 }
 
-export function playCardZhAudio(card, runId){
+function playSource(src, runId, sequenceToken){
   return new Promise(resolve => {
-    if(!card || !state.isPlaying || runId !== state.runId){
-      resolve();
-      return;
-    }
-
-    const src = zhAudioPath(card);
-    if(!src){
+    if(!src || !state.isPlaying || runId !== state.runId || sequenceToken !== audioSequenceToken){
       resolve();
       return;
     }
 
     startBgmQuietly();
-    clearSilentTimer();
+    forceQuietBgmElements();
 
-    if('speechSynthesis' in window){
-      speechSynthesis.cancel();
-    }
-
-    if(currentCardAudio){
-      currentCardAudio.pause();
-      currentCardAudio.currentTime = 0;
-      currentCardAudio = null;
-    }
-
-    const audio = new Audio(src);
-    currentCardAudio = audio;
-    audio.preload = 'auto';
-    audio.volume = 1;
-    audio.setAttribute('playsinline', '');
+    const audio = getSharedCardAudio();
+    stopSharedCardAudio();
 
     const done = () => {
-      if(currentCardAudio === audio){
-        currentCardAudio = null;
-      }
+      audio.removeEventListener('ended', done);
+      audio.removeEventListener('error', done);
+      forceQuietBgmElements();
       resolve();
     };
 
-    audio.addEventListener('ended', done, { once: true });
-    audio.addEventListener('error', done, { once: true });
+    audio.addEventListener('ended', done);
+    audio.addEventListener('error', done);
 
-    audio.play().catch(done);
+    audio.src = src;
+    audio.preload = 'auto';
+    audio.volume = 1;
+    audio.loop = false;
+
+    try{
+      audio.load();
+    }catch(error){
+      // load() can be unavailable or noisy on some mobile browsers; play() will still try.
+    }
+
+    audio.play().then(() => {
+      forceQuietBgmElements();
+    }).catch(done);
   });
 }
 
+export async function playCardZhAudio(card, runId){
+  if(!card || !state.isPlaying || runId !== state.runId) return;
+
+  const src = zhAudioPath(card);
+  if(!src) return;
+
+  const sequenceToken = audioSequenceToken;
+
+  // 1. Play the actual card MP3.
+  await playSource(src, runId, sequenceToken);
+  if(!state.isPlaying || runId !== state.runId || sequenceToken !== audioSequenceToken) return;
+
+  // 2. Immediately play a 1000ms silent MP3 after the card voice.
+  // This keeps mobile audio focus from dropping to BGM only during the transition.
+  await playSource(SILENCE_AFTER_CARD_SRC, runId, sequenceToken);
+}
+
+// Kept for compatibility with older imports. MP3 audio is now the production voice path.
 export function speak(text, runId){
   return new Promise(resolve => {
     if(!text || !state.isPlaying || runId !== state.runId){
@@ -169,12 +195,8 @@ export function speak(text, runId){
     }
 
     startBgmQuietly();
-
-    clearSilentTimer();
     speechSynthesis.cancel();
 
-    // Give the browser a short breath after cancel().
-    // This prevents short words from being skipped while preserving speakSilent().
     window.setTimeout(() => {
       if(!text || !state.isPlaying || runId !== state.runId){
         resolve();
@@ -183,43 +205,14 @@ export function speak(text, runId){
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'zh-TW';
-
-      const voice = zhVoice();
-      if(voice) utterance.voice = voice;
-
       utterance.rate = 0.88;
       utterance.pitch = 1;
       utterance.volume = 1;
-
       utterance.onend = () => resolve();
       utterance.onerror = () => resolve();
-
       speechSynthesis.speak(utterance);
     }, 120);
   });
-}
-
-function speakOneSilentPulse(runId){
-  if(!('speechSynthesis' in window)) return;
-  if(!state.isPlaying || runId !== state.runId) return;
-
-  // Keep the speech engine occupied during silent gaps.
-  // This prevents BGM from becoming perceptually dominant after sentence playback.
-  speechSynthesis.cancel();
-
-  silentUtterance = new SpeechSynthesisUtterance('。');
-  silentUtterance.lang = 'zh-TW';
-  silentUtterance.volume = 0;
-  silentUtterance.rate = 0.1;
-  silentUtterance.pitch = 1;
-
-  const voice = zhVoice();
-  if(voice) silentUtterance.voice = voice;
-
-  silentUtterance.onerror = () => {};
-  silentUtterance.onend = () => {};
-
-  speechSynthesis.speak(silentUtterance);
 }
 
 export function speakSilent(durationMs = 800, runId){
@@ -237,41 +230,12 @@ export function speakSilent(durationMs = 800, runId){
     }
 
     startBgmQuietly();
-
-    let resolved = false;
-
-    const done = () => {
-      if(resolved) return;
-      resolved = true;
-      clearSilentTimer();
-
-      if('speechSynthesis' in window){
-        speechSynthesis.cancel();
-      }
-
-      resolve();
-    };
-
-    if(!('speechSynthesis' in window)){
-      clearSilentTimer();
-      silentEndTimer = window.setTimeout(done, duration);
-      return;
-    }
-
     clearSilentTimer();
 
-    speakOneSilentPulse(runId);
-
-    silentKeepaliveTimer = window.setInterval(() => {
-      if(!state.isPlaying || runId !== state.runId){
-        done();
-        return;
-      }
-
-      startBgmQuietly();
-      speakOneSilentPulse(runId);
-    }, SILENT_KEEPALIVE_INTERVAL_MS);
-
-    silentEndTimer = window.setTimeout(done, duration);
+    silentEndTimer = window.setTimeout(() => {
+      clearSilentTimer();
+      forceQuietBgmElements();
+      resolve();
+    }, duration);
   });
 }
