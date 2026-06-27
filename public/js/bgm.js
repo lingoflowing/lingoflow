@@ -1,4 +1,4 @@
-// Kotoba Biyori phase123-ios-voice-only-reset
+// Kotoba Biyori phase125-display-safe
 // iPhone音声安定化のため、BGMを完全停止するリセット版。
 // ここではBGM用audioを作らず、既存のBGM audioがあれば停止する。
 

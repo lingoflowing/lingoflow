@@ -1,15 +1,15 @@
-import { state, getCurrentCard, nextCard } from './state.js?v=phase123-ios-voice-only-reset';
-import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase123-ios-voice-only-reset';
-import { clearTimer } from './timer.js?v=phase123-ios-voice-only-reset';
+import { state, getCurrentCard, nextCard } from './state.js?v=phase125-display-safe';
+import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase125-display-safe';
+import { clearTimer } from './timer.js?v=phase125-display-safe';
 import {
   playCardZhAudio,
   speakSilent,
   startPlayback as startAudioPlayback,
   stopPlayback,
   stopAllAudio
-} from './audio.js?v=phase123-ios-voice-only-reset';
-import { PLAY_SVG, STOP_SVG } from './icons.js?v=phase123-ios-voice-only-reset';
-import { track } from './analytics.js?v=phase123-ios-voice-only-reset';
+} from './audio.js?v=phase125-display-safe';
+import { PLAY_SVG, STOP_SVG } from './icons.js?v=phase125-display-safe';
+import { track } from './analytics.js?v=phase125-display-safe';
 
 const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
@@ -247,7 +247,14 @@ window.addEventListener('resize', () => {
   rerenderForViewport();
 });
 
-window.addEventListener('load', async () => {
+let hasBootstrapped = false;
+
+async function bootstrap(){
+  if(hasBootstrapped){
+    return;
+  }
+
+  hasBootstrapped = true;
   updateButton();
 
   if('speechSynthesis' in window){
@@ -259,7 +266,13 @@ window.addEventListener('load', async () => {
   }catch(error){
     clearTimer();
     stopAllAudio();
-    showError('週替わりプレイリストを読み込めませんでした。data/cards.json が600件あるか確認してください。');
+    showError('週替わりプレイリストを読み込めませんでした。data/cards.json / data/images.json の配置を確認してください。');
     console.error(error);
   }
-});
+}
+
+if(document.readyState === 'loading'){
+  window.addEventListener('DOMContentLoaded', bootstrap, { once: true });
+}else{
+  bootstrap();
+}

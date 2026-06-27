@@ -1,6 +1,6 @@
-import { state } from './state.js?v=phase123-ios-voice-only-reset';
-import { clearTimer } from './timer.js?v=phase123-ios-voice-only-reset';
-import { stopBgm } from './bgm.js?v=phase123-ios-voice-only-reset';
+import { state } from './state.js?v=phase125-display-safe';
+import { clearTimer } from './timer.js?v=phase125-display-safe';
+import { stopBgm } from './bgm.js?v=phase125-display-safe';
 
 const TRAILING_SILENCE_MS = 1000;
 

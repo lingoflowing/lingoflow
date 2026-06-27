@@ -1,4 +1,4 @@
-import { state, getCurrentCard } from './state.js?v=phase123-ios-voice-only-reset';
+import { state, getCurrentCard } from './state.js?v=phase125-display-safe';
 
 const photo = document.getElementById('photo');
 const photoWrap = document.querySelector('.photo-wrap');
@@ -25,6 +25,7 @@ let renderToken = 0;
 let hasRenderedOnce = false;
 let lastRenderedCardKey = '';
 let handlingImageError = false;
+let imageRetryToken = 0;
 
 function safeText(value){
   return typeof value === 'string' ? value : '';
@@ -108,38 +109,77 @@ function cardImageId(card){
   return '';
 }
 
-function currentImage(card){
+function pushUnique(list, value){
+  const v = safeText(value).trim();
+
+  if(v && !list.includes(v)){
+    list.push(v);
+  }
+}
+
+function cardNumber(card){
+  const raw =
+    card?.cardNo ??
+    card?.no ??
+    card?.number ??
+    safeText(card?.id).match(/\d+/)?.[0];
+
+  const num = Number(raw);
+  return Number.isFinite(num) && num > 0 ? num : null;
+}
+
+function imageCandidates(card){
+  const list = [];
+
   if(!card){
-    return '';
+    return list;
   }
 
   const id = cardImageId(card);
+  const no = cardNumber(card);
 
-  // Prefer existing image metadata when present.
-  // Fallback to the fixed card_001.png ... card_600.png rule.
-  if(card.image){
-    return card.image;
-  }
-
-  if(card.imageMeta?.imagePath){
-    return card.imageMeta.imagePath;
-  }
+  pushUnique(list, card.image);
+  pushUnique(list, card.imagePath);
+  pushUnique(list, card.imageMeta?.imagePath);
 
   if(card.imageFile){
-    return `images/${card.imageFile}`;
+    const file = safeText(card.imageFile);
+    pushUnique(list, file.includes('/') ? file : `images/${file}`);
+  }
+
+  if(no){
+    pushUnique(list, `images/Card_${String(no).padStart(3, '0')}.png`);
+    pushUnique(list, `images/card_${String(no).padStart(3, '0')}.png`);
   }
 
   if(id){
-    return `images/${id}.png`;
+    pushUnique(list, `images/${id}.png`);
   }
 
-  return placeholderImage(card);
+  pushUnique(list, placeholderImage(card));
+  return list;
+}
+
+function currentImage(card){
+  return imageCandidates(card)[0] || placeholderImage(card);
 }
 
 function setText(el, value){
   if(el){
     el.textContent = safeText(value);
   }
+}
+
+function firstText(...values){
+  for(const value of values){
+    const text = safeText(value).trim();
+
+    if(text){
+      return text;
+    }
+  }
+
+  return '';
 }
 
 function renderMeta(card){
@@ -183,12 +223,12 @@ function renderKey(card, src){
 function renderText(card){
   renderMeta(card);
 
-  setText(wordZh, card.wordZh);
-  setText(wordPinyin, card.wordPinyin);
-  setText(wordJa, card.wordJa);
-  setText(sentenceZh, card.sentenceZh);
-  setText(sentencePinyin, card.sentencePinyin);
-  setText(sentenceJa, card.sentenceJa);
+  setText(wordZh, firstText(card.wordZh, card.word?.zh, card.zh, card.word));
+  setText(wordPinyin, firstText(card.wordPinyin, card.word?.pinyin, card.pinyin));
+  setText(wordJa, firstText(card.wordJa, card.word?.ja, card.ja, card.wordJapanese));
+  setText(sentenceZh, firstText(card.sentenceZh, card.sentence?.zh, card.exampleZh, card.sentence));
+  setText(sentencePinyin, firstText(card.sentencePinyin, card.sentence?.pinyin, card.examplePinyin));
+  setText(sentenceJa, firstText(card.sentenceJa, card.sentence?.ja, card.exampleJa, card.sentenceJapanese));
 }
 
 function restoreTextTransitionSoon(){
@@ -322,9 +362,18 @@ function setImageImmediately(src, card){
   photo.classList.remove('is-changing');
   photo.style.opacity = '1';
 
-  // Do not force visibility here.
-  // On the first render, .is-initializing keeps the image hidden until
-  // the actual image load event fires, preventing alt text from flashing.
+  photo.classList.remove('is-initializing');
+  photo.style.visibility = 'visible';
+
+  const token = ++imageRetryToken;
+  window.setTimeout(() => {
+    if(token === imageRetryToken && photo.classList.contains('is-initializing')){
+      photo.classList.remove('is-initializing');
+      photo.style.visibility = 'visible';
+      photo.style.opacity = '1';
+    }
+  }, 1800);
+
   photo.src = src;
   photo.alt = safeText(
     card.wordJa ||
@@ -355,6 +404,7 @@ function crossfadeToImage(src, card){
   }
 
   handlingImageError = false;
+  ++imageRetryToken;
 
   const overlay = makeOverlayFromCurrentImage();
 
@@ -477,27 +527,39 @@ if(photo){
   });
 
   photo.addEventListener('error', () => {
+    const card = getCurrentCard();
+    const candidates = imageCandidates(card);
+    const current = photo.getAttribute('src') || photo.src || '';
+    const currentIndex = candidates.findIndex(src => src === current || current.endsWith(src));
+    const next = candidates[currentIndex + 1];
+
+    if(next && next !== current){
+      photo.classList.remove('is-changing', 'is-initializing');
+      photo.style.opacity = '1';
+      photo.style.visibility = 'visible';
+      photo.src = next;
+      lastImage = next;
+      lastRenderedCardKey = renderKey(card, next);
+      return;
+    }
+
     if(handlingImageError){
       return;
     }
 
     handlingImageError = true;
 
-    const fallback = placeholderImage(getCurrentCard());
+    const fallback = placeholderImage(card);
 
-    photo.classList.remove('is-changing');
+    photo.classList.remove('is-changing', 'is-initializing');
     photo.style.opacity = '1';
     photo.style.visibility = 'visible';
     photo.src = fallback;
 
     lastImage = fallback;
-    lastRenderedCardKey = renderKey(
-      getCurrentCard(),
-      fallback
-    );
-
-    photo.classList.remove('is-initializing');
+    lastRenderedCardKey = renderKey(card, fallback);
   });
+}
 }
 
 export function renderCurrentCard(){
