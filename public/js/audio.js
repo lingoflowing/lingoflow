@@ -1,52 +1,57 @@
 import { state } from './state.js';
 import { clearTimer } from './timer.js';
-import { startBgm, stopBgm, markBgmUserStarted } from './bgm.js';
 
-const BGM_SAFE_VOLUME = 0.003;
-const SILENT_KEEPALIVE_INTERVAL_MS = 650;
+// Phase122 iPhone stable audio patch
+// - BGM is intentionally disabled in this recovery patch.
+// - The card narration uses one reusable <audio> element.
+// - Silent gaps are plain timers, so speechSynthesis cannot steal audio focus.
+// - A short silent MP3 is played after each card voice to keep mobile audio flow stable.
+
+const TRAILING_SILENCE_SRC = 'audio/silence/silence_1000ms.mp3';
 
 let silentEndTimer = null;
-let silentKeepaliveTimer = null;
-let silentUtterance = null;
-let currentCardAudio = null;
-
-function forceQuietBgmElements(){
-  document.querySelectorAll('audio').forEach(audio => {
-    const key = `${audio.id || ''} ${audio.className || ''} ${audio.src || ''}`.toLowerCase();
-    if(key.includes('bgm') || key.includes('music')){
-      audio.volume = BGM_SAFE_VOLUME;
-    }
-  });
-}
-
-function startBgmQuietly(){
-  markBgmUserStarted();
-  startBgm();
-  forceQuietBgmElements();
-}
+let cardAudio = null;
 
 function clearSilentTimer(){
   if(silentEndTimer){
     clearTimeout(silentEndTimer);
     silentEndTimer = null;
   }
+}
 
-  if(silentKeepaliveTimer){
-    clearInterval(silentKeepaliveTimer);
-    silentKeepaliveTimer = null;
+function ensureCardAudio(){
+  if(cardAudio) return cardAudio;
+
+  cardAudio = document.getElementById('cardZhAudio');
+
+  if(!cardAudio){
+    cardAudio = document.createElement('audio');
+    cardAudio.id = 'cardZhAudio';
+    cardAudio.preload = 'auto';
+    cardAudio.setAttribute('playsinline', '');
+    document.body.appendChild(cardAudio);
   }
 
-  silentUtterance = null;
+  cardAudio.volume = 1;
+  cardAudio.loop = false;
+  return cardAudio;
+}
+
+function resetCardAudio(){
+  if(!cardAudio) return;
+
+  try {
+    cardAudio.pause();
+    cardAudio.removeAttribute('src');
+    cardAudio.load();
+  } catch (error) {
+    // Ignore browser-specific media cleanup errors.
+  }
 }
 
 export function stopAllAudio(){
   clearSilentTimer();
-
-  if(currentCardAudio){
-    currentCardAudio.pause();
-    currentCardAudio.currentTime = 0;
-    currentCardAudio = null;
-  }
+  resetCardAudio();
 
   if('speechSynthesis' in window){
     speechSynthesis.cancel();
@@ -59,7 +64,8 @@ export function startPlayback(){
   clearTimer();
   clearSilentTimer();
 
-  startBgmQuietly();
+  // Unlock the reusable audio element from the user's tap.
+  ensureCardAudio();
 
   return state.runId;
 }
@@ -69,19 +75,7 @@ export function stopPlayback(){
   state.runId++;
   clearTimer();
   stopAllAudio();
-  stopBgm();
 }
-
-function zhVoice(){
-  if(!('speechSynthesis' in window)) return null;
-
-  const voices = speechSynthesis.getVoices();
-
-  return voices.find(v => v.lang === 'zh-TW')
-      || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'))
-      || null;
-}
-
 
 function cardNoFromCard(card){
   const raw = card?.cardNo ?? card?.no ?? card?.number;
@@ -110,116 +104,74 @@ export function zhAudioPath(card){
   return `audio/zh/Card_${id}_zh.mp3`;
 }
 
-export function playCardZhAudio(card, runId){
+function playAudioSrc(src, runId){
   return new Promise(resolve => {
-    if(!card || !state.isPlaying || runId !== state.runId){
+    if(!src || !state.isPlaying || runId !== state.runId){
       resolve();
       return;
     }
 
-    const src = zhAudioPath(card);
-    if(!src){
-      resolve();
-      return;
-    }
+    const audio = ensureCardAudio();
+    let finished = false;
 
-    startBgmQuietly();
-    clearSilentTimer();
+    const cleanup = () => {
+      audio.removeEventListener('ended', onDone);
+      audio.removeEventListener('error', onDone);
+      audio.removeEventListener('abort', onDone);
+    };
 
-    if('speechSynthesis' in window){
-      speechSynthesis.cancel();
-    }
-
-    if(currentCardAudio){
-      currentCardAudio.pause();
-      currentCardAudio.currentTime = 0;
-      currentCardAudio = null;
-    }
-
-    const audio = new Audio(src);
-    currentCardAudio = audio;
-    audio.preload = 'auto';
-    audio.volume = 1;
-    audio.setAttribute('playsinline', '');
-
-    const done = () => {
-      if(currentCardAudio === audio){
-        currentCardAudio = null;
-      }
+    const onDone = () => {
+      if(finished) return;
+      finished = true;
+      cleanup();
       resolve();
     };
 
-    audio.addEventListener('ended', done, { once: true });
-    audio.addEventListener('error', done, { once: true });
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+    } catch (error) {
+      // Ignore seek errors while changing source.
+    }
 
-    audio.play().catch(done);
+    audio.addEventListener('ended', onDone);
+    audio.addEventListener('error', onDone);
+    audio.addEventListener('abort', onDone);
+
+    audio.volume = 1;
+    audio.loop = false;
+    audio.src = src;
+    audio.load();
+
+    const playPromise = audio.play();
+
+    if(playPromise && typeof playPromise.catch === 'function'){
+      playPromise.catch(onDone);
+    }
   });
 }
 
-export function speak(text, runId){
-  return new Promise(resolve => {
-    if(!text || !state.isPlaying || runId !== state.runId){
-      resolve();
-      return;
-    }
+export async function playCardZhAudio(card, runId){
+  if(!card || !state.isPlaying || runId !== state.runId) return;
 
-    if(!('speechSynthesis' in window)){
-      resolve();
-      return;
-    }
+  const src = zhAudioPath(card);
+  if(!src) return;
 
-    startBgmQuietly();
-
-    clearSilentTimer();
+  if('speechSynthesis' in window){
     speechSynthesis.cancel();
+  }
 
-    // Give the browser a short breath after cancel().
-    // This prevents short words from being skipped while preserving speakSilent().
-    window.setTimeout(() => {
-      if(!text || !state.isPlaying || runId !== state.runId){
-        resolve();
-        return;
-      }
+  await playAudioSrc(src, runId);
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-TW';
-
-      const voice = zhVoice();
-      if(voice) utterance.voice = voice;
-
-      utterance.rate = 0.88;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-
-      utterance.onend = () => resolve();
-      utterance.onerror = () => resolve();
-
-      speechSynthesis.speak(utterance);
-    }, 120);
-  });
-}
-
-function speakOneSilentPulse(runId){
-  if(!('speechSynthesis' in window)) return;
   if(!state.isPlaying || runId !== state.runId) return;
 
-  // Keep the speech engine occupied during silent gaps.
-  // This prevents BGM from becoming perceptually dominant after sentence playback.
-  speechSynthesis.cancel();
+  // Keep the iPhone media pipeline continuous without letting BGM come forward.
+  await playAudioSrc(TRAILING_SILENCE_SRC, runId);
+}
 
-  silentUtterance = new SpeechSynthesisUtterance('。');
-  silentUtterance.lang = 'zh-TW';
-  silentUtterance.volume = 0;
-  silentUtterance.rate = 0.1;
-  silentUtterance.pitch = 1;
-
-  const voice = zhVoice();
-  if(voice) silentUtterance.voice = voice;
-
-  silentUtterance.onerror = () => {};
-  silentUtterance.onend = () => {};
-
-  speechSynthesis.speak(silentUtterance);
+// Kept for compatibility. The app now uses pre-generated MP3 narration.
+export function speak(text, runId){
+  return speakSilent(0, runId);
 }
 
 export function speakSilent(durationMs = 800, runId){
@@ -236,42 +188,11 @@ export function speakSilent(durationMs = 800, runId){
       return;
     }
 
-    startBgmQuietly();
-
-    let resolved = false;
-
-    const done = () => {
-      if(resolved) return;
-      resolved = true;
-      clearSilentTimer();
-
-      if('speechSynthesis' in window){
-        speechSynthesis.cancel();
-      }
-
-      resolve();
-    };
-
-    if(!('speechSynthesis' in window)){
-      clearSilentTimer();
-      silentEndTimer = window.setTimeout(done, duration);
-      return;
-    }
-
     clearSilentTimer();
 
-    speakOneSilentPulse(runId);
-
-    silentKeepaliveTimer = window.setInterval(() => {
-      if(!state.isPlaying || runId !== state.runId){
-        done();
-        return;
-      }
-
-      startBgmQuietly();
-      speakOneSilentPulse(runId);
-    }, SILENT_KEEPALIVE_INTERVAL_MS);
-
-    silentEndTimer = window.setTimeout(done, duration);
+    silentEndTimer = window.setTimeout(() => {
+      silentEndTimer = null;
+      resolve();
+    }, duration);
   });
 }

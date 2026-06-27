@@ -49,8 +49,8 @@ async function playLoop(runId){
     await speakSilent(CARD_SETTLE_BEFORE_WORD_MS, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
-    // playCardZhAudio waits for the card MP3 and the trailing 1000ms silence MP3.
-    // This keeps mobile audio focus stable before the app continues the card cycle.
+    // playCardZhAudio waits for the card MP3 and the trailing 1000ms silent MP3.
+    // BGM is disabled in this iPhone recovery baseline.
     await playCardZhAudio(card, runId);
     if(!state.isPlaying || runId !== state.runId) break;
 
