@@ -1,4 +1,4 @@
-import { state, getCurrentCard } from './state.js';
+import { state, getCurrentCard } from './state.js?v=phase123-ios-voice-only-reset';
 
 const photo = document.getElementById('photo');
 const photoWrap = document.querySelector('.photo-wrap');
