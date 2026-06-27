@@ -1,9 +1,9 @@
-// LingoFlow BGM
+// LingoFlow Phase66 BGM v1
 // 静かなピアノBGMを1曲固定・再生中だけ流す
-// UI追加なし / 設定追加なし / 音量1%
+// UI追加なし / 設定追加なし / iPhone向けBGM音量0.3%
 
 const BGM_SRC = 'audio/bgm_piano.mp3';
-export const BGM_VOLUME = 0.01;
+const BGM_VOLUME = 0.003;
 
 let bgmAudio = null;
 let bgmUserStarted = false;
@@ -35,14 +35,6 @@ export function markBgmUserStarted() {
   bgmUserStarted = true;
 }
 
-export function enforceBgmVolume() {
-  if (!bgmAudio) initBgm();
-  if (!bgmAudio) return;
-
-  bgmAudio.volume = BGM_VOLUME;
-  bgmAudio.loop = true;
-}
-
 export async function startBgm() {
   if (!bgmAudio) initBgm();
   if (!bgmAudio) return;
@@ -50,13 +42,13 @@ export async function startBgm() {
   // iPhone対策：ユーザー操作後だけ再生
   if (!bgmUserStarted) return;
 
-  enforceBgmVolume();
+  bgmAudio.volume = BGM_VOLUME;
+  bgmAudio.loop = true;
 
   if (!bgmAudio.paused) return;
 
   try {
     await bgmAudio.play();
-    enforceBgmVolume();
   } catch (error) {
     // iPhone/Safariの自動再生ブロック時は何もしない
   }
@@ -67,5 +59,4 @@ export function stopBgm() {
 
   bgmAudio.pause();
   bgmAudio.currentTime = 0;
-  enforceBgmVolume();
 }
