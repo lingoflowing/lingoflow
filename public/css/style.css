@@ -477,3 +477,18 @@ img#photo.photo{
   transition:none !important;
   opacity:1 !important;
 }
+
+
+/* Phase126: fallback play icon.
+   If JavaScript fails before updateButton() runs, the button is no longer an empty circle.
+*/
+.play-stop-icon:empty::before{
+  content:"";
+  display:block;
+  width:0;
+  height:0;
+  border-top:10px solid transparent;
+  border-bottom:10px solid transparent;
+  border-left:16px solid currentColor;
+  margin-left:4px;
+}

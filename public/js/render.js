@@ -1,4 +1,4 @@
-import { state, getCurrentCard } from './state.js?v=phase125-display-safe';
+import { state, getCurrentCard } from './state.js?v=phase126-cache-safe-20260629';
 
 const photo = document.getElementById('photo');
 const photoWrap = document.querySelector('.photo-wrap');
