@@ -1,6 +1,6 @@
-import { state } from './state.js?v=phase129-boot-safe-20260629';
-import { clearTimer } from './timer.js?v=phase129-boot-safe-20260629';
-import { stopBgm } from './bgm.js?v=phase129-boot-safe-20260629';
+import { state } from './state.js?v=phase130-hibilingo-20260629';
+import { clearTimer } from './timer.js?v=phase130-hibilingo-20260629';
+import { stopBgm } from './bgm.js?v=phase130-hibilingo-20260629';
 
 const TRAILING_SILENCE_MS = 1000;
 

@@ -1,4 +1,4 @@
-import { state, getCurrentCard } from './state.js?v=phase129-boot-safe-20260629';
+import { state, getCurrentCard } from './state.js?v=phase130-hibilingo-20260629';
 
 const photo = document.getElementById('photo');
 const photoWrap = document.querySelector('.photo-wrap');
@@ -40,7 +40,7 @@ function escapeSvgText(value){
 }
 
 function placeholderImage(card){
-  const title = escapeSvgText(card?.wordZh || 'LingoFlow');
+  const title = escapeSvgText(card?.wordZh || 'HibiLingo');
   const sub = escapeSvgText(card?.sentenceZh || 'image coming soon');
   const no = escapeSvgText(card?.id || 'card');
 
@@ -378,7 +378,7 @@ function setImageImmediately(src, card){
   photo.alt = safeText(
     card.wordJa ||
     card.wordZh ||
-    'LingoFlow scene'
+    'HibiLingo scene'
   );
 
   lastImage = src;
@@ -396,7 +396,7 @@ function crossfadeToImage(src, card){
   photo.alt = safeText(
     card.wordJa ||
     card.wordZh ||
-    'LingoFlow scene'
+    'HibiLingo scene'
   );
 
   if(!shouldChangeImage){
@@ -481,7 +481,7 @@ function setCardWithFade(card){
     photo.alt = safeText(
       card.wordJa ||
       card.wordZh ||
-      'LingoFlow scene'
+      'HibiLingo scene'
     );
 
     if(textArea){

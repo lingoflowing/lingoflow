@@ -1,4 +1,4 @@
-// Kotoba Biyori phase129-boot-safe-20260629
+// HibiLingo phase130-hibilingo-20260629
 // iPhone音声安定化のため、BGMを完全停止するリセット版。
 // ここではBGM用audioを作らず、既存のBGM audioがあれば停止する。
 
