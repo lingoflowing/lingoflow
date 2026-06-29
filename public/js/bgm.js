@@ -1,4 +1,4 @@
-// Kotoba Biyori phase127-render-cache-bust-20260629
+// Kotoba Biyori phase128-unified-state-20260629
 // iPhone音声安定化のため、BGMを完全停止するリセット版。
 // ここではBGM用audioを作らず、既存のBGM audioがあれば停止する。
 
