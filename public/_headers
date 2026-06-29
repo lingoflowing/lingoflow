@@ -1,13 +1,13 @@
-/index.html
+/*
   Cache-Control: no-store, no-cache, must-revalidate, max-age=0
 
 /*.html
   Cache-Control: no-store, no-cache, must-revalidate, max-age=0
 
-/js/*
+/css/*
   Cache-Control: no-store, no-cache, must-revalidate, max-age=0
 
-/css/*
+/js/*
   Cache-Control: no-store, no-cache, must-revalidate, max-age=0
 
 /data/*
