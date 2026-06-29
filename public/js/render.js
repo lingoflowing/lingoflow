@@ -1,4 +1,4 @@
-import { state, getCurrentCard } from './state.js?v=phase126-cache-safe-20260629';
+import { state, getCurrentCard } from './state.js?v=phase125-display-safe';
 
 const photo = document.getElementById('photo');
 const photoWrap = document.querySelector('.photo-wrap');
@@ -559,7 +559,6 @@ if(photo){
     lastImage = fallback;
     lastRenderedCardKey = renderKey(card, fallback);
   });
-}
 }
 
 export function renderCurrentCard(){
