@@ -492,3 +492,11 @@ img#photo.photo{
   border-left:16px solid currentColor;
   margin-left:4px;
 }
+
+
+/* Phase129: boot guard.
+   The inline version in index.html prevents first paint flash before external CSS loads.
+*/
+body.is-booting .app{
+  visibility:hidden;
+}

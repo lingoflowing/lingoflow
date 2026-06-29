@@ -26,10 +26,17 @@
 <meta name="twitter:description" content="台湾の日常風景を眺めながら、台湾華語の単語と例文をゆっくり聞き流せる学習サイト。繁體字・ピンイン・日本語訳で、毎日静かに続けられます。">
 <meta name="twitter:image" content="https://lingoflowing.com/ogp.png">
 
-<link rel="stylesheet" href="css/style.css?v=phase128-unified-state-20260629">
+<style>
+/* Phase129: prevent first-paint text flash before the first card is rendered. */
+body.is-booting .app{
+  visibility:hidden;
+}
+</style>
+
+<link rel="stylesheet" href="css/style.css?v=phase129-boot-safe-20260629">
 </head>
 
-<body>
+<body class="is-booting">
 <main class="app" aria-label="ことば日和">
   <section class="card" aria-live="polite">
 
@@ -37,7 +44,8 @@
       <img
         id="photo"
         class="photo is-initializing"
-        alt="ことば日和の台湾華語学習シーン">
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+        alt="">
     </div>
 
     <section class="text-area">
@@ -79,7 +87,12 @@
   </section>
 </main>
 
-<script type="module" src="js/app.js?v=phase128-unified-state-20260629"></script>
+<script type="module" src="js/app.js?v=phase129-boot-safe-20260629"></script>
 
+<script>
+window.setTimeout(function(){
+  document.body.classList.remove('is-booting');
+}, 4000);
+</script>
 </body>
 </html>

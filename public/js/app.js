@@ -1,15 +1,15 @@
-import { state, getCurrentCard, nextCard } from './state.js?v=phase128-unified-state-20260629';
-import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase128-unified-state-20260629';
-import { clearTimer } from './timer.js?v=phase128-unified-state-20260629';
+import { state, getCurrentCard, nextCard } from './state.js?v=phase129-boot-safe-20260629';
+import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase129-boot-safe-20260629';
+import { clearTimer } from './timer.js?v=phase129-boot-safe-20260629';
 import {
   playCardZhAudio,
   speakSilent,
   startPlayback as startAudioPlayback,
   stopPlayback,
   stopAllAudio
-} from './audio.js?v=phase128-unified-state-20260629';
-import { PLAY_SVG, STOP_SVG } from './icons.js?v=phase128-unified-state-20260629';
-import { track } from './analytics.js?v=phase128-unified-state-20260629';
+} from './audio.js?v=phase129-boot-safe-20260629';
+import { PLAY_SVG, STOP_SVG } from './icons.js?v=phase129-boot-safe-20260629';
+import { track } from './analytics.js?v=phase129-boot-safe-20260629';
 
 const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
@@ -22,6 +22,10 @@ const PLAYLIST_COUNT = 30;
 const CARD_SETTLE_BEFORE_WORD_MS = 2000;
 const PAUSE_AFTER_TEXT_MS = 1350;
 const PAUSE_AFTER_CARD_MS = 3800;
+
+function finishBoot(){
+  document.body.classList.remove('is-booting');
+}
 
 function updateButton(){
   button.classList.toggle('is-playing', state.isPlaying);
@@ -228,6 +232,7 @@ async function loadCards(){
   });
 
   renderCurrentCard();
+  finishBoot();
 }
 
 button.addEventListener('click', () => {
@@ -267,6 +272,7 @@ async function bootstrap(){
     clearTimer();
     stopAllAudio();
     showError('週替わりプレイリストを読み込めませんでした。data/cards.json / data/images.json の配置を確認してください。');
+    finishBoot();
     console.error(error);
   }
 }

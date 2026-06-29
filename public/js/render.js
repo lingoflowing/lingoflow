@@ -1,4 +1,4 @@
-import { state, getCurrentCard } from './state.js?v=phase128-unified-state-20260629';
+import { state, getCurrentCard } from './state.js?v=phase129-boot-safe-20260629';
 
 const photo = document.getElementById('photo');
 const photoWrap = document.querySelector('.photo-wrap');

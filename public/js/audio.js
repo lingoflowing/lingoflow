@@ -1,6 +1,6 @@
-import { state } from './state.js?v=phase128-unified-state-20260629';
-import { clearTimer } from './timer.js?v=phase128-unified-state-20260629';
-import { stopBgm } from './bgm.js?v=phase128-unified-state-20260629';
+import { state } from './state.js?v=phase129-boot-safe-20260629';
+import { clearTimer } from './timer.js?v=phase129-boot-safe-20260629';
+import { stopBgm } from './bgm.js?v=phase129-boot-safe-20260629';
 
 const TRAILING_SILENCE_MS = 1000;
 
