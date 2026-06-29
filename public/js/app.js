@@ -1,15 +1,15 @@
-import { state, getCurrentCard, nextCard } from './state.js?v=phase126-cache-safe-20260629';
-import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase126-cache-safe-20260629';
-import { clearTimer } from './timer.js?v=phase126-cache-safe-20260629';
+import { state, getCurrentCard, nextCard } from './state.js?v=phase127-render-cache-bust-20260629';
+import { renderCurrentCard, rerenderForViewport, showError } from './render.js?v=phase127-render-cache-bust-20260629';
+import { clearTimer } from './timer.js?v=phase127-render-cache-bust-20260629';
 import {
   playCardZhAudio,
   speakSilent,
   startPlayback as startAudioPlayback,
   stopPlayback,
   stopAllAudio
-} from './audio.js?v=phase126-cache-safe-20260629';
-import { PLAY_SVG, STOP_SVG } from './icons.js?v=phase126-cache-safe-20260629';
-import { track } from './analytics.js?v=phase126-cache-safe-20260629';
+} from './audio.js?v=phase127-render-cache-bust-20260629';
+import { PLAY_SVG, STOP_SVG } from './icons.js?v=phase127-render-cache-bust-20260629';
+import { track } from './analytics.js?v=phase127-render-cache-bust-20260629';
 
 const button = document.getElementById('playStopButton');
 const icon = document.getElementById('playStopIcon');
