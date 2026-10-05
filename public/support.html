@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HibiLingoを支援する | HibiLingo</title>
+  <meta name="description" content="HibiLingoの運営・改善を、任意の一回払いで支援できます。300円・500円・1,000円からお選びください。">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://lingoflowing.com/support.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="HibiLingo">
+  <meta property="og:title" content="HibiLingoを支援する">
+  <meta property="og:description" content="日々の学びが、静かに続いていくように。任意の一回払いで運営・改善を支援できます。">
+  <meta property="og:url" content="https://lingoflowing.com/support.html">
+  <style>
+    * { box-sizing: border-box; }
+    html { background: #f6f3ed; color: #2b241c; }
+    body { margin: 0; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Serif JP","Noto Sans JP","Noto Sans TC",serif; line-height: 1.85; }
+    main { width: min(100% - 32px, 720px); margin: 0 auto; padding: 48px 0 max(32px, env(safe-area-inset-bottom)); }
+    .brand { color: #8a6b44; text-decoration: none; letter-spacing: .08em; font-size: 18px; }
+    .panel { margin-top: 28px; background: #fffaf2; border-radius: 28px; padding: clamp(24px,5vw,48px); box-shadow: 0 18px 42px rgba(60,45,25,.06); }
+    .eyebrow { margin: 0 0 12px; color: #725a3c; font-size: 13px; letter-spacing: .12em; }
+    h1 { margin: 0 0 20px; font-size: clamp(24px,5vw,32px); font-weight: 500; line-height: 1.5; }
+    p { margin: 0 0 16px; color: #5f5144; }
+    .choices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 30px 0 20px; }
+    .support-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 112px; padding: 18px 10px; border: 1px solid #b9a78e; border-radius: 18px; color: #2b241c; background: #fffaf2; text-decoration: none; }
+    .amount { font-size: 25px; font-weight: 500; white-space: nowrap; }
+    .action { font-size: 13px; color: #725a3c; }
+    .support-link:hover { background: #eee7dc; border-color: #8a6b44; }
+    a:focus-visible { outline: 3px solid #8a6b44; outline-offset: 5px; }
+    .note { font-size: 14px; }
+    .thanks { border-top: 1px solid #ded3c3; margin-top: 26px; padding-top: 24px; font-size: 14px; }
+    .back { display: inline-block; margin: 28px 0 0; color: #5f5144; text-underline-offset: 5px; font-size: 14px; }
+    @media (max-width: 480px) { main { padding-top: 28px; } .choices { grid-template-columns: 1fr; } .support-link { flex-direction: row; justify-content: space-between; min-height: 72px; padding: 14px 20px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="brand" href="/">HibiLingo</a>
+    <section class="panel" aria-labelledby="support-title">
+      <p class="eyebrow">日々の学びが、静かに続いていくように。</p>
+      <h1 id="support-title">HibiLingoを支援する</h1>
+      <p>台湾の日常に耳をすます、小さな学びの時間。<br>HibiLingoを気に入っていただけたら、運営・改善を支えていただけるとうれしいです。</p>
+      <p>支援は任意です。無理のない金額をお選びください。</p>
+      <nav class="choices" aria-label="一回払いの支援金額">
+        <a class="support-link" href="https://buy.stripe.com/eVqdRaeyv28o4jTbm52ZO00" aria-label="300円で支援する（Stripeの決済ページへ）"><span class="amount">300円</span><span class="action">支援する →</span></a>
+        <a class="support-link" href="https://buy.stripe.com/cNi6oIcqn5kAeYx61L2ZO01" aria-label="500円で支援する（Stripeの決済ページへ）"><span class="amount">500円</span><span class="action">支援する →</span></a>
+        <a class="support-link" href="https://buy.stripe.com/9B69AUeyvcN2cQpfCl2ZO02" aria-label="1,000円で支援する（Stripeの決済ページへ）"><span class="amount">1,000円</span><span class="action">支援する →</span></a>
+      </nav>
+      <p class="note">いずれも一回払いです。定期的な請求はありません。<br>ボタンを押すと、Stripeの決済ページへ移動します。</p>
+      <p class="thanks">ご支援は、HibiLingoの運営・改善に大切に活用させていただきます。いつも学びの時間を共にしてくださり、ありがとうございます。</p>
+    </section>
+    <a class="back" href="/">← HibiLingoに戻る</a>
+  </main>
+</body>
+</html>
