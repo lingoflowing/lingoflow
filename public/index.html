@@ -34,6 +34,28 @@ body.is-booting .app{
 </style>
 
 <link rel="stylesheet" href="css/style.css?v=phase130-hibilingo-20260629">
+
+<style>
+.card { position: relative; }
+.support-nav {
+  position: absolute;
+  right: 8px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  min-height: 44px;
+  padding: 8px;
+  color: #5f5144;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  border-radius: 12px;
+}
+.support-nav:hover { background: #eee7dc; }
+.support-nav:focus-visible { outline: 2px solid #8a6b44; outline-offset: -2px; }
+</style>
 </head>
 
 <body class="is-booting">
@@ -84,6 +106,7 @@ body.is-booting .app{
 
     </button>
 
+    <a class="support-nav" href="/support">支援する</a>
   </section>
 </main>
 
